@@ -52,6 +52,46 @@ const blogPosts = [
     date: "January 8, 2026",
     readTime: "6 min read",
   },
+  {
+    slug: "roblox-lua-scripting-tips",
+    title: "10 Lua Scripting Tips Every Roblox Developer Should Know",
+    excerpt: "Level up your Roblox game development with these practical Lua scripting tips. From optimizing performance with task.wait() to mastering RemoteEvents for multiplayer, these techniques will make your code cleaner and your games faster.",
+    category: "Development",
+    date: "February 5, 2026",
+    readTime: "11 min read",
+  },
+  {
+    slug: "roblox-avatar-customization-guide",
+    title: "Ultimate Roblox Avatar Customization Guide 2026",
+    excerpt: "Express yourself on Roblox with the complete avatar customization guide. Learn about layered clothing, UGC items, animation packs, body morphs, and how to create a unique look without spending a fortune on Robux.",
+    category: "Guides",
+    date: "February 10, 2026",
+    readTime: "9 min read",
+  },
+  {
+    slug: "roblox-group-management",
+    title: "How to Build and Manage a Successful Roblox Group",
+    excerpt: "Running a Roblox group takes more than just creating one. This guide covers recruiting members, setting up ranks and permissions, managing group funds, creating group games, and building an active community that lasts.",
+    category: "Community",
+    date: "February 15, 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "roblox-game-monetization",
+    title: "Roblox Game Monetization: How Developers Actually Earn Money",
+    excerpt: "A realistic breakdown of how Roblox developers earn revenue through game passes, developer products, Premium Payouts, and the Developer Exchange program. Includes real strategies for pricing and retention.",
+    category: "Development",
+    date: "February 20, 2026",
+    readTime: "13 min read",
+  },
+  {
+    slug: "roblox-parental-controls-safety",
+    title: "Roblox Parental Controls & Safety: A Parent's Complete Guide",
+    excerpt: "Everything parents need to know about keeping children safe on Roblox. Covers account restrictions, chat filters, spending limits, privacy settings, and how to have productive conversations about online safety.",
+    category: "Safety",
+    date: "February 25, 2026",
+    readTime: "8 min read",
+  },
 ];
 
 export default function Blog() {
