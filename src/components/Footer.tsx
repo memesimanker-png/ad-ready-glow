@@ -11,7 +11,7 @@ export function Footer() {
               <span className="font-heading font-bold text-lg">ComboWick</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your trusted marketplace for premium Roblox accounts, game keys, and authentic Jamaican natural oils. Serving customers worldwide since 2024 with instant delivery and verified products.
+              Your marketplace for premium Roblox accounts, game keys, and authentic Jamaican natural oils. Instant delivery, verified products, and secure PayPal payments.
             </p>
           </div>
 

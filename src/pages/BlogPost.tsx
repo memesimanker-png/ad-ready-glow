@@ -531,9 +531,18 @@ export default function BlogPost() {
               <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {post.date}</span>
               <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {post.readTime}</span>
             </div>
-            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
               {post.title}
             </h1>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground border-t border-border/50 pt-4">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-xs font-bold text-primary">CW</span>
+              </div>
+              <div>
+                <p className="text-foreground font-medium text-sm">ComboWick Team</p>
+                <p className="text-xs text-muted-foreground">Roblox enthusiasts & developers sharing what we know</p>
+              </div>
+            </div>
           </div>
 
           <div className="prose-content">
