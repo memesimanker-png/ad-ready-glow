@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, AlertTriangle, CheckCircle2, Key, TrendingUp, Gamepad2, Code, CreditCard, Users, Settings, DollarSign, ShieldCheck, Layers } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, AlertTriangle, CheckCircle2, Key, TrendingUp, Gamepad2, Code, CreditCard, Users, Settings, DollarSign, ShieldCheck, Layers, Monitor, Coins, Flag, Gift } from "lucide-react";
 
 const posts: Record<string, { title: string; category: string; date: string; readTime: string; content: React.ReactNode }> = {
   "roblox-account-security-guide": {
@@ -851,6 +851,276 @@ end)`}
             <li>✓ Regular check-ins about online experiences</li>
             <li>✓ Device placed in a common area of the home</li>
           </ul>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-device-compatibility-performance": {
+    title: "Roblox Device Compatibility & Performance Optimization Guide",
+    category: "Technical",
+    date: "March 2, 2026",
+    readTime: "9 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox runs on an impressive range of devices — from high-end gaming PCs to budget smartphones. But the experience varies dramatically depending on your hardware and settings. This guide covers how to get the smoothest, best-looking Roblox experience on every platform, whether you're dealing with lag, low FPS, or crashes.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Monitor className="h-7 w-7 text-primary" />
+          PC & Mac Optimization
+        </h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          PC and Mac offer the most control over your Roblox experience. The Roblox client automatically detects your hardware and sets graphics quality, but the auto-detection isn't always optimal. To manually adjust settings, press Escape during a game and navigate to Settings. The Graphics Quality slider ranges from 1 (lowest) to 10 (highest). If you're getting below 30 FPS, lower this slider until performance stabilizes. The sweet spot for most mid-range PCs is between 5-7.
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">Recommended PC Specs for Smooth Gameplay:</h3>
+          <ul className="space-y-2 text-muted-foreground text-sm">
+            <li>• <strong>Minimum:</strong> Dual-core CPU, 4 GB RAM, integrated graphics (Intel HD 4000+), Windows 10</li>
+            <li>• <strong>Recommended:</strong> Quad-core CPU, 8 GB RAM, dedicated GPU (GTX 1050 or equivalent), SSD storage</li>
+            <li>• <strong>High-end:</strong> Modern 6+ core CPU, 16 GB RAM, GTX 1660 or better — runs graphics level 10 at 60+ FPS in most games</li>
+            <li>• <strong>Mac:</strong> M1 or later Apple Silicon runs Roblox excellently; Intel Macs with dedicated GPU work well; integrated Intel graphics on older Macs may struggle</li>
+          </ul>
+        </Card>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          Additional PC tips: Close background applications (especially browsers with many tabs) to free up RAM. Make sure your GPU drivers are up to date — outdated drivers are the number one cause of graphical glitches and crashes. If you're on a laptop, plug it in while playing; most laptops throttle performance on battery. Disable Windows Game Mode if you're experiencing stuttering, as it can conflict with Roblox's rendering. Using an Ethernet cable instead of WiFi provides more stable network performance, reducing rubber-banding and teleporting in multiplayer games.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Mobile Optimization (iOS & Android)</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox on mobile has improved dramatically but still requires optimization on older devices. The biggest performance killer on mobile is thermal throttling — when your phone gets hot, it automatically reduces CPU and GPU speed to prevent damage, causing massive frame drops. To combat this: remove your phone case while playing long sessions, avoid playing while charging (generates extra heat), and lower the graphics quality in Settings. Close all other apps before launching Roblox. If you're on Android, clearing the Roblox app cache periodically (Settings → Apps → Roblox → Clear Cache) can resolve crashes and loading issues. On iOS, make sure your device is running the latest version of iOS, as Roblox updates often require the newest OS features.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Xbox & Console</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox on Xbox One and Xbox Series X|S provides a controller-optimized experience. The Series X|S delivers significantly better performance than the original Xbox One — faster loading times, smoother frame rates, and better draw distances. If you're on the original Xbox One and experiencing lag, reduce your graphics quality and avoid games with extremely high player counts. Make sure your Xbox is set to "Instant On" power mode for faster loading, and consider using a wired Ethernet connection instead of WiFi for more stable online performance. Note that not all Roblox games support controllers perfectly — games designed primarily for PC may have limited controller compatibility.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Network Performance Tips</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Many Roblox performance issues are actually network problems, not hardware problems. Lag, teleporting, desync, and "connection lost" errors are typically caused by high latency or packet loss. Test your internet speed at speedtest.net — Roblox requires very little bandwidth (1-2 Mbps is sufficient) but is very sensitive to latency (ping). Aim for under 100ms ping to Roblox servers. If you're on WiFi, move closer to your router, use 5GHz band instead of 2.4GHz if available, and avoid playing during peak household internet usage. If others in your home are streaming video or downloading large files, this can cause lag spikes in Roblox. A Quality of Service (QoS) setting on your router can prioritize gaming traffic over other types.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Troubleshooting Common Issues</h2>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Game won't load / infinite loading screen:</strong> Clear browser cache (web version), reinstall the Roblox app, or check if the game's servers are full</li>
+            <li>• <strong>Constant crashes:</strong> Update GPU drivers, lower graphics quality, check available storage space (need at least 1 GB free)</li>
+            <li>• <strong>Rubber-banding / teleporting:</strong> Network issue — switch from WiFi to Ethernet, restart router, or try a different server</li>
+            <li>• <strong>Audio glitches:</strong> Update audio drivers on PC; on mobile, toggle Bluetooth off/on or restart the app</li>
+            <li>• <strong>Can't join friends:</strong> Check privacy settings, ensure you're not blocked, verify the game allows joining from profiles</li>
+          </ul>
+        </Card>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Quick Performance Checklist</h3>
+          <ul className="space-y-1 text-muted-foreground text-sm">
+            <li>✓ Graphics quality set appropriately for your device</li>
+            <li>✓ Background apps closed</li>
+            <li>✓ GPU drivers updated (PC/Mac)</li>
+            <li>✓ Using wired internet connection if possible</li>
+            <li>✓ Device not overheating</li>
+            <li>✓ Sufficient free storage space</li>
+            <li>✓ Latest Roblox version installed</li>
+          </ul>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-economy-robux-explained": {
+    title: "How the Roblox Economy Works: Robux, Trading & DevEx Explained",
+    category: "Analysis",
+    date: "March 8, 2026",
+    readTime: "12 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox operates one of the most complex virtual economies in gaming. With millions of daily transactions, a developer payment program, and a thriving trading market, understanding how money flows through Roblox is fascinating — whether you're a player, parent, or developer. This article breaks down every aspect of the Roblox economy in plain language.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Coins className="h-7 w-7 text-primary" />
+          What Is Robux?
+        </h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Robux is Roblox's virtual currency. It's used to buy avatar items, game passes, in-game items, and access premium experiences. Players obtain Robux by purchasing it directly ($0.99 for 80 Robux up to $199.99 for 22,500 Robux), receiving the monthly Roblox Premium stipend, selling items they've created, or earning it through game development. Importantly, Robux is not a cryptocurrency — it's a centrally controlled virtual currency issued and managed entirely by Roblox Corporation. Its value is set by Roblox, not by a market, and it cannot be traded on external exchanges.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">The Marketplace: How Items Get Their Value</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          The Roblox Avatar Shop (formerly Catalog) is where most Robux spending happens. Items are sold by both Roblox and UGC (User Generated Content) creators. When a UGC creator sells an item, Roblox takes a 30% commission, and the creator keeps 70%. For Limited items — items Roblox no longer sells directly — value is determined by supply and demand on the secondary trading market. A Limited item's price depends on how many copies exist, how popular it is, and broader market trends. The RAP (Recent Average Price) metric tracks the average of recent sales, but actual trading values can deviate significantly from RAP based on current demand and speculation.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">How Developers Earn Real Money</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          The Developer Exchange (DevEx) program is how Roblox developers convert virtual Robux into real-world currency. The current rate is approximately 100,000 earned Robux = $350 USD. "Earned Robux" means Robux received from game pass sales, developer product purchases, and Premium Payouts — not Robux you purchased yourself. Here's how money typically flows for a Roblox developer:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">The Money Flow:</h3>
+          <ol className="space-y-2 text-muted-foreground text-sm">
+            <li>1. <strong>Player buys Robux</strong> → Roblox Corporation receives real money</li>
+            <li>2. <strong>Player spends Robux in a game</strong> → Developer earns Robux (minus 30% Roblox commission)</li>
+            <li>3. <strong>Developer requests DevEx cash-out</strong> → Roblox converts Robux to USD at ~$0.0035 per Robux</li>
+            <li>4. <strong>Developer receives payment</strong> → Via PayPal, direct deposit, or wire transfer (2-4 week processing)</li>
+          </ol>
+          <p className="text-muted-foreground text-xs mt-3">
+            Note: Between the player's initial purchase and the developer's cash-out, Roblox effectively takes about 75% of the original dollar value. This is a common criticism of the platform's economics.
+          </p>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Premium Payouts: The Engagement Economy</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Beyond direct purchases, Roblox rewards developers through Premium Payouts — a share of subscription revenue distributed based on how much time Roblox Premium members spend in each game. This creates an "attention economy" where developers are incentivized to build games that keep players engaged for long periods. The exact payout formula isn't public, but it's proportional: if your game captures 0.1% of all Premium member playtime, you receive approximately 0.1% of the Premium Payout pool. This system rewards games with high retention rates and daily active users, not just games with aggressive monetization.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">The Trading Market</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox's trading system allows Premium members to exchange Limited items directly. The trading market has its own dynamics: "projected" items are those the community expects to rise in value; "demand" items are consistently sought-after regardless of RAP; and "stable" items maintain consistent value over time. Experienced traders track price history, monitor community sentiment on trading forums and Discord servers, and diversify their portfolio across different item categories. The trading market can be volatile — new item releases, events, and platform changes can cause sudden price swings. Always research thoroughly before making high-value trades, and never trade based solely on another person's recommendation.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Economic Challenges & Criticism</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox's economy isn't without controversy. The 75% effective take rate from developers (compared to ~30% on platforms like Steam) has been widely criticized. Some argue this makes it difficult for smaller developers to earn a sustainable income. Additionally, the use of virtual currency can obscure real-money costs from young players — spending 800 Robux feels different from spending $10, even though they're equivalent. Roblox has made incremental improvements to developer payouts and added more transparency to pricing, but these remain active discussions in the developer community. Understanding these dynamics is important for anyone — player, parent, or developer — participating in the Roblox ecosystem.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Key Takeaway</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            The Roblox economy is a real economic system with real money flowing through it. Whether you're a player spending Robux, a developer earning through DevEx, or a parent managing a child's spending, understanding how value is created, transferred, and extracted on the platform helps you make better decisions. Always treat Robux as real money — because behind every virtual transaction, there are real dollars involved.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-reporting-moderation-guide": {
+    title: "How Roblox Moderation Works: Reporting, Bans & Appeals",
+    category: "Safety",
+    date: "March 12, 2026",
+    readTime: "8 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox's moderation system processes millions of reports daily using a combination of automated AI detection and human review. Understanding how this system works helps you use it effectively — whether you're reporting bad behavior, protecting your own account from false reports, or navigating the appeals process after a ban.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Flag className="h-7 w-7 text-primary" />
+          How to Report Effectively
+        </h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox provides reporting tools in every game and on every profile. To report a player in-game, click the Roblox menu (Escape key or hamburger icon), select the "Report" tab, choose the player from the list, select the violation category, and provide a clear, specific description. The quality of your report significantly affects how quickly it's processed. Vague reports like "this person is being mean" are harder to act on than specific reports like "this player is using racial slurs in chat and threatening other players."
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">Tips for Effective Reports:</h3>
+          <ul className="space-y-2 text-muted-foreground text-sm">
+            <li>• <strong>Be specific:</strong> Describe exactly what happened, when, and what was said or done</li>
+            <li>• <strong>Choose the right category:</strong> Harassment, exploiting/cheating, inappropriate content, scamming — pick the one that matches best</li>
+            <li>• <strong>Report promptly:</strong> Reports filed soon after the incident are more useful because Roblox can review chat logs and game data from that session</li>
+            <li>• <strong>Don't spam reports:</strong> Filing multiple reports about the same incident doesn't speed up processing — one well-written report is more effective</li>
+            <li>• <strong>Take screenshots:</strong> While Roblox has its own logs, having your own screenshots helps if you need to escalate</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Understanding Moderation Actions</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          When Roblox confirms a violation, the consequences vary based on severity and repeat offenses:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Warning:</strong> A notification on your account for minor first-time violations. No restriction on gameplay, but it's on your permanent record.</li>
+            <li>• <strong>1-Day Ban:</strong> Temporary suspension for 24 hours. Common for first-time moderate violations like inappropriate language.</li>
+            <li>• <strong>3-Day Ban:</strong> Extended suspension for repeated violations or more serious offenses.</li>
+            <li>• <strong>7-Day Ban:</strong> Week-long suspension indicating a pattern of rule-breaking behavior.</li>
+            <li>• <strong>14-Day Ban:</strong> Two-week suspension, often the last step before permanent action.</li>
+            <li>• <strong>Account Deletion (Permanent Ban):</strong> Reserved for severe violations — real-life threats, CSAM, major exploitation, or persistent repeat offenders. The account is permanently inaccessible.</li>
+            <li>• <strong>IP Ban:</strong> In extreme cases, Roblox blocks the IP address entirely, preventing new account creation. This is rare and typically reserved for the most serious offenses.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">The Automated Moderation System</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox uses AI-powered systems to detect violations in real-time. The chat filter automatically blocks profanity, personal information, and external links. Image detection AI scans uploaded images and decals for inappropriate content. Audio moderation reviews uploaded sounds. And behavioral analysis can flag accounts engaging in suspicious patterns (like mass-following or repetitive messaging). These automated systems handle the vast majority of moderation — human reviewers focus on complex cases, appeals, and situations the AI flags as uncertain. Because the system is automated, false positives do happen — sometimes innocent messages get filtered or accounts get flagged incorrectly, which is why the appeals process exists.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">How to Appeal a Ban</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          If you believe your account was banned unfairly, you can submit an appeal through the Roblox Support page (en.help.roblox.com). Select "Moderation" as the help category, provide your username, and explain clearly why you believe the ban was incorrect. Be honest and specific — if you did violate a rule accidentally, acknowledge it and explain the context. Appeals are reviewed by human moderators, and processing typically takes 1-5 business days. If your first appeal is denied, you can submit one follow-up appeal with additional context or evidence. The success of appeals varies, but accounts banned due to genuine misunderstandings or false positives are frequently restored. Permanently deleted accounts are much harder to recover but not impossible in cases of clear error.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Keeping Your Account Safe</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Prevention is better than appeals. Follow Roblox's Community Standards: don't share personal information, avoid offensive language (even if "joking"), don't exploit or use third-party cheat software, and respect other players. Be especially careful in group chats and Discord-linked communities where moderation is lighter. If someone is trying to provoke you into breaking rules (a common tactic to get you banned so a scammer can take your items), don't engage — just report and leave. Remember that everything you say in Roblox chat is logged and can be reviewed during a moderation investigation.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Summary</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Roblox's moderation system is imperfect but continuously improving. Report rule-breakers with specific, detailed reports. If you're banned and believe it's a mistake, appeal calmly and factually through official channels. And ultimately, the best way to avoid moderation issues is to follow the Community Standards and treat other players with respect.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-events-seasonal-guide": {
+    title: "Roblox Events & Seasonal Content: How to Never Miss Free Rewards",
+    category: "Guides",
+    date: "March 18, 2026",
+    readTime: "7 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox runs events throughout the year — from massive platform-wide celebrations to brand partnerships and community challenges. Each event typically offers free avatar items, exclusive badges, and limited-time game modes. If you know where to look and how to participate, you can build an impressive collection without spending a single Robux. This guide covers everything you need to know about Roblox events.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Gift className="h-7 w-7 text-primary" />
+          Types of Roblox Events
+        </h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox events come in several forms, each with different scales and reward structures:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Platform Events (Roblox-Hosted):</strong> Major events organized by Roblox Corporation themselves. These include seasonal celebrations (Halloween, Winter Holiday, Easter), the annual Bloxy Awards, and milestone celebrations. They typically offer the most rewards and span multiple games.</li>
+            <li>• <strong>Brand Partnerships:</strong> Collaborations between Roblox and major brands — Nike, Gucci, Spotify, movie studios, musicians, and more. These create limited-time virtual experiences and exclusive branded items. The items are usually free and become highly collectible because they're never re-released.</li>
+            <li>• <strong>Creator Events:</strong> Events hosted by popular game developers within their own games. These are smaller in scale but often offer unique items only available in that specific game. Follow your favorite games on social media to stay informed.</li>
+            <li>• <strong>Community Challenges:</strong> Platform-wide goals where the entire Roblox community works together toward a shared objective (e.g., "players collectively visit 1 billion game sessions"). Completion unlocks free items for all participants.</li>
+            <li>• <strong>Promo Code Drops:</strong> Roblox and its partners periodically release promotional codes that can be redeemed for free items at roblox.com/promocodes. These are shared through official Roblox social media, partner websites, and sometimes hidden in videos or livestreams.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">How to Find Events</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Missing events is easy if you're not actively looking. The best sources for event information are: the Roblox Events page (accessible from the Roblox home screen), the official @Roblox Twitter/X account, the Roblox YouTube channel, and community news accounts like @RBXNews and Bloxy News. Many Roblox YouTubers and content creators also cover events extensively, providing walkthroughs and item previews. For brand partnership events, they're often announced simultaneously on both the brand's and Roblox's social media channels. Set up notifications for @Roblox on your preferred social media platform to catch announcements as soon as they drop.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Maximizing Event Rewards</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Most event items require completing specific challenges — collecting hidden objects, finishing obstacle courses, defeating bosses, or spending a certain amount of time in an event space. Some tips for efficiently claiming all rewards: check YouTube for walkthrough videos before starting (this saves time wandering around looking for hidden items), complete time-gated challenges early (some events require daily logins over multiple days), and prioritize limited-quantity items first since they can sell out. If an event spans multiple games, make a list of which items come from which game and work through them systematically. Join event-specific Discord servers or Reddit threads where other players share locations of hidden items and shortcuts.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Seasonal Calendar: What to Expect</h2>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>January-February:</strong> New Year celebrations, occasional Valentine's Day items, Bloxy Awards nominations begin</li>
+            <li>• <strong>March-April:</strong> Spring events, Easter egg hunts (historically one of Roblox's biggest annual events with dozens of free items)</li>
+            <li>• <strong>May-June:</strong> Summer kickoff events, brand partnerships often increase during summer break</li>
+            <li>• <strong>July-August:</strong> Summer events continue, back-to-school promotions begin in late August</li>
+            <li>• <strong>September-October:</strong> Halloween preparations start early September, Roblox's Halloween event is typically massive with multiple games and dozens of free items</li>
+            <li>• <strong>November-December:</strong> Black Friday/Cyber Monday sales on Robux, Winter Holiday event (another major event with extensive free items), New Year countdown events</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Building Your Collection</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Event items are valuable precisely because they're limited-time. Items from past events become increasingly sought-after as time passes because new players can never obtain them. This makes consistent event participation a form of investment — even if you don't want an item now, future you (or future traders) might value it highly. Keep an organized inventory and note which items came from which events. Some veteran players have collections worth thousands of Robux in event items they obtained for free simply by participating consistently over the years.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Stay Connected</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            The key to never missing Roblox events is staying connected to official channels. Follow @Roblox on social media, turn on notifications, and check the Events page on the Roblox home screen regularly. Events are one of the best parts of the Roblox experience — they bring the community together, offer free rewards, and create memories that last long after the event ends.
+          </p>
         </Card>
       </>
     ),
