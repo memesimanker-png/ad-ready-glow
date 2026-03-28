@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
-  Shield, Zap, Check, Users, Lock, HeadphonesIcon,
-  ChevronDown, ChevronUp, Star, Clock, Download, Eye
+  Shield, Zap, Check, Lock, HeadphonesIcon,
+  ChevronDown, ChevronUp, Clock, Download, Eye
 } from "lucide-react";
 import { useState } from "react";
 
