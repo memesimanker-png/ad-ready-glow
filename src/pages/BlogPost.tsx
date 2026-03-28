@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, AlertTriangle, CheckCircle2, Key, TrendingUp, Gamepad2, Code, CreditCard } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, AlertTriangle, CheckCircle2, Key, TrendingUp, Gamepad2, Code, CreditCard, Users, Settings, DollarSign, ShieldCheck, Layers } from "lucide-react";
 
 const posts: Record<string, { title: string; category: string; date: string; readTime: string; content: React.ReactNode }> = {
   "roblox-account-security-guide": {
@@ -492,6 +492,365 @@ end)`}
           <p className="text-muted-foreground text-sm leading-relaxed">
             If you're a developer evaluating Premium benefits across different account types, ComboWick provides verified Roblox accounts for testing purposes. Having multiple accounts lets you test Premium vs. non-Premium experiences in your games without managing individual subscriptions.
           </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-lua-scripting-tips": {
+    title: "10 Lua Scripting Tips Every Roblox Developer Should Know",
+    category: "Development",
+    date: "February 5, 2026",
+    readTime: "11 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Whether you're just starting with Roblox Studio or you've published a few games already, writing better Lua (Luau) code will make your games faster, more reliable, and easier to maintain. These 10 tips come from real development experience and will help you avoid common pitfalls that trip up many Roblox developers.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Code className="h-7 w-7 text-primary" />
+          1. Use task.wait() Instead of wait()
+        </h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          The old <code className="bg-muted px-1.5 py-0.5 rounded text-sm">wait()</code> function is deprecated and unreliable — it often waits longer than the time you specify because it yields to the legacy scheduler. Replace it with <code className="bg-muted px-1.5 py-0.5 rounded text-sm">task.wait()</code>, which uses the modern task scheduler and provides more accurate timing. Similarly, use <code className="bg-muted px-1.5 py-0.5 rounded text-sm">task.spawn()</code> instead of <code className="bg-muted px-1.5 py-0.5 rounded text-sm">spawn()</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">task.delay()</code> instead of <code className="bg-muted px-1.5 py-0.5 rounded text-sm">delay()</code>. The task library is the official replacement and is better optimized for Roblox's engine.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">2. Cache Frequently Accessed Services</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Every time you call <code className="bg-muted px-1.5 py-0.5 rounded text-sm">game:GetService("Players")</code>, the engine has to look up that service. If you're calling it inside a loop or a frequently-fired event, this adds up. Instead, cache services as local variables at the top of your script: <code className="bg-muted px-1.5 py-0.5 rounded text-sm">local Players = game:GetService("Players")</code>. Local variable access in Luau is significantly faster than global lookups or repeated service calls. This is especially impactful in scripts that run every frame via RunService.Heartbeat.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">3. Understand Client vs. Server Architecture</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          One of the most important concepts in Roblox development is the client-server model. Scripts in ServerScriptService run on the server and have authority over game state. LocalScripts run on each player's device and handle UI, camera, and input. Communication between them happens through RemoteEvents (fire-and-forget) and RemoteFunctions (request-response).
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">The Golden Rule:</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Never trust the client. Any data sent from a LocalScript via a RemoteEvent could be manipulated by exploiters. Always validate inputs on the server. For example, if a player fires a RemoteEvent to purchase an item, the server script should independently verify that the player has enough currency — don't rely on the client telling you the price.
+          </p>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">4. Use Tables Efficiently</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Tables are the fundamental data structure in Lua, but using them poorly can tank performance. When you need to check if a value exists in a collection, use a dictionary (key-value table) instead of an array. Searching an array with <code className="bg-muted px-1.5 py-0.5 rounded text-sm">table.find()</code> checks every element one by one (O(n) time). A dictionary lookup like <code className="bg-muted px-1.5 py-0.5 rounded text-sm">myTable[value]</code> is nearly instant (O(1) time). This matters a lot when you're checking permissions, inventories, or any frequently-queried data.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">5. Debounce Your Events</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Touch events, click detectors, and proximity prompts can fire multiple times in rapid succession. Without debouncing, a player touching a reward part could collect the reward dozens of times in a single second. Always implement a debounce pattern:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <pre className="bg-background/80 p-4 rounded-lg text-sm overflow-x-auto text-muted-foreground">
+{`local debounce = {}
+
+part.Touched:Connect(function(hit)
+    local player = game.Players:GetPlayerFromCharacter(hit.Parent)
+    if not player then return end
+    if debounce[player.UserId] then return end
+    
+    debounce[player.UserId] = true
+    -- Give reward here
+    task.delay(2, function()
+        debounce[player.UserId] = nil
+    end)
+end)`}
+          </pre>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">6. Use ProfileService or DataStore2 for Player Data</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox's built-in DataStoreService works, but it's low-level and prone to data loss if not handled carefully. Community libraries like ProfileService handle session locking (preventing data duplication when a player is in multiple servers), automatic retries on failures, and safe data saving on player leave. The initial setup takes more time, but it prevents the nightmare scenario of players losing their progress — which leads to negative reviews and player churn.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">7. Optimize with Object Pooling</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Creating and destroying instances (parts, effects, projectiles) is expensive. If your game spawns many objects frequently — like bullets, particles, or NPCs — use object pooling. Instead of creating new instances each time, keep a pool of pre-created objects. When you need one, grab it from the pool and move it into position. When it's done, return it to the pool instead of destroying it. This dramatically reduces garbage collection stutters and improves frame rates in action-heavy games.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">8. Use Type Checking with Luau</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Luau supports optional type annotations that catch bugs before your game even runs. Adding types like <code className="bg-muted px-1.5 py-0.5 rounded text-sm">local health: number = 100</code> or <code className="bg-muted px-1.5 py-0.5 rounded text-sm">function damage(target: Model, amount: number): boolean</code> helps the Studio script editor catch errors as you type. Enable strict mode at the top of your scripts with <code className="bg-muted px-1.5 py-0.5 rounded text-sm">--!strict</code> for maximum type safety. This is especially valuable in larger projects where tracking variable types across multiple scripts becomes challenging.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">9. Use CollectionService for Tagging</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Instead of putting the same script in dozens of similar objects, use CollectionService to tag objects and handle them with a single script. Tag all your "Lava" parts with the "Lava" tag in Studio, then write one script that loops through all tagged parts and applies damage on touch. When you need to change the damage amount, you update one script instead of fifty. This pattern is cleaner, more performant, and much easier to maintain as your game grows.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">10. Test with Multiple Accounts</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Studio's built-in local server test mode is useful, but it doesn't perfectly replicate live server conditions. Network latency, real DataStore calls, and actual player interactions behave differently on published servers. Testing with real accounts on a live private server catches bugs that local testing misses. Keep dedicated test accounts for different scenarios: a fresh account for first-time user experience, a high-level account for endgame testing, and multiple accounts for multiplayer stress testing.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Keep Learning</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Roblox development is constantly evolving. Follow the official Roblox Developer Forum (devforum.roblox.com) for announcements, join developer Discord communities, and study the source code of open-source Roblox games. The best developers never stop learning, and every game you build makes you better at building the next one.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-avatar-customization-guide": {
+    title: "Ultimate Roblox Avatar Customization Guide 2026",
+    category: "Guides",
+    date: "February 10, 2026",
+    readTime: "9 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Your Roblox avatar is your digital identity — it's the first thing other players see and a major part of the Roblox experience. With the platform's evolving avatar system, there are now more ways than ever to express yourself. This guide covers everything from free customization tricks to advanced styling with UGC items and layered clothing.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Layers className="h-7 w-7 text-primary" />
+          Understanding Avatar Types
+        </h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox offers two main avatar types: <strong>R6</strong> and <strong>R15</strong>. R6 is the classic blocky avatar with 6 body parts and limited animation capability — it's nostalgic and still used in many older games. R15 is the modern standard with 15 body parts, allowing for much smoother animations, facial expressions, and detailed body proportions. Most new games support R15, and it's required for layered clothing. You can switch between them in your avatar editor settings, though some games override your choice.
+        </p>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          In 2026, Roblox has also expanded support for <strong>dynamic heads</strong> with facial animations. These heads can show expressions in real-time — smiling, frowning, talking — adding a new layer of communication in social games. You can select from a variety of dynamic heads in the avatar shop and they work automatically in supported games.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Layered Clothing Explained</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Layered clothing is Roblox's advanced clothing system that drapes realistically over any avatar body shape. Unlike classic 2D clothing (t-shirts, shirts, pants) that are flat textures wrapped around your character, layered clothing items are 3D meshes that adapt to your avatar's proportions. A jacket will actually look like a jacket, a hoodie will have a visible hood, and accessories like scarves and belts sit naturally on your character. You can layer multiple items — wear a t-shirt under an open jacket, add a scarf, and pair it with fitted pants. The system figures out how to display everything together without clipping issues. Layered clothing items are available from both Roblox and UGC (User Generated Content) creators in the Avatar Shop.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">UGC Items: The Community Marketplace</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          UGC (User Generated Content) has revolutionized Roblox avatar fashion. Thousands of community creators design and sell accessories, hats, hair, wings, tails, and clothing items in the Avatar Shop. UGC items range from free to hundreds of Robux, and the quality of top UGC creators rivals or exceeds Roblox's own catalog items. Some tips for shopping UGC: check the creator's profile and other items to gauge quality consistency, read the reviews and ratings, and look at how the item appears on different body types. Some popular UGC categories include anime-inspired hair styles, fantasy wings and horns, streetwear accessories, and themed costume sets for holidays and events.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Free Customization Tips</h2>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Event items:</strong> Roblox frequently gives away free items during events, brand partnerships, and seasonal celebrations. Follow @Roblox on social media and check the event page regularly to claim limited-time free accessories.</li>
+            <li>• <strong>Promo codes:</strong> Roblox occasionally releases promotional codes that unlock free items. These are shared through official channels and partner websites — never trust unofficial "code generator" sites.</li>
+            <li>• <strong>Classic clothing:</strong> Thousands of free t-shirts, shirts, and pants are available in the catalog. Search for specific styles and sort by "Free" to build outfits without spending Robux.</li>
+            <li>• <strong>Body colors:</strong> Customizing your avatar's body and head colors is completely free and can dramatically change your look, especially when paired with minimal clothing for a stylized aesthetic.</li>
+            <li>• <strong>Default animations:</strong> Your walk, run, jump, and idle animations all affect how your avatar feels in-game. Some free animation packs are available through events and promotions.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Animation Packs & Emotes</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Animation packs change how your avatar moves — walking style, jump animation, idle stance, swim stroke, and climbing motion. Each pack gives your character a distinct personality: the Superhero pack makes you run like a comic book character, while the Zombie pack gives you a shambling walk. Emotes let you perform specific actions on command — dances, gestures, poses — and are a major part of social interaction in Roblox. Equip emotes from your inventory and trigger them in-game using the emote menu. Some games also have their own unique emote systems.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Building a Signature Look</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          The most memorable Roblox avatars aren't the ones wearing the most expensive items — they're the ones with a cohesive, intentional style. Pick a theme or color palette and build around it. Coordinate your hair, face, outfit, and accessories so they feel like they belong together. Save multiple outfit presets in your avatar editor for different moods or games. And remember: trends come and go, but a unique personal style stands out in any server. Don't just follow what's popular — experiment with combinations that express who you are.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Stay Updated</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Roblox continuously updates its avatar system with new features, body types, and customization options. Follow the Roblox blog and developer announcements to stay ahead of new releases. The avatar system in 2026 is far more expressive than ever before, and it will only keep getting better.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-group-management": {
+    title: "How to Build and Manage a Successful Roblox Group",
+    category: "Community",
+    date: "February 15, 2026",
+    readTime: "10 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox groups are the foundation of communities on the platform. Whether you want to run a game studio, manage a roleplay military, build a clothing brand, or create a fan community, understanding how to set up and grow a group is essential. This guide covers everything from creation to scaling a thriving community with hundreds or thousands of members.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <Users className="h-7 w-7 text-primary" />
+          Creating Your Group
+        </h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Creating a Roblox group costs 100 Robux. Before you spend that, plan your group's identity: choose a memorable name that clearly communicates what the group is about, design a professional-looking logo (you can use free tools like Canva), and write a description that tells potential members exactly what they'll gain by joining. First impressions matter — a group with a polished logo, clear description, and organized rank structure looks legitimate and attracts more members than one that looks thrown together.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Setting Up Ranks & Permissions</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Your rank structure determines who can do what within the group. Roblox allows up to 255 ranks, but most successful groups use 5-10 clearly defined tiers. Here's a proven structure:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Owner (Rank 255):</strong> Full control over the group. Only one person holds this rank. Be very careful with ownership transfers — they're irreversible.</li>
+            <li>• <strong>Admins (Rank 200-254):</strong> Trusted leaders who can manage members, approve join requests, post on the group wall, and configure group settings. Keep this circle small.</li>
+            <li>• <strong>Moderators (Rank 100-199):</strong> Help manage day-to-day community activity, remove inappropriate wall posts, and enforce group rules. These should be active, trustworthy members.</li>
+            <li>• <strong>Veterans/Elites (Rank 50-99):</strong> Long-term members who have earned recognition through activity or contributions. This creates an aspirational goal for regular members.</li>
+            <li>• <strong>Members (Rank 2-49):</strong> Standard members with basic permissions. You can create sub-tiers to reward participation — for example, "New Member," "Active Member," and "Trusted Member."</li>
+            <li>• <strong>Pending (Rank 1):</strong> The default rank for new joiners if you use manual approval. Use this to screen members before granting full access.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Growing Your Member Count</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          The hardest part of running a group is getting past the first 100 members. Start by inviting friends and classmates who play Roblox. Promote your group in your game's description, in-game UI, and social links. Create a group game — even a simple hangout space or showcase — because players can discover your group through your games. Post regularly on the group wall with updates, events, and shoutouts to active members. Cross-promote with other groups of similar size by hosting joint events. And most importantly: be patient. Organic growth is slow but sustainable. Avoid buying fake members or using follow-for-follow schemes — they provide zero engagement and can get your group flagged.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Managing Group Funds</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          If your group sells game passes, clothing, or has Premium Payouts enabled through a group game, Robux accumulates in the group fund. The owner can distribute group funds to members based on their contributions — paying developers for their work, rewarding moderators, or funding group purchases. Be transparent about how funds are distributed to maintain trust. Keep records of payouts and establish clear policies before money is involved to avoid conflicts. Note that Roblox takes a percentage of all transactions, so factor that into your budgeting.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Keeping the Community Active</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          An active group requires consistent effort from leadership. Host weekly or monthly events — game nights, building competitions, roleplay sessions, or trivia contests. Create a Discord server as a companion to your Roblox group for real-time communication (the Roblox group wall has limited functionality). Recognize member achievements publicly. Ask for member feedback on group decisions. Rotate moderator duties to prevent burnout. And address conflicts quickly and fairly — unresolved drama is the number one killer of online communities. The groups that last are the ones where members feel heard, valued, and connected to something bigger.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Common Pitfalls to Avoid</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Don't promote members to admin too quickly — trust is earned over time. Don't ignore your group for weeks then expect members to still be engaged. Don't copy another group's branding or identity. Don't use your group solely for self-promotion without offering value to members. And never share your account credentials with co-owners or admins — use Roblox's built-in permission system to delegate responsibilities safely.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-game-monetization": {
+    title: "Roblox Game Monetization: How Developers Actually Earn Money",
+    category: "Development",
+    date: "February 20, 2026",
+    readTime: "13 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox has paid out over $800 million to developers through the Developer Exchange (DevEx) program. But how do individual developers actually earn that money? This guide breaks down every monetization method available to Roblox game developers, with realistic expectations and practical strategies for maximizing revenue without alienating your player base.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <DollarSign className="h-7 w-7 text-primary" />
+          Game Passes: One-Time Purchases
+        </h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Game passes are one-time purchases that permanently unlock features, abilities, or perks in your game. They're the most straightforward monetization method and the one players are most comfortable with, because they pay once and keep the benefit forever. Successful game passes offer genuine value — things like doubled experience gain, exclusive areas, cosmetic items, or convenience features. The key is ensuring your game is fun without any passes; passes should enhance the experience, not gatekeep it. Roblox takes a 30% commission on game pass sales, so you receive 70% of each purchase. Price your passes thoughtfully: study what similar games charge and consider your audience's willingness to pay.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Developer Products: Repeatable Purchases</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Unlike game passes, developer products can be purchased multiple times. They're ideal for consumable items: in-game currency packs, extra lives, speed boosts, loot crates, or any resource that players use up and need to buy again. Developer products typically generate more total revenue than game passes because of repeat purchases, but they require more careful game design to avoid feeling exploitative. The best approach is offering developer products alongside free ways to earn the same items through gameplay. Players who value their time will pay; players who prefer grinding can still progress. This creates a fair system that doesn't feel "pay-to-win."
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Premium Payouts: Engagement-Based Revenue</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox Premium Payouts is a passive income stream that rewards developers based on how much time Roblox Premium subscribers spend in their games. You don't need to set up anything special — if Premium members play your game, you earn a share of Roblox's Premium subscription revenue proportional to the engagement time your game generates. This incentivizes creating games with high retention and replayability, not just initial visits.
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">Maximizing Premium Payouts:</h3>
+          <ul className="space-y-2 text-muted-foreground text-sm">
+            <li>• Create daily rewards, login streaks, and recurring events that bring players back</li>
+            <li>• Design progression systems that take weeks or months to complete</li>
+            <li>• Add social features that make players want to return with friends</li>
+            <li>• Regular content updates keep the game fresh and maintain engagement</li>
+            <li>• Seasonal events tied to holidays create natural return points</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Developer Exchange (DevEx)</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          DevEx is how you convert your earned Robux into real money. The current exchange rate is approximately $0.0035 per Robux (or 100,000 Robux = $350 USD), though Roblox adjusts this periodically. To qualify for DevEx, you need at least 30,000 earned Robux (not purchased), a verified email, be at least 13 years old, have a valid DevEx account, and comply with Roblox's Terms of Use. Payments are processed through Tipalti and can be received via PayPal, direct deposit, or wire transfer depending on your country. Processing takes 2-4 weeks after submitting a cash-out request.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Pricing Strategy & Psychology</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Pricing is where many developers leave money on the table. Research shows that offering 3-4 tiers of products works better than a single option — a cheap "starter" option, a mid-range "best value" option, and a premium "whale" option. The mid-range option typically generates the most revenue because it anchors between the other two. Avoid prices ending in round numbers; 249 Robux feels cheaper than 250 even though the difference is negligible. Run limited-time sales (genuinely limited — don't fake scarcity) to create urgency. And always A/B test your prices by trying different amounts for a few days and comparing revenue, not just sales volume.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Ethical Monetization</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox's audience skews young, which means ethical monetization isn't just good practice — it's a responsibility. Never use dark patterns like hiding close buttons on purchase prompts, creating artificial urgency with fake timers, or making the free path deliberately frustrating to push purchases. Be transparent about what players are buying. Make refund policies clear. And remember that your game's reputation depends on player trust — a game known for aggressive monetization will eventually lose its player base to competitors who treat players fairly. The most profitable Roblox games long-term are the ones where players feel good about their purchases.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Realistic Expectations</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Most Roblox games don't earn significant money. The developers earning substantial income typically have games with consistent player counts in the thousands, multiple well-designed monetization streams, and invest months or years in development and updates. Start by building the best game you can, focus on player retention, and add monetization thoughtfully. Revenue follows engagement — not the other way around.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  "roblox-parental-controls-safety": {
+    title: "Roblox Parental Controls & Safety: A Parent's Complete Guide",
+    category: "Safety",
+    date: "February 25, 2026",
+    readTime: "8 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Roblox is one of the most popular platforms for children and teens, with millions of young players worldwide. As a parent, understanding Roblox's safety features — and how to configure them properly — is essential for keeping your child safe while letting them enjoy the platform. This guide covers every parental control available and offers practical advice for ongoing online safety conversations.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4 flex items-center gap-3">
+          <ShieldCheck className="h-7 w-7 text-primary" />
+          Setting Up Account Restrictions
+        </h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox offers a comprehensive Account Restrictions mode that limits your child's experience to curated, age-appropriate content. When enabled, it restricts the games they can access to those pre-approved for younger audiences, disables free-form chat (replacing it with a pre-selected menu of safe phrases), and prevents the child from changing account settings.
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <h3 className="font-heading text-lg font-semibold mb-3">How to Enable Account Restrictions:</h3>
+          <ol className="space-y-2 text-muted-foreground text-sm">
+            <li>1. Log into your child's Roblox account</li>
+            <li>2. Go to Settings (gear icon in the top-right corner)</li>
+            <li>3. Click on "Privacy" in the left menu</li>
+            <li>4. Toggle "Account Restrictions" to ON</li>
+            <li>5. Set a 4-digit Account PIN to prevent your child from changing settings (Settings → Security → Account PIN)</li>
+            <li>6. Make sure the PIN is something your child won't guess — don't use their birthday</li>
+          </ol>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Age-Based Content Controls</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox uses age verification and content ratings to filter experiences by appropriateness. When creating an account, ensure the correct birth date is entered — this automatically applies age-appropriate filters. Children under 13 get stricter chat filters, cannot access games rated for older audiences, and see limited search results. Roblox's content rating system categorizes games as "All Ages," "9+," "13+," and "17+" — similar to movie ratings. You can further restrict which rating levels your child can access in the Privacy settings. If your child has entered an incorrect birth date, contact Roblox Support with identification to correct it — this cannot be changed through account settings for safety reasons.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Chat & Communication Settings</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Roblox offers granular control over who can communicate with your child. In Privacy settings, you can separately control who can message your child in-app, who can chat with them in games, and who can chat with them in the Roblox app. Options include "Everyone," "Friends," "No one," or "Following/Followers." For younger children, setting all chat options to "Friends" or "No one" significantly reduces exposure to strangers. Roblox also has an automated chat filter that blocks profanity, personal information (addresses, phone numbers), and other inappropriate content — but no filter is perfect, which is why layering it with communication restrictions provides better protection.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Spending Controls</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          Roblox purchases use Robux (the platform's virtual currency), which is bought with real money. Without controls, children can spend significant amounts on in-game items, game passes, and avatar accessories. Here's how to manage spending:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>Don't save payment methods:</strong> Remove credit/debit cards from the Roblox account so purchases require manual entry each time</li>
+            <li>• <strong>Use gift cards:</strong> Buy Roblox gift cards with a fixed amount instead of linking a payment method — this creates a natural spending cap</li>
+            <li>• <strong>Review purchase history:</strong> Regularly check Settings → Billing → Transaction History to see what your child has bought</li>
+            <li>• <strong>Set expectations:</strong> Have a clear family rule about Robux spending — e.g., one gift card per month</li>
+            <li>• <strong>Understand refund policies:</strong> Roblox generally does not refund in-game purchases, so prevention is key</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Recognizing Red Flags</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          While Roblox has robust safety systems, no platform is completely risk-free. Be aware of these warning signs: your child being secretive about their Roblox activity (closing the screen when you approach), receiving gifts or Robux from strangers (potential grooming), being asked to move conversations to Discord or other platforms (circumventing Roblox's safety filters), emotional changes after playing (possible bullying), or visiting websites that promise free Robux (phishing scams). If your child reports uncomfortable interactions, take it seriously — use Roblox's Report Abuse feature (available in every game and on every profile) and consider contacting Roblox Support directly.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Having the Conversation</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Technology controls are important, but ongoing conversations about online safety are even more effective. Talk to your child about why they shouldn't share personal information (real name, school, address, photos) with anyone online. Explain that not everyone online is who they claim to be. Make it clear that they can always come to you if something makes them uncomfortable — without fear of losing their Roblox access. Show genuine interest in what they're building or playing; this builds trust and gives you natural insight into their online interactions. The goal isn't to make Roblox feel dangerous — it's to empower your child to navigate it safely and confidently.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Quick Safety Checklist</h3>
+          <ul className="space-y-2 text-muted-foreground text-sm">
+            <li>✓ Correct birth date on the account</li>
+            <li>✓ Account PIN enabled and known only to parents</li>
+            <li>✓ Chat settings restricted to "Friends" or "No one"</li>
+            <li>✓ Account Restrictions enabled for children under 10</li>
+            <li>✓ No saved payment methods — use gift cards instead</li>
+            <li>✓ Two-Factor Authentication enabled</li>
+            <li>✓ Regular check-ins about online experiences</li>
+            <li>✓ Device placed in a common area of the home</li>
+          </ul>
         </Card>
       </>
     ),
