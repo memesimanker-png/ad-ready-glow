@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
-  Shield, Zap, Check, Users, Lock, HeadphonesIcon,
-  ChevronDown, ChevronUp, Star, Clock, Download, Eye
+  Shield, Zap, Check, Lock, HeadphonesIcon,
+  ChevronDown, ChevronUp, Clock, Download, Eye
 } from "lucide-react";
 import { useState } from "react";
 
@@ -193,39 +193,12 @@ export default function RobloxAccounts() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">What Customers Say About Our Accounts</h2>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              { name: "Alex R.", role: "Game Developer", text: "Needed 100 test accounts for my Roblox game's multiplayer testing. ComboWick delivered all of them instantly. Every single one worked perfectly. Saved me an entire day of work creating accounts manually." },
-              { name: "Sarah M.", role: "Content Creator", text: "I've been buying accounts from ComboWick for months now for my YouTube channel. The accounts are always verified and work on the first try. Their Discord support replied within 5 minutes when I had a question." },
-              { name: "Marcus J.", role: "Studio Owner", text: "Our studio needed 200+ accounts for our new game's closed beta testing. ComboWick handled the custom order professionally. Best value and service I've found anywhere online." },
-            ].map((t) => (
-              <Card key={t.name} className="p-6 bg-glass">
-                <div className="flex gap-1 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-warning text-warning" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">"{t.text}"</p>
-                <div>
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-heading text-3xl font-bold mb-4">Ready to Get Your Roblox Accounts?</h2>
           <p className="text-muted-foreground text-lg mb-8">
-            Join 10,000+ customers who trust ComboWick for verified Roblox accounts. Instant delivery, PayPal protection, and 24/7 support.
+            Get verified Roblox accounts with instant delivery, PayPal buyer protection, and 24/7 Discord support. Browse our packages and get started today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#pricing">

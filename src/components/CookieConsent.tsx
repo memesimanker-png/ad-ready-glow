@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-export function CookieConsent() {
+export const CookieConsent = forwardRef<HTMLDivElement>(function CookieConsent(_, ref) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] p-4">
+    <div ref={ref} className="fixed bottom-0 left-0 right-0 z-[100] p-4">
       <div className="mx-auto max-w-4xl bg-card border border-border rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex-1">
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -45,4 +45,4 @@ export function CookieConsent() {
       </div>
     </div>
   );
-}
+});
