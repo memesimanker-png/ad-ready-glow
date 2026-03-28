@@ -1,12 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { Users, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const navLinks = [
   { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
+  { to: "/roblox-accounts", label: "Roblox Accounts" },
+  { to: "/premium-keys", label: "Premium Keys" },
+  { to: "/oils", label: "Natural Oils" },
   { to: "/blog", label: "Blog" },
+  { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -23,12 +26,12 @@ export function Navbar() {
             <span className="font-heading font-bold text-lg">ComboWick</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === link.to
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -39,23 +42,23 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="sm">Discord Support</Button>
+              <Button variant="outline" size="sm">Discord</Button>
             </a>
             <Link to="/login">
               <Button size="sm">Sign In</Button>
             </Link>
           </div>
 
-          <button className="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="lg:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
+        <div className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
               <Link
