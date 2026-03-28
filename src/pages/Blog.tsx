@@ -92,6 +92,38 @@ const blogPosts = [
     date: "February 25, 2026",
     readTime: "8 min read",
   },
+  {
+    slug: "roblox-device-compatibility-performance",
+    title: "Roblox Device Compatibility & Performance Optimization Guide",
+    excerpt: "Get the best Roblox experience on any device. This guide covers PC, Mac, mobile, Xbox, and tablet optimization — graphics settings, FPS improvements, network fixes, and hardware recommendations for smooth gameplay.",
+    category: "Technical",
+    date: "March 2, 2026",
+    readTime: "9 min read",
+  },
+  {
+    slug: "roblox-economy-robux-explained",
+    title: "How the Roblox Economy Works: Robux, Trading & DevEx Explained",
+    excerpt: "A deep dive into Roblox's virtual economy — how Robux flows between players, developers, and Roblox Corporation. Understand trading markets, the Developer Exchange, inflation, and how value is created on the platform.",
+    category: "Analysis",
+    date: "March 8, 2026",
+    readTime: "12 min read",
+  },
+  {
+    slug: "roblox-reporting-moderation-guide",
+    title: "How Roblox Moderation Works: Reporting, Bans & Appeals",
+    excerpt: "Understand Roblox's moderation system from the inside. Learn how to report rule-breakers effectively, what behaviors lead to warnings or bans, how the appeals process works, and how to keep your account in good standing.",
+    category: "Safety",
+    date: "March 12, 2026",
+    readTime: "8 min read",
+  },
+  {
+    slug: "roblox-events-seasonal-guide",
+    title: "Roblox Events & Seasonal Content: How to Never Miss Free Rewards",
+    excerpt: "Roblox runs dozens of events each year with free items, exclusive badges, and limited-time game modes. This guide explains how events work, where to find them, and strategies to collect every free reward available.",
+    category: "Guides",
+    date: "March 18, 2026",
+    readTime: "7 min read",
+  },
 ];
 
 export default function Blog() {
