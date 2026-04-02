@@ -51,6 +51,17 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/scripts" element={<Scripts />} />
+          <Route path="/executors" element={<Executors />} />
+          <Route path="/keys" element={<Keys />} />
+          <Route path="/tutorials" element={<Tutorials />} />
+          <Route path="/docs" element={<Docs />} />
+          <Route path="/guides" element={<Guides />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
+          <Route path="/fair-use" element={<FairUse />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
