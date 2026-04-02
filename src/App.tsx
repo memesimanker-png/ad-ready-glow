@@ -16,6 +16,17 @@ import PremiumKeys from "./pages/PremiumKeys";
 import Oils from "./pages/Oils";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Scripts from "./pages/Scripts";
+import Executors from "./pages/Executors";
+import Keys from "./pages/Keys";
+import Tutorials from "./pages/Tutorials";
+import Docs from "./pages/Docs";
+import Guides from "./pages/Guides";
+import Changelog from "./pages/Changelog";
+import Payment from "./pages/Payment";
+import AntiCheatGuide from "./pages/AntiCheatGuide";
+import FairUse from "./pages/FairUse";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +51,17 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/scripts" element={<Scripts />} />
+          <Route path="/executors" element={<Executors />} />
+          <Route path="/keys" element={<Keys />} />
+          <Route path="/tutorials" element={<Tutorials />} />
+          <Route path="/docs" element={<Docs />} />
+          <Route path="/guides" element={<Guides />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
+          <Route path="/fair-use" element={<FairUse />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

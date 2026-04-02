@@ -5,12 +5,14 @@ import { useState } from "react";
 
 const navLinks = [
   { to: "/", label: "Home" },
-  { to: "/roblox-accounts", label: "Roblox Accounts" },
-  { to: "/premium-keys", label: "Premium Keys" },
-  { to: "/oils", label: "Natural Oils" },
+  { to: "/scripts", label: "Scripts" },
+  { to: "/keys", label: "Keys" },
+  { to: "/executors", label: "Executors" },
+  { to: "/payment", label: "Premium" },
+  { to: "/roblox-accounts", label: "Accounts" },
+  { to: "/guides", label: "Guides" },
   { to: "/blog", label: "Blog" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
+  { to: "/faq", label: "FAQ" },
 ];
 
 export function Navbar() {
