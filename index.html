@@ -53,9 +53,17 @@
   <meta name="twitter:title" content="ComboWick - Buy Verified Roblox Accounts | Instant Delivery 2026">
   <meta property="og:description" content="ComboWick offers verified Roblox accounts with instant automated delivery. Starting at $6 for 25 accounts. Secure PayPal payments and 24/7 Discord support.">
   <meta name="twitter:description" content="ComboWick offers verified Roblox accounts with instant automated delivery. Starting at $6 for 25 accounts. Secure PayPal payments and 24/7 Discord support.">
+
+    <!-- Hide Lovable badge -->
+    <style>
+      a[href*="lovable.dev"],a[href*="lovable.app"]{display:none!important;width:0!important;height:0!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important;position:absolute!important}
+    </style>
 </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function(){var s='a[href*="lovable"]';function r(){document.querySelectorAll(s).forEach(function(e){e.remove()});}r();new MutationObserver(function(){r()}).observe(document.body,{childList:true,subtree:true});})();
+    </script>
   </body>
 </html>
