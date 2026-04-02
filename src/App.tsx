@@ -16,6 +16,17 @@ import PremiumKeys from "./pages/PremiumKeys";
 import Oils from "./pages/Oils";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Scripts from "./pages/Scripts";
+import Executors from "./pages/Executors";
+import Keys from "./pages/Keys";
+import Tutorials from "./pages/Tutorials";
+import Docs from "./pages/Docs";
+import Guides from "./pages/Guides";
+import Changelog from "./pages/Changelog";
+import Payment from "./pages/Payment";
+import AntiCheatGuide from "./pages/AntiCheatGuide";
+import FairUse from "./pages/FairUse";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
