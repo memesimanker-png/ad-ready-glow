@@ -52,11 +52,16 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
           </div>
 
           <div>
-            <h4 className="font-heading font-semibold mb-4">Support</h4>
+            <h4 className="font-heading font-semibold mb-4">Community</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
+                <a href="https://www.youtube.com/@COMBO_WICK" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                  YouTube Channel
+                </a>
+              </li>
+              <li>
                 <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-                  Discord Community
+                  Discord Server
                 </a>
               </li>
               <li>
@@ -64,8 +69,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
                   support@combowick.com
                 </a>
               </li>
-              <li><Link to="/login" className="hover:text-foreground transition-colors">Sign In / Dashboard</Link></li>
-              <li className="text-xs pt-2">Response time: within 24 hours</li>
+              <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
             </ul>
           </div>
         </div>
