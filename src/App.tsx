@@ -27,6 +27,15 @@ import Payment from "./pages/Payment";
 import AntiCheatGuide from "./pages/AntiCheatGuide";
 import FairUse from "./pages/FairUse";
 import FAQ from "./pages/FAQ";
+import VerifyProviderSelect from "./pages/VerifyProviderSelect";
+import VerifyStep1 from "./pages/VerifyStep1";
+import VerifyStep2 from "./pages/VerifyStep2";
+import VerifyStep3 from "./pages/VerifyStep3";
+import AdReturn from "./pages/AdReturn";
+import AccessKey from "./pages/AccessKey";
+import Blocked from "./pages/Blocked";
+import Register from "./pages/Register";
+import ClaimAccess from "./pages/ClaimAccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +71,16 @@ const App = () => (
           <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
           <Route path="/fair-use" element={<FairUse />} />
           <Route path="/faq" element={<FAQ />} />
+          {/* Key system flow */}
+          <Route path="/verify/provider-select" element={<VerifyProviderSelect />} />
+          <Route path="/verify/step1" element={<VerifyStep1 />} />
+          <Route path="/verify/step2" element={<VerifyStep2 />} />
+          <Route path="/verify/step3" element={<VerifyStep3 />} />
+          <Route path="/ad-return/:step" element={<AdReturn />} />
+          <Route path="/access-key" element={<AccessKey />} />
+          <Route path="/blocked" element={<Blocked />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/claim-access" element={<ClaimAccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
