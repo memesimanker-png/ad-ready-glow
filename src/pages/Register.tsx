@@ -26,13 +26,11 @@ export default function Register() {
     setIsLoading(true);
     setError("");
 
-    // Store HWID locally and redirect to verification
     localStorage.setItem("pending_hwid", hwid);
     localStorage.setItem("hwid_session_id", Math.random().toString(36).substring(2, 15));
 
     setSuccess(true);
     toast({ title: "HWID Registered!", description: "Your HWID has been added to the pending list." });
-
     setTimeout(() => navigate("/verify/provider-select"), 2000);
     setIsLoading(false);
   };
