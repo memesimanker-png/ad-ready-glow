@@ -35,61 +35,60 @@ export default function Blocked() {
           title: "Incomplete Verification",
           description: "You must complete all verification steps",
           message: "You attempted to access a protected area without completing all required verification steps.",
-          bulletPoints: ["All verification steps must be completed", "Each step must be fully completed before proceeding", "Your progress is being monitored", "Complete all steps to gain access"],
+          bulletPoints: ["All verification steps must be completed", "Each step must be fully completed", "Your progress is being monitored", "Complete all steps to gain access"],
         };
       default:
         return {
           title: "Security Warning",
           description: "Suspicious activity detected",
           message: "Our system has detected potentially suspicious activity.",
-          bulletPoints: ["Rapidly switching between tabs or windows", "Using browser extensions that interfere with the verification process", "Attempting to skip verification steps", "Using automated tools or scripts"],
+          bulletPoints: ["Rapidly switching between tabs or windows", "Using browser extensions that interfere", "Attempting to skip verification steps", "Using automated tools or scripts"],
         };
     }
   };
 
-  const info = getBlockingInfo();
+  const blockingInfo = getBlockingInfo();
 
   return (
-    <div className="min-h-screen bg-[url('/images/hacker-background.jpg')] bg-cover bg-center bg-fixed flex flex-col">
-      <div className="min-h-screen bg-black/70 flex flex-col">
-        <header className="container py-6">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">SecureVerify</h1>
-          </div>
-        </header>
-        <main className="flex-1 container flex flex-col items-center justify-center py-12">
-          <div className="max-w-md w-full mx-auto space-y-6">
-            <Card className="border-amber-500">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  <CardTitle>{info.title}</CardTitle>
-                </div>
-                <CardDescription>{info.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm">{info.message}</p>
-                <div className="rounded-lg bg-muted p-4 text-sm">
-                  <ul className="list-disc pl-5 space-y-1">
-                    {info.bulletPoints.map((point, i) => <li key={i}>{point}</li>)}
-                  </ul>
-                </div>
-                <div className="text-center text-sm">
-                  <p>Redirecting to the correct verification step in <span className="font-medium">{countdown}</span> seconds...</p>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Link to={redirect} className="w-full">
-                  <Button className="w-full" variant="outline">
-                    <Lock className="mr-2 h-4 w-4" /> Return to Verification
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          </div>
-        </main>
-      </div>
+    <div className="min-h-screen bg-black/70 flex flex-col">
+      <header className="container py-6">
+        <div className="flex items-center gap-2">
+          <Shield className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-bold">SecureVerify</h1>
+        </div>
+      </header>
+      <main className="flex-1 container flex flex-col items-center justify-center py-12">
+        <div className="max-w-md w-full mx-auto space-y-6">
+          <Card className="border-amber-500">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                <CardTitle>{blockingInfo.title}</CardTitle>
+              </div>
+              <CardDescription>{blockingInfo.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm">{blockingInfo.message}</p>
+              <div className="rounded-lg bg-muted p-4 text-sm">
+                <ul className="list-disc pl-5 space-y-1">
+                  {blockingInfo.bulletPoints.map((point, index) => <li key={index}>{point}</li>)}
+                </ul>
+              </div>
+              <div className="text-center text-sm">
+                <p>Redirecting in <span className="font-medium">{countdown}</span> seconds...</p>
+              </div>
+              <p className="text-sm text-muted-foreground">If you believe this is an error, you can return to the verification process.</p>
+            </CardContent>
+            <CardFooter>
+              <Link to={redirect} className="w-full">
+                <Button className="w-full bg-transparent" variant="outline">
+                  <Lock className="mr-2 h-4 w-4" /> Return to Verification
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 }
