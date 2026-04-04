@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, MousePointerClick, X } from "lucide-react";
+import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { FloatingYouTubePlayer } from "@/components/FloatingYouTubePlayer";
+import { getTodaySchedule } from "@/lib/day-schedule";
+
+const adProviders = [
+  { id: "linkvertise", name: "Free Key", description: "" },
+];
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
@@ -13,17 +20,16 @@ const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const DIRECT_LINK_COOLDOWN_MINUTES = 5;
 const WAIT_TIME_SECONDS = 3;
 
-const adProviders = [
-  { id: "linkvertise", name: "Free Key", description: "Complete verification to get your free key" },
-];
-
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
+  const todaySchedule = getTodaySchedule();
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
   const [showDirectLinkGate, setShowDirectLinkGate] = useState(false);
+
   const [youtubeCompleted, setYoutubeCompleted] = useState(false);
   const [discordCompleted, setDiscordCompleted] = useState(false);
   const [youtubeTimer, setYoutubeTimer] = useState(0);
@@ -31,6 +37,8 @@ export default function VerifyProviderSelect() {
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
 
   useEffect(() => {
+    setMounted(true);
+
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);
 
@@ -49,6 +57,8 @@ export default function VerifyProviderSelect() {
         setShowDirectLinkGate(true);
         localStorage.removeItem("direct_link_clicks");
         setDirectLinkClicks(0);
+      } else {
+        setShowDirectLinkGate(false);
       }
     } else {
       setShowDirectLinkGate(true);
@@ -57,7 +67,6 @@ export default function VerifyProviderSelect() {
     const savedClicks = localStorage.getItem("direct_link_clicks");
     if (savedClicks) setDirectLinkClicks(parseInt(savedClicks, 10));
 
-    // Clear previous verification state
     localStorage.removeItem("step1_completed");
     localStorage.removeItem("step2_completed");
     localStorage.removeItem("step3_completed");
@@ -67,10 +76,7 @@ export default function VerifyProviderSelect() {
   useEffect(() => {
     if (youtubeTimer > 0) {
       const interval = setInterval(() => {
-        setYoutubeTimer((prev) => {
-          if (prev <= 1) { setYoutubeCompleted(true); return 0; }
-          return prev - 1;
-        });
+        setYoutubeTimer((prev) => { if (prev <= 1) { setYoutubeCompleted(true); return 0; } return prev - 1; });
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -79,10 +85,7 @@ export default function VerifyProviderSelect() {
   useEffect(() => {
     if (discordTimer > 0) {
       const interval = setInterval(() => {
-        setDiscordTimer((prev) => {
-          if (prev <= 1) { setDiscordCompleted(true); return 0; }
-          return prev - 1;
-        });
+        setDiscordTimer((prev) => { if (prev <= 1) { setDiscordCompleted(true); return 0; } return prev - 1; });
       }, 1000);
       return () => clearInterval(interval);
     }
@@ -117,15 +120,15 @@ export default function VerifyProviderSelect() {
   };
 
   const handleDirectLinkClick = () => {
-    const newClicks = directLinkClicks + 1;
-    setDirectLinkClicks(newClicks);
-    localStorage.setItem("direct_link_clicks", newClicks.toString());
+    const newClickCount = directLinkClicks + 1;
+    setDirectLinkClicks(newClickCount);
+    localStorage.setItem("direct_link_clicks", newClickCount.toString());
     window.open(DIRECT_LINK_URL, "_blank");
 
-    if (newClicks >= 2) {
+    if (newClickCount >= 2) {
       toast({ title: "Completed!", description: "You've clicked the button 2 times. Thank you!" });
     } else {
-      toast({ title: "Link Opened", description: `Click ${2 - newClicks} more time${2 - newClicks > 1 ? "s" : ""} after returning.` });
+      toast({ title: "Link Opened", description: `Click ${2 - newClickCount} more time${2 - newClickCount > 1 ? "s" : ""} after returning.` });
     }
   };
 
@@ -135,124 +138,123 @@ export default function VerifyProviderSelect() {
     navigate("/verify/step1");
   };
 
+  const handleCloseTutorial = () => setShowTutorialPopup(false);
+  const handleNeverShowAgain = () => {
+    localStorage.setItem("hide_tutorial_popup", "true");
+    setShowTutorialPopup(false);
+    toast({ title: "Tutorial Hidden", description: "You won't see this popup again." });
+  };
+
+  if (!mounted) return null;
+
+  const subscriptionGateCompleted = youtubeCompleted && discordCompleted;
+  const directLinkGateCompleted = directLinkClicks >= 2;
   const youtubeProgress = youtubeTimer > 0 ? ((WAIT_TIME_SECONDS - youtubeTimer) / WAIT_TIME_SECONDS) * 100 : youtubeCompleted ? 100 : 0;
   const discordProgress = discordTimer > 0 ? ((WAIT_TIME_SECONDS - discordTimer) / WAIT_TIME_SECONDS) * 100 : discordCompleted ? 100 : 0;
 
   return (
-    <div className="min-h-screen bg-[url('/images/hacker-background.jpg')] bg-cover bg-center bg-fixed flex flex-col">
-      <div className="min-h-screen bg-black/70 flex flex-col">
-        {/* Tutorial Popup */}
-        {showTutorialPopup && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <Card className="border-primary/30 w-full max-w-3xl relative animate-in fade-in zoom-in duration-300">
-              <CardHeader className="border-b border-primary/20">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl">FREE KEY TUTORIAL</CardTitle>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => { localStorage.setItem("hide_tutorial_popup", "true"); setShowTutorialPopup(false); }} className="text-muted-foreground hover:text-foreground">
-                      Don't show again
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setShowTutorialPopup(false)} className="h-8 w-8">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+    <div className="min-h-screen bg-black/70 flex flex-col">
+      <FloatingYouTubePlayer step="provider-select" />
+
+      {showTutorialPopup && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="border-primary/30 w-full max-w-3xl relative animate-in fade-in zoom-in duration-300">
+            <CardHeader className="border-b border-primary/20">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl">FREE KEY TUTORIAL</CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={handleNeverShowAgain} className="text-muted-foreground hover:text-foreground">
+                    Don't show again
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={handleCloseTutorial} className="h-8 w-8">
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
+              </div>
+              <CardDescription>Watch this quick tutorial to learn how to get your free key</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="aspect-video rounded-lg overflow-hidden border border-border/50">
+                <iframe
+                  src="https://www.youtube.com/embed/zGkNbPgQQx4?rel=0"
+                  title="Free Key Tutorial"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <header className="container py-6">
+        <div className="flex items-center gap-2">
+          <Shield className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-bold">SecureVerify</h1>
+        </div>
+      </header>
+
+      <main className="flex-1 container flex flex-col items-center justify-center py-12">
+        <div className="max-w-2xl w-full mx-auto space-y-6">
+          <div className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold">Verification Provider</h1>
+            <p className="text-muted-foreground">Select which provider you want to use for verification.</p>
+          </div>
+
+          {showSubscriptionGate && !subscriptionGateCompleted && (
+            <Card className="border-yellow-500/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-400" />
+                  Subscribe & Join to Continue
+                </CardTitle>
+                <CardDescription>Complete these steps to proceed</CardDescription>
               </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="aspect-video rounded-lg overflow-hidden border border-border/50">
-                  <iframe
-                    src="https://www.youtube.com/embed/zGkNbPgQQx4?rel=0"
-                    title="Free Key Tutorial"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <Button onClick={handleYoutubeClick} disabled={youtubeCompleted || youtubeTimer > 0} className="w-full bg-red-600 hover:bg-red-700">
+                    <Youtube className="mr-2 h-4 w-4" />
+                    {youtubeCompleted ? "✓ YouTube Subscribed" : youtubeTimer > 0 ? `Waiting ${youtubeTimer}s...` : "Subscribe to YouTube"}
+                  </Button>
+                  {youtubeTimer > 0 && <Progress value={youtubeProgress} className="h-1" />}
+
+                  <Button onClick={handleDiscordClick} disabled={discordCompleted || discordTimer > 0} className="w-full bg-indigo-600 hover:bg-indigo-700">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    {discordCompleted ? "✓ Discord Joined" : discordTimer > 0 ? `Waiting ${discordTimer}s...` : "Join Discord"}
+                  </Button>
+                  {discordTimer > 0 && <Progress value={discordProgress} className="h-1" />}
                 </div>
-                <p className="text-muted-foreground text-center">Watch this tutorial to learn how to get your free key in 2-5 minutes.</p>
+                <p className="text-xs text-muted-foreground text-center">This will appear again in 1 week</p>
               </CardContent>
             </Card>
-          </div>
-        )}
+          )}
 
-        <header className="container py-6">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">SecureVerify</h1>
-          </div>
-        </header>
+          {showDirectLinkGate && !directLinkGateCompleted && (
+            <Card className="border-primary/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MousePointerClick className="h-5 w-5 text-primary" />
+                  One More Step!
+                </CardTitle>
+                <CardDescription>Click the button below 2 times to continue</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
+                  <MousePointerClick className="mr-2 h-4 w-4" />
+                  {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2 clicks completed</p>
+                <p className="text-xs text-muted-foreground text-center">This gate reappears every 5 minutes for security purposes</p>
+              </CardContent>
+            </Card>
+          )}
 
-        <main className="flex-1 container flex flex-col items-center justify-center py-12">
-          <div className="max-w-2xl w-full mx-auto space-y-6">
-            <div className="space-y-2 text-center">
-              <h1 className="text-3xl font-bold">Get Your Free Key</h1>
-              <p className="text-muted-foreground">Complete the requirements below to start the verification process.</p>
-            </div>
-
-            {/* Subscription Gate */}
-            {showSubscriptionGate && (
-              <Card className="border-primary/30">
-                <CardHeader>
-                  <CardTitle className="text-lg">Step 1: Subscribe & Join</CardTitle>
-                  <CardDescription>Subscribe to our YouTube and join our Discord to continue.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Button onClick={handleYoutubeClick} disabled={youtubeCompleted} variant={youtubeCompleted ? "outline" : "default"} className="flex-1">
-                        <Youtube className="mr-2 h-4 w-4" />
-                        {youtubeCompleted ? "Subscribed ✓" : youtubeTimer > 0 ? `Wait ${youtubeTimer}s...` : "Subscribe on YouTube"}
-                      </Button>
-                    </div>
-                    {youtubeTimer > 0 && <Progress value={youtubeProgress} className="h-1" />}
-
-                    <div className="flex items-center gap-3">
-                      <Button onClick={handleDiscordClick} disabled={discordCompleted} variant={discordCompleted ? "outline" : "default"} className="flex-1">
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        {discordCompleted ? "Joined ✓" : discordTimer > 0 ? `Wait ${discordTimer}s...` : "Join Discord"}
-                      </Button>
-                    </div>
-                    {discordTimer > 0 && <Progress value={discordProgress} className="h-1" />}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Direct Link Gate */}
-            {showDirectLinkGate && !showSubscriptionGate && (
-              <Card className="border-primary/30">
-                <CardHeader>
-                  <CardTitle className="text-lg">Step 2: Click to Continue</CardTitle>
-                  <CardDescription>Click the button below 2 times to proceed ({directLinkClicks}/2 completed).</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={handleDirectLinkClick} className="w-full" disabled={directLinkClicks >= 2}>
-                    <MousePointerClick className="mr-2 h-4 w-4" />
-                    {directLinkClicks >= 2 ? "Completed ✓" : `Click Here (${directLinkClicks}/2)`}
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Provider Selection */}
-            {!showSubscriptionGate && !showDirectLinkGate && (
-              <Card className="border-primary/30">
-                <CardHeader>
-                  <CardTitle className="text-lg">Select Verification Provider</CardTitle>
-                  <CardDescription>Choose your preferred verification method to get your free key.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {adProviders.map((provider) => (
-                    <Button key={provider.id} onClick={() => handleProviderSelect(provider.id)} className="w-full h-auto py-4 flex flex-col items-start text-left" variant="outline">
-                      <span className="font-semibold">{provider.name}</span>
-                      <span className="text-sm text-muted-foreground">{provider.description}</span>
-                    </Button>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </main>
-      </div>
+          {(!showSubscriptionGate || subscriptionGateCompleted) && (!showDirectLinkGate || directLinkGateCompleted) && (
+            <AdProviderSelector providers={adProviders} onSelect={handleProviderSelect} />
+          )}
+        </div>
+      </main>
     </div>
   );
 }
