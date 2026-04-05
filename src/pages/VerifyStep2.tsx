@@ -42,7 +42,7 @@ export default function VerifyStep2() {
 
     if (selectedProvider === "linkvertise") {
       try {
-        const returnUrl = `${window.location.origin}/ad-return`;
+        const returnUrl = `${window.location.origin}/ad-return/step2`;
         const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
           body: { targetUrl: returnUrl },
         });

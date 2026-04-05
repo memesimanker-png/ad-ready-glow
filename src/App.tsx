@@ -76,6 +76,7 @@ const App = () => (
           <Route path="/verify/step1" element={<VerifyStep1 />} />
           <Route path="/verify/step2" element={<VerifyStep2 />} />
           <Route path="/verify/step3" element={<VerifyStep3 />} />
+          <Route path="/ad-return" element={<AdReturn />} />
           <Route path="/ad-return/:step" element={<AdReturn />} />
           <Route path="/access-key" element={<AccessKey />} />
           <Route path="/blocked" element={<Blocked />} />
