@@ -31,13 +31,11 @@ export default function VerifyStep1() {
 
     if (selectedProvider === "linkvertise") {
       try {
-        // Generate dynamic Linkvertise link via edge function
-        const returnUrl = `${window.location.origin}/ad-return`;
+        const returnUrl = `${window.location.origin}/ad-return/step1`;
         const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
           body: { targetUrl: returnUrl },
         });
         if (error || !data?.link) {
-          // Fallback to static link
           window.location.href = "https://link-center.net/405401/cWKDK8S88ys2";
           return;
         }
