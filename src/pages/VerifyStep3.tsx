@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function VerifyStep3() {
   const navigate = useNavigate();
@@ -24,16 +25,30 @@ export default function VerifyStep3() {
     setSelectedProvider(provider);
   }, [navigate, toast]);
 
-  const handleVerification = () => {
+  const handleVerification = async () => {
     setIsLoading(true);
-
-    let adLink = "https://work.ink/1XgX/m6qt5uyh";
-    if (selectedProvider === "linkvertise") adLink = "https://direct-link.net/405401/TwWRE4TowD9N";
-    else if (selectedProvider === "lootlabs") adLink = "https://lootdest.org/s?ASt4XtMq";
-
     if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
     localStorage.setItem("verification_step", "step3");
-    window.location.href = adLink;
+
+    if (selectedProvider === "linkvertise") {
+      try {
+        const returnUrl = `${window.location.origin}/ad-return`;
+        const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
+          body: { targetUrl: returnUrl },
+        });
+        if (error || !data?.link) {
+          window.location.href = "https://direct-link.net/405401/TwWRE4TowD9N";
+          return;
+        }
+        window.location.href = data.link;
+      } catch {
+        window.location.href = "https://direct-link.net/405401/TwWRE4TowD9N";
+      }
+    } else if (selectedProvider === "lootlabs") {
+      window.location.href = "https://lootdest.org/s?ASt4XtMq";
+    } else {
+      window.location.href = "https://work.ink/1XgX/m6qt5uyh";
+    }
   };
 
   return (
