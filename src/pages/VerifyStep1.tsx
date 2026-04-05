@@ -23,15 +23,32 @@ export default function VerifyStep1() {
     }
   }, []);
 
-  const handleVerification = () => {
+  const handleVerification = async () => {
     setIsLoading(true);
-    let adLink = "https://workink.net/1XgX/0yrwn95k";
-    if (selectedProvider === "linkvertise") adLink = "https://link-center.net/405401/cWKDK8S88ys2";
-    else if (selectedProvider === "lootlabs") adLink = "https://lootdest.org/s?hovfnQ85";
-
     localStorage.setItem("verification_step", "step1");
     localStorage.setItem("selected_ad_provider", selectedProvider || "");
-    window.location.href = adLink;
+
+    if (selectedProvider === "linkvertise") {
+      try {
+        // Generate dynamic Linkvertise link via edge function
+        const returnUrl = `${window.location.origin}/ad-return`;
+        const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
+          body: { targetUrl: returnUrl },
+        });
+        if (error || !data?.link) {
+          // Fallback to static link
+          window.location.href = "https://link-center.net/405401/cWKDK8S88ys2";
+          return;
+        }
+        window.location.href = data.link;
+      } catch {
+        window.location.href = "https://link-center.net/405401/cWKDK8S88ys2";
+      }
+    } else if (selectedProvider === "lootlabs") {
+      window.location.href = "https://lootdest.org/s?hovfnQ85";
+    } else {
+      window.location.href = "https://workink.net/1XgX/0yrwn95k";
+    }
   };
 
   return (
