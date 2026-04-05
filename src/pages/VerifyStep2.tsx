@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { getTodaySchedule } from "@/lib/day-schedule";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function VerifyStep2() {
   const navigate = useNavigate();
