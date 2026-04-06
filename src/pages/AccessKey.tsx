@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Copy, User, Clock, Shield, Key, MousePointerClick } from "lucide-react";
+import { Copy, User, Clock, Shield, Key, MousePointerClick, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StoredKeyData {
   key: string;
@@ -21,11 +22,14 @@ export default function AccessKey() {
   const [username, setUsername] = useState("");
   const [generatedKey, setGeneratedKey] = useState("");
   const [keyExpiresAt, setKeyExpiresAt] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
   const [directLinkCompleted, setDirectLinkCompleted] = useState(false);
   const [showDirectLinkGate, setShowDirectLinkGate] = useState(true);
+  const [error, setError] = useState("");
 
+  // Verify steps are completed & load stored key
   useEffect(() => {
     const step3Done = localStorage.getItem("step3_completed");
     if (!step3Done) {
@@ -34,12 +38,16 @@ export default function AccessKey() {
       return;
     }
 
-    // Load stored key
+    loadStoredKeyData();
+    checkExistingKey();
+  }, [navigate, toast]);
+
+  const loadStoredKeyData = () => {
     try {
       const storedData = localStorage.getItem("hwid_key_data");
       if (storedData) {
         const keyData: StoredKeyData = JSON.parse(storedData);
-        const expiryDate = new Date(keyData.generated_at + 24 * 60 * 60 * 1000);
+        const expiryDate = new Date(keyData.generated_at + 10 * 60 * 1000); // 10 minutes
         if (new Date() < expiryDate) {
           setGeneratedKey(keyData.key);
           setKeyExpiresAt(expiryDate.toISOString());
@@ -54,8 +62,43 @@ export default function AccessKey() {
     } catch {
       localStorage.removeItem("hwid_key_data");
     }
-  }, [navigate, toast]);
+  };
 
+  const checkExistingKey = async () => {
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("check-hwid-key-status", {
+        body: {},
+      });
+
+      if (fnError) {
+        console.error("Error checking existing key:", fnError);
+        return;
+      }
+
+      if (data?.success && data?.hasActiveKey) {
+        const now = Date.now();
+        const expiryDate = new Date(now + 10 * 60 * 1000);
+
+        const keyData: StoredKeyData = {
+          key: data.key || "",
+          expires_at: expiryDate.toISOString(),
+          username: data.username,
+          generated_at: now,
+        };
+
+        localStorage.setItem("hwid_key_data", JSON.stringify(keyData));
+        setGeneratedKey(data.key || "");
+        setKeyExpiresAt(expiryDate.toISOString());
+        setCanGenerate(false);
+        setShowDirectLinkGate(false);
+        setDirectLinkCompleted(true);
+      }
+    } catch (err) {
+      console.error("Error checking existing key:", err);
+    }
+  };
+
+  // Expiry watcher
   useEffect(() => {
     if (keyExpiresAt) {
       const interval = setInterval(() => {
@@ -84,31 +127,52 @@ export default function AccessKey() {
     }
   };
 
-  const generateKey = () => {
-    if (!canGenerate) return;
+  const generateKey = async () => {
+    if (!canGenerate || isLoading) return;
 
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const segments = Array.from({ length: 4 }, () =>
-      Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join("")
-    );
-    const key = `CW-${segments.join("-")}`;
+    setIsLoading(true);
+    setError("");
 
-    const now = Date.now();
-    const expiryDate = new Date(now + 24 * 60 * 60 * 1000);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("generate-hwid-key", {
+        body: { username: username.trim() || undefined },
+      });
 
-    const keyData: StoredKeyData = {
-      key,
-      expires_at: expiryDate.toISOString(),
-      username: username.trim() || undefined,
-      generated_at: now,
-    };
+      if (fnError) {
+        setError("Failed to generate key. Please try again.");
+        toast({ variant: "destructive", title: "Error", description: "Failed to generate key." });
+        setIsLoading(false);
+        return;
+      }
 
-    localStorage.setItem("hwid_key_data", JSON.stringify(keyData));
-    setGeneratedKey(key);
-    setKeyExpiresAt(expiryDate.toISOString());
-    setCanGenerate(false);
+      if (data?.success) {
+        const now = Date.now();
+        const expiryDate = new Date(now + 10 * 60 * 1000); // 10 minutes display timer
 
-    toast({ title: "Key Generated!", description: "Your access key has been generated successfully." });
+        const keyData: StoredKeyData = {
+          key: data.key,
+          expires_at: expiryDate.toISOString(),
+          username: data.username || username.trim(),
+          generated_at: now,
+        };
+
+        localStorage.setItem("hwid_key_data", JSON.stringify(keyData));
+        setGeneratedKey(data.key);
+        setKeyExpiresAt(expiryDate.toISOString());
+        setCanGenerate(false);
+
+        toast({ title: "Key Generated!", description: `Your ${data.hours || 11}-hour HWID key has been generated.` });
+      } else {
+        setError(data?.error || "Failed to generate key");
+        toast({ variant: "destructive", title: "Error", description: data?.error || "Failed to generate key." });
+      }
+    } catch (err) {
+      console.error("Network error in generateKey:", err);
+      setError("Network error occurred");
+      toast({ variant: "destructive", title: "Error", description: "Network error occurred." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const copyToClipboard = async (text: string) => {
@@ -129,7 +193,7 @@ export default function AccessKey() {
     return `${hours}h ${minutes}m`;
   };
 
-  // Show direct link gate before key generator
+  // Direct link gate
   if (showDirectLinkGate && !directLinkCompleted) {
     return (
       <div className="min-h-screen bg-black/70 flex items-center justify-center p-4">
@@ -172,13 +236,13 @@ export default function AccessKey() {
           <div className="text-center space-y-2">
             <Key className="h-12 w-12 text-primary mx-auto" />
             <h1 className="text-3xl font-bold">Access Key Generator</h1>
-            <p className="text-muted-foreground">Generate your free access key below.</p>
+            <p className="text-muted-foreground">Generate your HWID access key below.</p>
           </div>
 
           <Card className="border-primary/30">
             <CardHeader>
               <CardTitle>Generate Your Key</CardTitle>
-              <CardDescription>Enter a username (optional) and generate your key.</CardDescription>
+              <CardDescription>Enter a username (optional) and generate your 11-hour HWID key.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -190,15 +254,19 @@ export default function AccessKey() {
                   placeholder="Enter your Roblox username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  disabled={!canGenerate}
+                  disabled={!canGenerate || isLoading}
                 />
               </div>
+
+              {error && (
+                <p className="text-sm text-red-400">{error}</p>
+              )}
 
               {generatedKey ? (
                 <div className="space-y-3">
                   <div className="rounded-lg bg-black/50 p-4 border border-green-500/30">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-green-400 font-medium">Your Access Key:</span>
+                      <span className="text-sm text-green-400 font-medium">Your HWID Key:</span>
                       <Button size="sm" variant="ghost" onClick={() => copyToClipboard(generatedKey)} className="h-7 text-green-400 hover:text-green-300">
                         <Copy className="h-3 w-3 mr-1" /> Copy
                       </Button>
@@ -208,14 +276,21 @@ export default function AccessKey() {
                   {keyExpiresAt && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
-                      <span>Expires in: {formatTimeRemaining()}</span>
+                      <span>Display expires in: {formatTimeRemaining()}</span>
                     </div>
                   )}
                 </div>
               ) : (
-                <Button onClick={generateKey} disabled={!canGenerate} className="w-full bg-gradient-to-r from-primary to-purple-500 hover:shadow-lg transition-all">
-                  <Key className="mr-2 h-4 w-4" />
-                  Generate Access Key
+                <Button
+                  onClick={generateKey}
+                  disabled={!canGenerate || isLoading}
+                  className="w-full bg-gradient-to-r from-primary to-purple-500 hover:shadow-lg transition-all"
+                >
+                  {isLoading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                  ) : (
+                    <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
+                  )}
                 </Button>
               )}
             </CardContent>
