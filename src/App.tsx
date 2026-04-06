@@ -40,8 +40,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+import { TranslationProvider } from "@/lib/translation-context";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <TranslationProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
