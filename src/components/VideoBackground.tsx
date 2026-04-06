@@ -1,4 +1,4 @@
-import heroVideoAsset from "/public/videos/hero-bg.mp4.asset.json";
+const HERO_VIDEO_URL = "/__l5e/assets-v1/84c1b636-b427-4a93-a259-81a6624545bf/hero-bg.mp4";
 
 interface VideoBackgroundProps {
   className?: string;
@@ -16,7 +16,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         className="absolute inset-0 w-full h-full object-cover"
         style={{ filter: "brightness(0.3) saturate(1.4)" }}
       >
-        <source src={heroVideoAsset.url} type="video/mp4" />
+        <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
       {overlay && (
         <>
