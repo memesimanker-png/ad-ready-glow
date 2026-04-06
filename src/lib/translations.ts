@@ -60,7 +60,7 @@ const translations: Record<LangCode, TranslationMap> = {
     // How It Works
     "How It Works": "How It Works",
     "how_subtitle": "Getting your verified Roblox accounts is simple. Three steps and you're ready to go.",
-    "Choose Your Package": "Choose Your Package",
+    "Choose Your Package_step": "Choose Your Package",
     "step_1_desc": "Select from our Starter, Popular, or Pro packages based on how many verified accounts you need.",
     "Complete Payment": "Complete Payment",
     "step_2_desc": "Pay securely through PayPal. We accept credit cards, debit cards, and PayPal balance.",
