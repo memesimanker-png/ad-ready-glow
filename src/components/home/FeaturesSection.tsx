@@ -1,61 +1,61 @@
 import { Card } from "@/components/ui/card";
 import { Shield, Zap, Lock, HeadphonesIcon, Award, TrendingUp } from "lucide-react";
+import { useTranslation } from "@/lib/translation-context";
+import { motion } from "framer-motion";
 
-const features = [
-  {
-    icon: Shield,
-    title: "Verified & Secure Accounts",
-    description: "Every Roblox account is manually verified before listing. We ensure authenticity, proper age verification, and working credentials so you can start using them immediately.",
-  },
-  {
-    icon: Zap,
-    title: "Instant Automated Delivery",
-    description: "No waiting around. Once your PayPal payment confirms, your account credentials are delivered to your dashboard automatically within seconds.",
-  },
-  {
-    icon: Lock,
-    title: "Encrypted & Safe Payments",
-    description: "All transactions are processed through PayPal with SSL encryption. We never store your credit card details — your financial data stays completely private.",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "24/7 Discord Support",
-    description: "Our dedicated support team is available around the clock on Discord. Whether you have questions before purchasing or need help after, we're always here.",
-  },
-  {
-    icon: Award,
-    title: "Quality Guarantee",
-    description: "We stand behind every account we sell. If an account doesn't match its description, our team will resolve the issue promptly and fairly.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Growing Community",
-    description: "We're building a trusted community of Roblox enthusiasts, developers, and content creators who rely on ComboWick for their account needs.",
-  },
+const featureIcons = [Shield, Zap, Lock, HeadphonesIcon, Award, TrendingUp];
+const featureKeys = [
+  { title: "Verified & Secure Accounts", desc: "feat_1_desc" },
+  { title: "Instant Automated Delivery", desc: "feat_2_desc" },
+  { title: "Encrypted & Safe Payments", desc: "feat_3_desc" },
+  { title: "24/7 Discord Support", desc: "feat_4_desc" },
+  { title: "Quality Guarantee", desc: "feat_5_desc" },
+  { title: "Growing Community", desc: "feat_6_desc" },
 ];
 
 export function FeaturesSection() {
+  const { t } = useTranslation();
+
   return (
-    <section className="py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">
-            Why Gamers Choose ComboWick
+    <section className="relative py-24 sm:py-32 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-section" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-20"
+        >
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
+            {t("Why Gamers Choose ComboWick")}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            We've built our platform around security, speed, and customer satisfaction — the three pillars every gamer deserves.
+          <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
+            {t("features_subtitle")}
           </p>
-        </div>
+          <div className="mt-8 mx-auto w-24 h-px line-glow" />
+        </motion.div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <Card key={feature.title} className="p-6 bg-glass hover:border-primary/30 transition-all duration-300">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
-                <feature.icon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="font-heading text-lg font-semibold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-            </Card>
-          ))}
+          {featureKeys.map((feature, i) => {
+            const Icon = featureIcons[i];
+            return (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <Card className="p-8 card-neon group h-full">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 mb-6 group-hover:neon-glow transition-all">
+                    <Icon className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="font-heading text-sm font-semibold mb-3 uppercase tracking-wider">{t(feature.title)}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{t(feature.desc)}</p>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
