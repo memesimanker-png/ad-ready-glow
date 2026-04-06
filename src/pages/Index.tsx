@@ -1,50 +1,101 @@
 import { Layout } from "@/components/Layout";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import {
-  Shield, Zap, Check, ChevronDown, ChevronUp,
-  Lock, HeadphonesIcon, Award, TrendingUp, BookOpen, ArrowRight
-} from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { PricingSection } from "@/components/home/PricingSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { BlogPreviewSection } from "@/components/home/BlogPreviewSection";
+import { VideoBackground } from "@/components/VideoBackground";
+import { useTranslation } from "@/lib/translation-context";
+import { motion } from "framer-motion";
 
 export default function Index() {
+  const { t } = useTranslation();
+
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative bg-gradient-hero overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/warrior-bg.png')] bg-cover bg-center opacity-10" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/30 mb-6">
-            <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-xs font-semibold text-success uppercase tracking-wider">Available Now • Instant Delivery</span>
-          </div>
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 max-w-4xl mx-auto">
-            Premium Verified{" "}
-            <span className="text-gradient-primary">Roblox Accounts</span>{" "}
-            Delivered Instantly
-          </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Get verified Roblox accounts starting at just $0.20 per account with secure PayPal payments and automated instant delivery. Trusted by our growing community of gamers and developers.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        <VideoBackground />
+        <div className="absolute inset-0 dot-grid opacity-30" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/30 mb-8 backdrop-blur-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse-neon" />
+            <span className="text-xs font-semibold text-primary uppercase tracking-[0.2em]">
+              {t("Available Now • Instant Delivery")}
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-[1.1]"
+          >
+            {t("Premium Verified")}{" "}
+            <span className="text-gradient-neon">{t("Roblox Accounts")}</span>{" "}
+            {t("Delivered Instantly")}
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
+            {t("hero_desc")}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
             <a href="#pricing">
-              <Button size="lg" className="text-base px-8 py-6">
-                View Packages
+              <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider font-bold neon-glow group">
+                {t("View Packages")}
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </a>
             <Link to="/about">
-              <Button variant="outline" size="lg" className="text-base px-8 py-6">
-                Learn More
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
+                {t("Learn More")}
               </Button>
             </Link>
-          </div>
+          </motion.div>
+
+          {/* Stats bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-16 flex items-center justify-center gap-8 sm:gap-16"
+          >
+            {[
+              { value: "10K+", label: "Accounts Sold" },
+              { value: "99.9%", label: "Uptime" },
+              { value: "24/7", label: "Support" },
+              { value: "500+", label: "Discord Members" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="font-heading text-xl sm:text-2xl font-bold text-primary">{stat.value}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
         </div>
+
+        {/* Bottom fade line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px line-glow" />
       </section>
 
       <FeaturesSection />
@@ -54,23 +105,35 @@ export default function Index() {
       <FAQSection />
 
       {/* CTA */}
-      <section className="py-20 sm:py-24 bg-muted/20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">
-            Ready to Get Started?
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-section" />
+        <div className="absolute inset-0 dot-grid opacity-20" />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center"
+        >
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
+            {t("Ready to Get Started?")}
           </h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-            Create your account today and get instant access to verified Roblox accounts at competitive prices. Secure payments, instant delivery, and dedicated support.
+          <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
+            {t("cta_desc")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#pricing">
-              <Button size="lg" className="text-base px-8 py-6">Browse Packages</Button>
+              <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider neon-glow">
+                {t("Browse Packages")}
+              </Button>
             </a>
             <Link to="/blog">
-              <Button variant="outline" size="lg" className="text-base px-8 py-6">Read Our Guides</Button>
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
+                {t("Read Our Guides")}
+              </Button>
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
     </Layout>
   );

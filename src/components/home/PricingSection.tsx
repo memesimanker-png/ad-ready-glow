@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "@/lib/translation-context";
+import { motion } from "framer-motion";
 
 const packages = [
   { size: 25, price: 6, perAccount: "0.24", label: "Starter", popular: false },
@@ -10,51 +12,81 @@ const packages = [
 ];
 
 export function PricingSection() {
+  const { t } = useTranslation();
+
   return (
-    <section id="pricing" className="py-20 sm:py-24 bg-muted/20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">
-            Choose Your Package
+    <section id="pricing" className="relative py-24 sm:py-32 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-hero" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-20"
+        >
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
+            {t("Choose Your Package")}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            All packages include verified accounts with instant automated delivery. Larger packages offer better per-account value.
+          <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
+            {t("pricing_subtitle")}
           </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {packages.map((pkg) => (
-            <Card
+          <div className="mt-8 mx-auto w-24 h-px line-glow" />
+        </motion.div>
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {packages.map((pkg, i) => (
+            <motion.div
               key={pkg.size}
-              className={`p-6 sm:p-8 relative transition-all duration-300 ${
-                pkg.popular
-                  ? "border-primary/50 bg-primary/5 animate-glow scale-105"
-                  : "bg-glass hover:border-primary/30"
-              }`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
             >
-              {pkg.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full uppercase tracking-wider">
-                  Best Value
+              <Card
+                className={`relative p-8 h-full transition-all duration-500 ${
+                  pkg.popular
+                    ? "card-premium scale-[1.03]"
+                    : "card-neon"
+                }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-gradient-to-r from-primary to-accent text-primary-foreground text-[10px] font-bold rounded-full uppercase tracking-[0.2em] neon-glow flex items-center gap-1.5">
+                    <Crown className="h-3 w-3" />
+                    {t("Best Value")}
+                  </div>
+                )}
+                <div className="text-center mb-8">
+                  <h3 className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">{t(pkg.label)}</h3>
+                  <div className="text-5xl font-bold mb-2 font-heading">${pkg.price}</div>
+                  <p className="text-sm text-muted-foreground">{pkg.size} Accounts • ${pkg.perAccount}/ea</p>
                 </div>
-              )}
-              <div className="text-center mb-6">
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">{pkg.label}</h3>
-                <div className="text-4xl font-bold mb-1">${pkg.price}</div>
-                <p className="text-sm text-muted-foreground">{pkg.size} Accounts • ${pkg.perAccount}/account</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Verified accounts</li>
-                <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Instant delivery</li>
-                <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> PayPal buyer protection</li>
-                <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Dashboard access</li>
-                {pkg.size >= 50 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Bulk discount applied</li>}
-                {pkg.size >= 100 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Priority support</li>}
-              </ul>
-              <Link to="/login">
-                <Button className="w-full" variant={pkg.popular ? "default" : "outline"}>
-                  Purchase Now
-                </Button>
-              </Link>
-            </Card>
+                <ul className="space-y-3 mb-10">
+                  {[
+                    t("Verified accounts"),
+                    t("Instant delivery"),
+                    t("PayPal buyer protection"),
+                    t("Dashboard access"),
+                    ...(pkg.size >= 50 ? [t("Bulk discount applied")] : []),
+                    ...(pkg.size >= 100 ? [t("Priority support")] : []),
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm">
+                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/payment">
+                  <Button
+                    className={`w-full uppercase tracking-wider text-xs font-bold py-6 ${
+                      pkg.popular ? "neon-glow" : ""
+                    }`}
+                    variant={pkg.popular ? "default" : "outline"}
+                  >
+                    {t("Purchase Now")}
+                  </Button>
+                </Link>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
