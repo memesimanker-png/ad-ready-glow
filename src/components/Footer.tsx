@@ -29,7 +29,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
                 { to: "/scripts", label: t("Scripts") },
                 { to: "/keys", label: t("Keys") },
                 { to: "/executors", label: t("Executors") },
-                { to: "/payment", label: t("Premium") },
+                { to: "/premium-keys", label: t("Premium") },
                 { to: "/roblox-accounts", label: t("Accounts") },
               ],
             },
@@ -59,6 +59,7 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
               links: [
                 { href: "https://www.youtube.com/@COMBO_WICK", label: "YouTube" },
                 { href: "https://discord.com/invite/ufrz9Zaqs8", label: "Discord" },
+                { href: "https://shop-ready.lovable.app", label: "Website" },
                 { href: "mailto:support@combowick.com", label: "Email" },
                 { to: "/contact", label: "Contact" },
               ],

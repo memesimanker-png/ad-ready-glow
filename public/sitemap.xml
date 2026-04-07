@@ -12,11 +12,14 @@
   <url><loc>https://shop-ready.lovable.app/docs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/guides</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/changelog</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://shop-ready.lovable.app/payment</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/anti-cheat-guide</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://shop-ready.lovable.app/fair-use</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://shop-ready.lovable.app/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://shop-ready.lovable.app/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://shop-ready.lovable.app/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://shop-ready.lovable.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://shop-ready.lovable.app/refund-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog/roblox-account-security-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog/how-to-earn-robux-free</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog/roblox-trading-tips</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
@@ -37,8 +40,4 @@
   <url><loc>https://shop-ready.lovable.app/blog/roblox-social-features-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog/roblox-inventory-management</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shop-ready.lovable.app/blog/roblox-animation-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://shop-ready.lovable.app/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://shop-ready.lovable.app/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://shop-ready.lovable.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://shop-ready.lovable.app/refund-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
