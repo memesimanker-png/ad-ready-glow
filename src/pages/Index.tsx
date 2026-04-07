@@ -19,7 +19,7 @@ export default function Index() {
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <VideoBackground />
-        <div className="absolute inset-0 dot-grid opacity-30" />
+        <div className="absolute inset-0 star-field opacity-40" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center z-10">
           <motion.div
@@ -72,26 +72,6 @@ export default function Index() {
               </Button>
             </Link>
           </motion.div>
-
-          {/* Stats bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-16 flex items-center justify-center gap-8 sm:gap-16"
-          >
-            {[
-              { value: "10K+", label: "Accounts Sold" },
-              { value: "99.9%", label: "Uptime" },
-              { value: "24/7", label: "Support" },
-              { value: "500+", label: "Discord Members" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="font-heading text-xl sm:text-2xl font-bold text-primary">{stat.value}</div>
-                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         {/* Bottom fade line */}
@@ -107,7 +87,7 @@ export default function Index() {
       {/* CTA */}
       <section className="relative py-24 sm:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-section" />
-        <div className="absolute inset-0 dot-grid opacity-20" />
+        <div className="absolute inset-0 star-field opacity-20" />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
