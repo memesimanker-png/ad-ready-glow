@@ -5,8 +5,9 @@ import gallery3 from "@/assets/gallery-3.png";
 import gallery4 from "@/assets/gallery-4.png";
 import gallery5 from "@/assets/gallery-5.png";
 import gallery6 from "@/assets/gallery-6.png";
+import gallery7 from "@/assets/gallery-7.png";
 
-const images = [gallery1, gallery2, gallery3, gallery4, gallery5, gallery6];
+const images = [gallery1, gallery2, gallery3, gallery4, gallery5, gallery6, gallery7];
 
 interface VideoBackgroundProps {
   className?: string;
@@ -24,7 +25,6 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
     setSliding(true);
     setCurrent((c) => (c + 1) % images.length);
 
-    // After the slide transition ends, clear the prev image
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       setSliding(false);
@@ -45,7 +45,6 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
 
   return (
     <div className={`absolute inset-0 overflow-hidden ${className}`}>
-      {/* Previous image sliding out */}
       {prev !== null && (
         <div
           className="absolute inset-0 z-[1]"
@@ -64,11 +63,9 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         </div>
       )}
 
-      {/* Current image sliding in */}
       <div
         className="absolute inset-0 z-[2]"
         style={{
-          transform: sliding ? "translateX(0)" : "translateX(0)",
           animation: sliding ? "slideIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards" : "none",
         }}
       >
@@ -80,7 +77,6 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         />
       </div>
 
-      {/* Subtle Ken Burns zoom on the current image */}
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); }
