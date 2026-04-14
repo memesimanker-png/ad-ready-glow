@@ -87,6 +87,7 @@ const App = () => (
           <Route path="/access-key" element={<AccessKey />} />
           <Route path="/blocked" element={<Blocked />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/claim-access" element={<ClaimAccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
