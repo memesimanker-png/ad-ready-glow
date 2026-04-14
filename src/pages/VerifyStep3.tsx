@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
-import { supabase } from "@/integrations/supabase/client";
+import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 
 export default function VerifyStep3() {
   const navigate = useNavigate();
