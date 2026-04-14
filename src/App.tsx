@@ -66,6 +66,7 @@ const App = () => (
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/scripts" element={<Scripts />} />
           <Route path="/scripts/:slug" element={<ScriptDetail />} />
+          <Route path="/admin/scripts" element={<ScriptAdmin />} />
           <Route path="/executors" element={<Executors />} />
           <Route path="/keys" element={<Keys />} />
           <Route path="/tutorials" element={<Tutorials />} />
