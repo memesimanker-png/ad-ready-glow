@@ -19,6 +19,7 @@ import Signup from "./pages/Signup";
 import Scripts from "./pages/Scripts";
 import ScriptDetail from "./pages/ScriptDetail";
 import ScriptAdmin from "./pages/ScriptAdmin";
+import Admin from "./pages/Admin";
 import Executors from "./pages/Executors";
 import Keys from "./pages/Keys";
 import Tutorials from "./pages/Tutorials";
