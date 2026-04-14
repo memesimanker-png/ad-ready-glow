@@ -1,68 +1,64 @@
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { Check, Shield, Clock, Download, MessageSquare } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, UserPlus } from "lucide-react";
 
 export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Check your email", description: "We sent you a confirmation link. Please verify your email before signing in." });
+    }
+  };
+
   return (
     <Layout>
       <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-md px-4 sm:px-6">
           <Card className="bg-glass border-border/50">
             <CardHeader className="text-center">
-              <CardTitle className="font-heading text-2xl">Get Started with ComboWick</CardTitle>
-              <CardDescription>
-                Join our Discord community to browse products, place orders, and connect with our support team.
-              </CardDescription>
+              <CardTitle className="font-heading text-2xl">Create Account</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
-                <Button className="w-full gap-2" size="lg">
-                  <MessageSquare className="h-5 w-5" />
-                  Join Discord Community
+            <CardContent>
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="••••••••" />
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                  Sign Up
                 </Button>
-              </a>
-              <p className="text-xs text-center text-muted-foreground">
-                No account registration needed. All orders and support are handled directly through our Discord server with PayPal payments.
+              </form>
+              <p className="text-sm text-center text-muted-foreground mt-4">
+                Already have an account? <Link to="/login" className="text-primary hover:underline">Sign in</Link>
               </p>
-              <div className="text-center text-sm pt-2">
-                <span className="text-muted-foreground">Already a member? </span>
-                <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Go to Discord
-                </a>
-              </div>
             </CardContent>
           </Card>
-
-          <div className="mt-12">
-            <h2 className="font-heading text-2xl font-bold text-center mb-6">Why Join Our Discord?</h2>
-            <div className="space-y-3">
-              {[
-                { icon: Shield, text: "Secure purchasing through PayPal with full buyer protection on every transaction" },
-                { icon: Clock, text: "Instant delivery for digital products — Roblox accounts and Premium Keys delivered in seconds" },
-                { icon: Download, text: "Direct access to our support team for replacements, questions, and custom orders" },
-                { icon: Check, text: "Community of verified buyers sharing tips, feedback, and exclusive announcements" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-lg bg-glass border border-border/30">
-                  <item.icon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8">
-              <Card className="p-6 bg-primary/5 border-primary/30 text-center">
-                <h3 className="font-heading text-lg font-semibold mb-2">Browse Before You Buy</h3>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  Explore our product pages and read our in-depth Roblox guides to learn more about what we offer before joining Discord.
-                </p>
-                <Link to="/roblox-accounts">
-                  <Button variant="outline">View Products</Button>
-                </Link>
-              </Card>
-            </div>
-          </div>
         </div>
       </section>
     </Layout>
