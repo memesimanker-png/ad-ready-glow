@@ -37,6 +37,7 @@ import AccessKey from "./pages/AccessKey";
 import Blocked from "./pages/Blocked";
 import Register from "./pages/Register";
 import ClaimAccess from "./pages/ClaimAccess";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,7 @@ const App = () => (
           <Route path="/access-key" element={<AccessKey />} />
           <Route path="/blocked" element={<Blocked />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/claim-access" element={<ClaimAccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

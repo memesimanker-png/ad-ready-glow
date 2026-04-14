@@ -2,107 +2,73 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Key, Shield, Zap, Check, Clock, Star,
+  Key, Shield, Zap, Check, Star,
   ChevronDown, ChevronUp, Unlock, RefreshCw, Award, MessageCircle
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { VideoBackground } from "@/components/VideoBackground";
 import { motion } from "framer-motion";
+import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const tiers = [
   {
+    id: "trial-7day",
     name: "7-Day Trial",
-    price: "$5",
-    originalPrice: null,
-    discount: null,
-    period: "",
-    duration: "7 Days Full Access",
+    price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    bgColor: "bg-yellow-500/5",
-    features: [
-      { icon: "zap", text: "7 Days Full Access" },
-      { icon: "circle", text: "Instant Activation" },
-      { icon: "check", text: "Great for Trying Out" },
-    ],
+    features: ["7 Days Full Access", "Instant Activation", "Great for Trying Out"],
     buttonText: "Purchase Now",
     buttonStyle: "bg-primary hover:bg-primary/90",
-    popular: false,
-    paypalType: "onetime" as const,
-    paypalAmount: "5.00",
+    isSubscription: false,
   },
   {
+    id: "monthly",
     name: "Monthly Access",
-    price: "$9.99",
+    price: 9.99,
     originalPrice: "$20",
-    discount: "20% OFF",
-    period: "",
-    duration: "30 Days Access",
+    discount: "50% OFF",
     color: "text-green-400",
     borderColor: "border-green-500/30",
-    bgColor: "bg-green-500/5",
-    features: [
-      { icon: "zap", text: "30 Days Access" },
-      { icon: "circle", text: "Priority Support" },
-      { icon: "check", text: "Premium Support" },
-    ],
-    buttonText: "Choose Payment Option",
+    features: ["30 Days Access", "Priority Support", "Premium Support"],
+    buttonText: "Purchase Now",
     buttonStyle: "bg-green-600 hover:bg-green-700",
     popular: true,
-    paypalType: "subscription" as const,
-    paypalAmount: "9.99",
+    isSubscription: true,
+    subscriptionPrice: 8,
     subscribeText: "Subscribe & Save $2!",
     subscribeSubtext: "$8 /month with subscription",
   },
   {
+    id: "lifetime",
     name: "Lifetime Key",
-    price: "$49.99",
-    originalPrice: null,
-    discount: null,
-    period: "",
-    duration: "Lifetime Access",
+    price: 49.99,
     color: "text-red-400",
     borderColor: "border-red-500/30",
-    bgColor: "bg-red-500/5",
-    features: [
-      { icon: "zap", text: "Lifetime Access" },
-      { icon: "circle", text: "VIP Priority Support" },
-      { icon: "check", text: "Premium Support" },
-    ],
+    features: ["Lifetime Access", "VIP Priority Support", "Premium Support"],
     buttonText: "Purchase Now",
     buttonStyle: "bg-red-600 hover:bg-red-700",
-    popular: false,
-    paypalType: "onetime" as const,
-    paypalAmount: "49.99",
+    isSubscription: false,
   },
   {
+    id: "custom-script",
     name: "Custom Script Request",
-    price: null,
-    originalPrice: null,
-    discount: null,
-    period: "",
-    duration: "",
+    price: 0,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    bgColor: "bg-yellow-500/5",
-    features: [
-      { icon: "zap", text: "Contact on Discord" },
-      { icon: "circle", text: "Custom script tailored to your needs" },
-      { icon: "check", text: "Professional support" },
-    ],
+    features: ["Contact on Discord", "Custom script tailored to your needs", "Professional support"],
     buttonText: "Contact on Discord",
     buttonStyle: "bg-yellow-600 hover:bg-yellow-700",
-    popular: false,
-    paypalType: null,
-    paypalAmount: null,
     isDiscord: true,
+    isSubscription: false,
   },
 ];
 
-function FeatureIcon({ type }: { type: string }) {
-  if (type === "zap") return <Zap className="h-4 w-4 text-primary flex-shrink-0" />;
-  if (type === "circle") return <div className="h-4 w-4 rounded-full border-2 border-orange-400 flex-shrink-0" />;
-  return <Check className="h-4 w-4 text-success flex-shrink-0" />;
+function FeatureIcon({ index }: { index: number }) {
+  if (index === 0) return <Zap className="h-4 w-4 text-primary flex-shrink-0" />;
+  if (index === 1) return <div className="h-4 w-4 rounded-full border-2 border-orange-400 flex-shrink-0" />;
+  return <Check className="h-4 w-4 text-green-500 flex-shrink-0" />;
 }
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -124,13 +90,23 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function PremiumKeys() {
+  const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
+  const [paypalClientId, setPaypalClientId] = useState<string>("");
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    supabase.functions.invoke("paypal-config").then(({ data }) => {
+      if (data?.client_id) setPaypalClientId(data.client_id);
+    });
+  }, []);
+
   const handlePurchase = (tier: typeof tiers[0]) => {
     if (tier.isDiscord) {
       window.open("https://discord.com/invite/ufrz9Zaqs8", "_blank");
       return;
     }
-    // Redirect to PayPal checkout via the external shop
-    window.location.href = `https://combooo-wickshop.vercel.app/?plan=${tier.name.toLowerCase().replace(/\s+/g, '-')}&amount=${tier.paypalAmount}`;
+    setSelectedTier(tier);
+    setModalOpen(true);
   };
 
   return (
@@ -139,11 +115,7 @@ export default function PremiumKeys() {
       <section className="relative py-16 sm:py-20 overflow-hidden">
         <VideoBackground overlay />
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <Key className="h-4 w-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">Premium Features</span>
@@ -152,7 +124,7 @@ export default function PremiumKeys() {
               <span className="text-gradient-primary">Premium Keys</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get instant access to premium features
+              Get instant access to premium features with secure PayPal checkout
             </p>
           </motion.div>
         </div>
@@ -175,7 +147,7 @@ export default function PremiumKeys() {
                     <h3 className={`font-heading text-sm font-bold uppercase tracking-wider mb-4 ${tier.color}`}>
                       {tier.name}
                     </h3>
-                    {tier.price ? (
+                    {tier.price > 0 ? (
                       <>
                         {tier.originalPrice && (
                           <div className="flex items-center justify-center gap-2 mb-1">
@@ -183,7 +155,7 @@ export default function PremiumKeys() {
                             <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-400">{tier.discount}</span>
                           </div>
                         )}
-                        <div className="text-4xl font-bold mb-1">{tier.price}</div>
+                        <div className="text-4xl font-bold mb-1">${tier.price}</div>
                         <p className="text-sm text-muted-foreground">Premium Key</p>
                       </>
                     ) : (
@@ -192,10 +164,10 @@ export default function PremiumKeys() {
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
-                    {tier.features.map((f) => (
-                      <li key={f.text} className="flex items-center gap-3 text-sm">
-                        <FeatureIcon type={f.icon} />
-                        <span>{f.text}</span>
+                    {tier.features.map((f, fi) => (
+                      <li key={f} className="flex items-center gap-3 text-sm">
+                        <FeatureIcon index={fi} />
+                        <span>{f}</span>
                       </li>
                     ))}
                   </ul>
@@ -256,8 +228,8 @@ export default function PremiumKeys() {
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { step: "1", title: "Choose a Plan", desc: "Select the Premium plan that best fits your needs — Trial, Monthly, or Lifetime." },
-              { step: "2", title: "Complete Payment", desc: "Pay securely through PayPal. All transactions are encrypted and covered by buyer protection." },
-              { step: "3", title: "Receive Your Key", desc: "Your unique Premium Key is generated instantly and appears in your ComboWick dashboard." },
+              { step: "2", title: "Secure Checkout", desc: "Pay securely through PayPal or Credit/Debit card. All transactions are encrypted." },
+              { step: "3", title: "Receive Your Key", desc: "Your unique Premium Key is generated instantly right in the checkout modal." },
               { step: "4", title: "Enjoy Benefits", desc: "Your premium features activate immediately. Access VIP channels, priority support, and more." },
             ].map((item) => (
               <div key={item.step} className="text-center">
@@ -302,6 +274,16 @@ export default function PremiumKeys() {
           </div>
         </div>
       </section>
+
+      {/* PayPal Checkout Modal */}
+      {selectedTier && paypalClientId && (
+        <PayPalCheckoutModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          tier={selectedTier}
+          paypalClientId={paypalClientId}
+        />
+      )}
     </Layout>
   );
 }

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      premium_key_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          customer_email: string | null
+          expires_at: string | null
+          id: string
+          key_generated: string
+          payment_id: string
+          status: string
+          tier: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          expires_at?: string | null
+          id?: string
+          key_generated: string
+          payment_id: string
+          status?: string
+          tier: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          customer_email?: string | null
+          expires_at?: string | null
+          id?: string
+          key_generated?: string
+          payment_id?: string
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       scripts: {
         Row: {
           category: string
