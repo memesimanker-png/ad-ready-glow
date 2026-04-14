@@ -94,6 +94,7 @@ export type Database = {
           description: string
           faqs: Json | null
           game: string
+          game_universe_id: number | null
           id: string
           long_description: string | null
           slug: string
@@ -110,6 +111,7 @@ export type Database = {
           description: string
           faqs?: Json | null
           game: string
+          game_universe_id?: number | null
           id?: string
           long_description?: string | null
           slug: string
@@ -126,6 +128,7 @@ export type Database = {
           description?: string
           faqs?: Json | null
           game?: string
+          game_universe_id?: number | null
           id?: string
           long_description?: string | null
           slug?: string
