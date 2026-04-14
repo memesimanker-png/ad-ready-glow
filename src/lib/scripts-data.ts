@@ -13,6 +13,7 @@ export type Script = {
   verified: boolean;
   code: string;
   faqs: { question: string; answer: string }[];
+  game_universe_id?: number | null;
 };
 
 export const CATEGORIES = [

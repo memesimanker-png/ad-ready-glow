@@ -15,7 +15,7 @@ const emptyScript = {
   title: "", slug: "", description: "", longDescription: "",
   game: "", category: "Utility", tags: [] as string[],
   code: "", faqs: [] as { question: string; answer: string }[],
-  trending: false, verified: true,
+  trending: false, verified: true, gameUniverseId: "" as string,
 };
 
 export default function Admin() {
@@ -105,6 +105,7 @@ function ScriptsTab() {
         long_description: form.longDescription, game: form.game, category: form.category,
         tags: form.tags, code: form.code, faqs: form.faqs as any,
         trending: form.trending, verified: form.verified,
+        game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -136,6 +137,7 @@ function ScriptsTab() {
       longDescription: s.long_description || "", game: s.game, category: s.category,
       tags: s.tags || [], code: s.code, faqs: s.faqs || [],
       trending: !!s.trending, verified: !!s.verified,
+      gameUniverseId: s.game_universe_id ? String(s.game_universe_id) : "",
     });
     setEditingId(s.id);
     setShowForm(true);
@@ -173,7 +175,8 @@ function ScriptsTab() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className="text-sm font-medium mb-1 block">Title *</label><input value={form.title} onChange={e => set("title", e.target.value)} className={inputCls} /></div>
             <div><label className="text-sm font-medium mb-1 block">Slug *</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={inputCls} /></div>
-            <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} /></div>
+            <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} placeholder="e.g. Prison Life" /></div>
+            <div><label className="text-sm font-medium mb-1 block">Game Universe ID</label><input value={form.gameUniverseId} onChange={e => set("gameUniverseId", e.target.value)} className={inputCls} placeholder="Roblox Universe ID for thumbnail" /></div>
             <div><label className="text-sm font-medium mb-1 block">Category *</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}

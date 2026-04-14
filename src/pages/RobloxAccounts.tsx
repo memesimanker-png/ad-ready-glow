@@ -1,7 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import {
   Shield, Zap, Check, Lock, HeadphonesIcon,
   ChevronDown, ChevronUp, Clock, Download, Eye
@@ -13,6 +12,8 @@ const packages = [
   { size: 50, price: 11, perAccount: "0.22", label: "Popular", popular: true },
   { size: 100, price: 20, perAccount: "0.20", label: "Pro", popular: false },
 ];
+
+const EXTERNAL_SHOP_URL = "https://combooo-wickshop.vercel.app/roblox-accounts";
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -35,7 +36,6 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 export default function RobloxAccounts() {
   return (
     <Layout>
-      {/* Hero */}
       <section className="py-16 sm:py-20 bg-gradient-hero">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/30 mb-6">
@@ -43,29 +43,26 @@ export default function RobloxAccounts() {
             <span className="text-xs font-semibold text-success uppercase tracking-wider">In Stock • Instant Delivery</span>
           </div>
           <h1 className="font-heading text-4xl sm:text-5xl font-bold tracking-tight mb-6 max-w-4xl mx-auto">
-            Buy Verified <span className="text-gradient-primary">Roblox Accounts</span> in Bulk
+            Verified <span className="text-gradient-primary">Roblox Accounts</span> in Bulk
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            ComboWick provides verified, ready-to-use Roblox accounts for developers, content creators, and studios. Every account is manually verified with working credentials, valid email addresses, and proper age verification. Choose from packages of 25, 50, or 100 accounts with instant automated delivery after PayPal checkout.
+            ComboWick provides verified, ready-to-use Roblox accounts for developers, content creators, and studios. Every account is manually verified with working credentials.
           </p>
         </div>
       </section>
 
-      {/* What You Get */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-4">What's Included With Every Account</h2>
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">
-            We don't cut corners. Every Roblox account we sell goes through a rigorous verification process before being listed in our inventory.
-          </p>
+          <h2 className="font-heading text-3xl font-bold text-center mb-4">What's Included</h2>
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">Every account goes through a rigorous verification process.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Shield, title: "Manual Verification", desc: "Each account is individually checked by our team to ensure the username and password work correctly, the email is verified, and the account isn't flagged or banned." },
-              { icon: Zap, title: "Instant Automated Delivery", desc: "Once your PayPal payment is confirmed, our system automatically delivers account credentials to your ComboWick dashboard within seconds. No manual processing delays." },
-              { icon: Lock, title: "Secure Credential Storage", desc: "Your purchased account credentials are stored in your encrypted dashboard. Only you can access them. We recommend changing passwords immediately after receiving your accounts." },
-              { icon: Download, title: "Bulk Export Options", desc: "Download all your account credentials as a formatted text file for easy management. Perfect for developers who need to import credentials into testing tools or scripts." },
-              { icon: Eye, title: "Account Details Visible", desc: "View each account's username, password, creation date, and verification status directly in your dashboard. Full transparency on what you're getting." },
-              { icon: HeadphonesIcon, title: "24/7 Replacement Guarantee", desc: "If any account doesn't work as described, our Discord support team is available around the clock to provide a replacement or resolve the issue." },
+              { icon: Shield, title: "Manual Verification", desc: "Each account is individually checked to ensure credentials work correctly and the account isn't flagged." },
+              { icon: Zap, title: "Instant Delivery", desc: "Automated delivery within seconds of payment confirmation." },
+              { icon: Lock, title: "Secure Storage", desc: "Credentials stored securely. We recommend changing passwords immediately." },
+              { icon: Download, title: "Bulk Export", desc: "Download all credentials as a formatted text file for easy management." },
+              { icon: Eye, title: "Full Transparency", desc: "View each account's username, password, and verification status." },
+              { icon: HeadphonesIcon, title: "24/7 Support", desc: "Discord support team available around the clock for replacements or issues." },
             ].map((item) => (
               <Card key={item.title} className="p-6 bg-glass hover:border-primary/30 transition-all">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
@@ -79,47 +76,11 @@ export default function RobloxAccounts() {
         </div>
       </section>
 
-      {/* Use Cases */}
-      <section className="py-16 sm:py-20 bg-muted/20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-4">Who Buys Roblox Accounts?</h2>
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">
-            Our customers span a wide range of use cases. Here's why thousands of people trust ComboWick for their Roblox account needs.
-          </p>
-          <div className="space-y-6">
-            {[
-              {
-                title: "Game Developers & QA Testers",
-                desc: "Roblox game developers frequently need multiple accounts to test their games across different scenarios — testing multiplayer functionality, verifying permission systems, simulating different player states, and stress-testing game servers. Instead of manually creating and verifying dozens of accounts, developers save hours by purchasing pre-verified accounts from ComboWick. Our accounts are ready to use immediately, letting developers focus on building great games instead of managing test accounts."
-              },
-              {
-                title: "Content Creators & YouTubers",
-                desc: "Roblox content creators and YouTubers often need multiple accounts for recording content — whether it's comparing game experiences from different perspectives, creating tutorial videos that require fresh accounts, or managing community events with alt accounts. ComboWick provides instant access to verified accounts, eliminating the tedious process of creating, verifying emails, and setting up new accounts manually."
-              },
-              {
-                title: "Studio Teams & Organizations",
-                desc: "Professional Roblox studios managing multiple games need dedicated accounts for different team members, testing environments, and production workflows. Our Pro package (100 accounts) is designed specifically for teams that need reliable, verified accounts at scale. With priority support included, studio teams get the responsive service they need for time-sensitive projects."
-              },
-              {
-                title: "Backup & Security-Conscious Players",
-                desc: "Some players purchase additional accounts as backups in case their primary account faces issues. Having verified backup accounts means you're never locked out of the Roblox ecosystem. These accounts can also be used for managing separate game inventories or participating in different communities without mixing identities."
-              },
-            ].map((item) => (
-              <Card key={item.title} className="p-6 bg-glass">
-                <h3 className="font-heading text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
       <section id="pricing" className="py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-heading text-3xl font-bold text-center mb-4">Account Packages & Pricing</h2>
           <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">
-            All packages include verified accounts with instant automated delivery. Larger packages offer better per-account value, saving you up to 17% compared to the Starter package.
+            All packages include verified accounts with instant delivery.
           </p>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {packages.map((pkg) => (
@@ -149,65 +110,36 @@ export default function RobloxAccounts() {
                   {pkg.size >= 50 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Bulk discount applied</li>}
                   {pkg.size >= 100 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Priority support</li>}
                 </ul>
-                <Link to="/login">
+                <a href={EXTERNAL_SHOP_URL} target="_blank" rel="noopener noreferrer">
                   <Button className="w-full" variant={pkg.popular ? "default" : "outline"}>
                     Purchase Now
                   </Button>
-                </Link>
+                </a>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">Roblox Accounts FAQ</h2>
+          <h2 className="font-heading text-3xl font-bold text-center mb-12">FAQ</h2>
           <div className="space-y-3">
-            <FAQItem
-              q="What exactly do I receive after purchasing?"
-              a="After completing your PayPal payment, you'll receive a set of account credentials (username and password) delivered to your ComboWick dashboard. Each account has a verified email address, working login credentials, and has been checked for bans or restrictions. You can view, copy, or download all credentials from your dashboard."
-            />
-            <FAQItem
-              q="How long does delivery take?"
-              a="Delivery is fully automated and happens within seconds of PayPal payment confirmation. There is no manual processing step. As soon as PayPal notifies our system that your payment is complete, the accounts appear in your dashboard immediately."
-            />
-            <FAQItem
-              q="Can I use these accounts for game development testing?"
-              a="Absolutely. Many of our customers are Roblox game developers who need multiple accounts for testing multiplayer features, permission systems, and game mechanics. Our accounts are fully functional Roblox accounts that work identically to manually created ones."
-            />
-            <FAQItem
-              q="What if an account doesn't work?"
-              a="We stand behind every account we sell. If any account's credentials don't work or the account is restricted, contact our 24/7 Discord support team. We'll either replace the account or resolve the issue promptly. Your satisfaction is guaranteed."
-            />
-            <FAQItem
-              q="Do you offer custom bulk orders over 100 accounts?"
-              a="Yes. For orders exceeding 100 accounts, please contact us through Discord for custom pricing. We regularly fulfill orders of 500+ accounts for studios and large development teams. Custom orders include dedicated support and flexible delivery options."
-            />
-            <FAQItem
-              q="Is this legal and safe?"
-              a="Purchasing Roblox accounts is a common practice for development, testing, and content creation purposes. All transactions are processed through PayPal with full buyer protection. We use SSL encryption for all data transfer, and your credentials are stored securely in your encrypted dashboard."
-            />
+            <FAQItem q="What do I receive after purchasing?" a="Account credentials (username and password) delivered to your dashboard. Each account has a verified email and working login." />
+            <FAQItem q="How long does delivery take?" a="Delivery is fully automated and happens within seconds of payment confirmation." />
+            <FAQItem q="What if an account doesn't work?" a="Contact our 24/7 Discord support team for a replacement or resolution." />
+            <FAQItem q="Do you offer custom bulk orders?" a="Yes. For orders exceeding 100 accounts, contact us through Discord for custom pricing." />
           </div>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-3xl font-bold mb-4">Ready to Get Your Roblox Accounts?</h2>
-          <p className="text-muted-foreground text-lg mb-8">
-            Get verified Roblox accounts with instant delivery, PayPal buyer protection, and 24/7 Discord support. Browse our packages and get started today.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#pricing">
-              <Button size="lg" className="text-base px-8 py-6">View Packages</Button>
-            </a>
-            <Link to="/blog/roblox-account-security-guide">
-              <Button variant="outline" size="lg" className="text-base px-8 py-6">Read Security Guide</Button>
-            </Link>
-          </div>
+          <h2 className="font-heading text-3xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-muted-foreground text-lg mb-8">Browse our packages and get started today.</p>
+          <a href="#pricing">
+            <Button size="lg" className="text-base px-8 py-6">View Packages</Button>
+          </a>
         </div>
       </section>
     </Layout>

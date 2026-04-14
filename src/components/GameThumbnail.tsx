@@ -3,6 +3,7 @@ import { Gamepad2 } from "lucide-react";
 
 interface GameThumbnailProps {
   gameName: string;
+  universeId?: number | null;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
@@ -13,8 +14,8 @@ const sizeMap = {
   lg: "w-20 h-20 rounded-xl",
 };
 
-export function GameThumbnail({ gameName, className = "", size = "sm" }: GameThumbnailProps) {
-  const thumbnail = useGameThumbnail(gameName);
+export function GameThumbnail({ gameName, universeId, className = "", size = "sm" }: GameThumbnailProps) {
+  const thumbnail = useGameThumbnail(universeId);
 
   return thumbnail ? (
     <img

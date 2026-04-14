@@ -18,6 +18,7 @@ function mapRow(row: any): Script {
     verified: row.verified || false,
     code: row.code,
     faqs: (row.faqs as any[]) || [],
+    game_universe_id: row.game_universe_id || null,
   };
 }
 

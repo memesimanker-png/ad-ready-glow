@@ -2,7 +2,6 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { PricingSection } from "@/components/home/PricingSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { FAQSection } from "@/components/home/FAQSection";
@@ -30,7 +29,7 @@ export default function Index() {
           >
             <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse-neon" />
             <span className="text-xs font-semibold text-primary uppercase tracking-[0.2em]">
-              {t("Available Now • Instant Delivery")}
+              Combo_WICK Official
             </span>
           </motion.div>
 
@@ -40,9 +39,8 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="font-heading text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-6 max-w-3xl leading-[1.1]"
           >
-            {t("Premium Verified")}{" "}
-            <span className="text-gradient-neon">{t("Roblox Accounts")}</span>{" "}
-            {t("Delivered Instantly")}
+            Welcome to{" "}
+            <span className="text-gradient-neon">Combo_WICK</span>
           </motion.h1>
 
           <motion.p
@@ -51,7 +49,7 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-sm sm:text-base text-muted-foreground max-w-xl mb-8 leading-relaxed"
           >
-            {t("hero_desc")}
+            Your one-stop hub for free Roblox scripts, premium keys, and more. Trusted by our growing community of gamers and developers.
           </motion.p>
 
           <motion.div
@@ -60,26 +58,24 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.45 }}
             className="flex flex-col sm:flex-row items-start gap-4"
           >
-            <a href="#pricing">
+            <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider font-bold neon-glow group">
-                {t("View Packages")}
+                Browse Scripts
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-            </a>
-            <Link to="/about">
+            </Link>
+            <Link to="/premium-keys">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
-                {t("Learn More")}
+                Premium Keys
               </Button>
             </Link>
           </motion.div>
         </div>
 
-        {/* Bottom fade line */}
         <div className="absolute bottom-0 left-0 right-0 h-px line-glow" />
       </section>
 
       <FeaturesSection />
-      <PricingSection />
       <HowItWorksSection />
       <BlogPreviewSection />
       <FAQSection />
@@ -99,14 +95,14 @@ export default function Index() {
             {t("Ready to Get Started?")}
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-            {t("cta_desc")}
+            Join the community and explore our collection of scripts, premium keys, and tools.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#pricing">
+            <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider neon-glow">
-                {t("Browse Packages")}
+                Explore Scripts
               </Button>
-            </a>
+            </Link>
             <Link to="/blog">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
                 {t("Read Our Guides")}
