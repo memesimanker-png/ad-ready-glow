@@ -36,6 +36,15 @@ export default function VerifyProviderSelect() {
   const [discordTimer, setDiscordTimer] = useState(0);
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
 
+  // Load onclick pounder script only on this page
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.dataset.zone = "10877295";
+    script.src = "https://al5sm.com/tag.min.js";
+    document.body.appendChild(script);
+    return () => { script.remove(); };
+  }, []);
+
   useEffect(() => {
     setMounted(true);
 
