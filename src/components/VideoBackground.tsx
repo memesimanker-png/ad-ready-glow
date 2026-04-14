@@ -1,4 +1,10 @@
-const HERO_VIDEO_URL = "https://iphiksvnuzpteoryrdxf.supabase.co/storage/v1/object/public/site-assets/hero-bg.mp4";
+import { useState, useEffect, useCallback } from "react";
+import gallery1 from "@/assets/gallery-1.png";
+import gallery2 from "@/assets/gallery-2.png";
+import gallery3 from "@/assets/gallery-3.png";
+import gallery4 from "@/assets/gallery-4.png";
+
+const images = [gallery1, gallery2, gallery3, gallery4];
 
 interface VideoBackgroundProps {
   className?: string;
@@ -6,18 +12,31 @@ interface VideoBackgroundProps {
 }
 
 export function VideoBackground({ className = "", overlay = true }: VideoBackgroundProps) {
+  const [current, setCurrent] = useState(0);
+
+  const next = useCallback(() => {
+    setCurrent((prev) => (prev + 1) % images.length);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(next, 5000);
+    return () => clearInterval(id);
+  }, [next]);
+
   return (
     <div className={`absolute inset-0 overflow-hidden ${className}`}>
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover"
-        style={{ filter: "brightness(0.5) saturate(1.2)" }}
-      >
-        <source src={HERO_VIDEO_URL} type="video/mp4" />
-      </video>
+      {images.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-in-out"
+          style={{
+            opacity: i === current ? 1 : 0,
+            filter: "brightness(0.45) saturate(1.2)",
+          }}
+        />
+      ))}
       {overlay && (
         <>
           <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/20 to-background" />
