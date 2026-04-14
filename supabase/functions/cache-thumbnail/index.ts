@@ -7,6 +7,28 @@ const corsHeaders = {
 
 const BUCKET = "game-thumbnails";
 
+async function resolveUniverseId(id: string): Promise<string | null> {
+  // First try as universe ID directly
+  const thumbRes = await fetch(
+    `https://thumbnails.roblox.com/v1/games/icons?universeIds=${id}&returnPolicy=PlaceHolder&size=150x150&format=Png&isCircular=false`
+  );
+  if (thumbRes.ok) {
+    const data = await thumbRes.json();
+    if (data?.data?.[0]?.imageUrl) return id;
+  }
+
+  // If that fails, try as place ID → get universe ID
+  try {
+    const placeRes = await fetch(`https://apis.roblox.com/universes/v1/places/${id}/universe`);
+    if (placeRes.ok) {
+      const placeData = await placeRes.json();
+      if (placeData?.universeId) return String(placeData.universeId);
+    }
+  } catch {}
+
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -14,9 +36,9 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const universeId = url.searchParams.get("id");
+    const rawId = url.searchParams.get("id");
 
-    if (!universeId || !/^\d+$/.test(universeId)) {
+    if (!rawId || !/^\d+$/.test(rawId)) {
       return new Response(JSON.stringify({ error: "Missing or invalid id parameter" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -27,10 +49,10 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    const filePath = `${universeId}.png`;
+    // Check cache first using rawId as filename
+    const filePath = `${rawId}.png`;
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${filePath}`;
 
-    // Check if file already exists
     const { data: existing } = await supabase.storage
       .from(BUCKET)
       .createSignedUrl(filePath, 1);
@@ -41,7 +63,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fetch from Roblox thumbnails API directly
+    // Resolve the ID (could be universe or place ID)
+    const universeId = await resolveUniverseId(rawId);
+    if (!universeId) {
+      console.error(`Could not resolve ID ${rawId} to a universe ID`);
+      return new Response(JSON.stringify({ error: "No thumbnail found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Fetch thumbnail using resolved universe ID
     const robloxRes = await fetch(
       `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&returnPolicy=PlaceHolder&size=150x150&format=Png&isCircular=false`
     );

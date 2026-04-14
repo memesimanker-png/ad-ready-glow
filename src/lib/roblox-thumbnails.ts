@@ -1,7 +1,7 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-const CACHE_KEY = "roblox_thumb_cache_v4";
+const CACHE_KEY = "roblox_thumb_cache_v5";
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
 interface CacheEntry { url: string; ts: number; }
