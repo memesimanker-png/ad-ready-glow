@@ -1,11 +1,17 @@
 import gallery1 from "@/assets/gallery-1.png";
 import gallery2 from "@/assets/gallery-2.png";
 import gallery3 from "@/assets/gallery-3.png";
+import gallery4 from "@/assets/gallery-4.png";
+import gallery5 from "@/assets/gallery-5.png";
+import gallery6 from "@/assets/gallery-6.png";
 
 const images = [
   { src: gallery1, alt: "Combo_WICK character with swords" },
   { src: gallery2, alt: "Combo_WICK in a car" },
   { src: gallery3, alt: "Combo_WICK mirror selfie" },
+  { src: gallery4, alt: "Combo_WICK with cows" },
+  { src: gallery5, alt: "Combo_WICK vibes" },
+  { src: gallery6, alt: "Combo_WICK style" },
 ];
 
 export function GallerySection() {
@@ -14,7 +20,7 @@ export function GallerySection() {
       <div className="mx-auto max-w-6xl">
         <h2 className="text-2xl font-bold font-heading text-center mb-2">The Gallery</h2>
         <p className="text-center text-muted-foreground mb-10 text-sm">Combo_WICK vibes only.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
           {images.map((img, i) => (
             <div
               key={i}
