@@ -70,6 +70,11 @@ export default function Index() {
                 Premium Keys
               </Button>
             </Link>
+            <Link to="/keys">
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
+                Get Key
+              </Button>
+            </Link>
           </motion.div>
         </div>
 
