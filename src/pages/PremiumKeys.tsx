@@ -252,7 +252,7 @@ export default function PremiumKeys() {
             <FAQItem q="Can I upgrade from a Trial to Monthly or Lifetime?" a="Yes! You can upgrade at any time from your dashboard. If you upgrade during an active trial, the remaining trial days are credited proportionally toward your new plan." />
             <FAQItem q="What happens when my Premium Key expires?" a="When your key expires, you'll revert to a free account. Your purchase history, account credentials, and dashboard data remain intact — you just lose access to premium features." />
             <FAQItem q="Can I use my Premium Key on multiple devices?" a="It depends on your plan. The 7-Day Trial allows activation on a single device. Monthly Access supports up to 3 devices simultaneously. Lifetime Access provides unlimited device activations." />
-            <FAQItem q="Is there a refund policy for Premium Keys?" a="Yes. If you're unsatisfied with your Premium Key purchase, you can request a refund within 24 hours of purchase, provided the key hasn't been extensively used. Contact our support team on Discord." />
+            <FAQItem q="Is there a refund policy for Premium Keys?" a="All sales are final. Due to the instant digital nature of premium keys, we do not offer refunds. Keys are delivered immediately upon purchase and cannot be returned. Please review your selection carefully before purchasing." />
             <FAQItem q="Do Premium Keys work with all ComboWick products?" a="Premium Keys enhance your entire ComboWick experience. The benefits apply across all products — Roblox accounts, future product launches, and platform features." />
           </div>
         </div>

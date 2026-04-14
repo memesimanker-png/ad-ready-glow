@@ -14,7 +14,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: "brightness(0.3) saturate(1.4)" }}
+        style={{ filter: "brightness(0.3) saturate(1.4)", minWidth: "100%", minHeight: "100%" }}
       >
         <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
