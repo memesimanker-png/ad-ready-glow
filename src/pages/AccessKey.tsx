@@ -29,6 +29,15 @@ export default function AccessKey() {
   const [showDirectLinkGate, setShowDirectLinkGate] = useState(true);
   const [error, setError] = useState("");
 
+  // Load onclick pounder on access key page only
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.dataset.zone = "10877295";
+    script.src = "https://al5sm.com/tag.min.js";
+    document.body.appendChild(script);
+    return () => { script.remove(); };
+  }, []);
+
   // Verify steps are completed & load stored key
   useEffect(() => {
     const step3Done = localStorage.getItem("step3_completed");
