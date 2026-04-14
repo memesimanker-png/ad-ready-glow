@@ -57,7 +57,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
           <img
             src={images[prev]}
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             style={{ filter: "brightness(0.55) saturate(1.15)" }}
           />
         </div>
@@ -72,7 +72,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         <img
           src={images[current]}
           alt=""
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
           style={{ filter: "brightness(0.55) saturate(1.15)" }}
         />
       </div>
