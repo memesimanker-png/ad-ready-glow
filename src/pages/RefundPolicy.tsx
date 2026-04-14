@@ -18,9 +18,9 @@ export default function RefundPolicy() {
             <div className="flex items-start gap-4">
               <AlertTriangle className="h-6 w-6 text-destructive flex-shrink-0 mt-1" />
               <div>
-                <h2 className="font-heading text-xl font-bold text-destructive mb-2">Digital Products — No General Refunds</h2>
+                <h2 className="font-heading text-xl font-bold text-destructive mb-2">All Sales Are Final — No Refunds</h2>
                 <p className="text-foreground text-sm leading-relaxed">
-                  Due to the instant digital nature of our products (Roblox account credentials and premium keys), all sales are final once delivery is completed. Because digital credentials cannot be "returned" after being accessed, we are unable to process refunds for successfully delivered orders.
+                  Due to the instant digital nature of our products (premium keys and digital credentials), all sales are final. We do not offer refunds under any circumstances. Products are delivered immediately upon payment and cannot be returned or reversed.
                 </p>
               </div>
             </div>
@@ -48,14 +48,14 @@ export default function RefundPolicy() {
           </Card>
 
           <Card className="p-8 bg-glass mb-6">
-            <h2 className="font-heading text-2xl font-semibold mb-4">Exceptions — When We Will Help</h2>
+            <h2 className="font-heading text-2xl font-semibold mb-4">Support — When We Will Help</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              While general refunds are not available, we are committed to customer satisfaction. We will replace or resolve issues in the following cases:
+              While we do not offer refunds, we are committed to customer satisfaction. We will assist in the following cases:
             </p>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li>• <strong className="text-foreground">Non-working accounts:</strong> If an account credential doesn't work at the time of delivery, contact us within 24 hours for a free replacement.</li>
+              <li>• <strong className="text-foreground">Non-working keys:</strong> If a premium key doesn't activate at the time of delivery, contact us within 24 hours for a replacement.</li>
               <li>• <strong className="text-foreground">Incorrect delivery:</strong> If you receive a different product than what you ordered, we'll correct it immediately.</li>
-              <li>• <strong className="text-foreground">Duplicate charges:</strong> If you were charged multiple times for a single order, we'll refund the duplicate charge promptly.</li>
+              <li>• <strong className="text-foreground">Duplicate charges:</strong> If you were charged multiple times for a single order, we'll resolve the duplicate charge.</li>
               <li>• <strong className="text-foreground">Technical errors:</strong> If a system error prevented proper delivery, we'll redeliver or resolve the issue.</li>
             </ul>
           </Card>
