@@ -283,10 +283,11 @@ export default function PremiumKeys() {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           tier={{
-            ...selectedTier,
+            id: selectedTier.id,
             name: t(selectedTier.nameKey),
-            features: selectedTier.featureKeys.map(f => t(f)),
-            buttonText: t(selectedTier.buttonTextKey),
+            price: selectedTier.price,
+            isSubscription: selectedTier.isSubscription,
+            subscriptionPrice: selectedTier.subscriptionPrice,
           }}
           paypalClientId={paypalClientId}
         />
