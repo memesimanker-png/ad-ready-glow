@@ -105,6 +105,7 @@ function ScriptsTab() {
         long_description: form.longDescription, game: form.game, category: form.category,
         tags: form.tags, code: form.code, faqs: form.faqs as any,
         trending: form.trending, verified: form.verified,
+        game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -136,6 +137,7 @@ function ScriptsTab() {
       longDescription: s.long_description || "", game: s.game, category: s.category,
       tags: s.tags || [], code: s.code, faqs: s.faqs || [],
       trending: !!s.trending, verified: !!s.verified,
+      gameUniverseId: s.game_universe_id ? String(s.game_universe_id) : "",
     });
     setEditingId(s.id);
     setShowForm(true);
