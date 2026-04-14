@@ -15,7 +15,7 @@ const emptyScript = {
   title: "", slug: "", description: "", longDescription: "",
   game: "", category: "Utility", tags: [] as string[],
   code: "", faqs: [] as { question: string; answer: string }[],
-  trending: false, verified: true,
+  trending: false, verified: true, gameUniverseId: "" as string,
 };
 
 export default function Admin() {
