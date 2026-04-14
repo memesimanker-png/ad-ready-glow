@@ -14,7 +14,7 @@ interface StoredKeyData {
   generated_at: number;
 }
 
-const DIRECT_LINK_URL = "https://otieu.com/4/10494355";
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 
 export default function AccessKey() {
   const navigate = useNavigate();
