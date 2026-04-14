@@ -37,6 +37,7 @@ import AccessKey from "./pages/AccessKey";
 import Blocked from "./pages/Blocked";
 import Register from "./pages/Register";
 import ClaimAccess from "./pages/ClaimAccess";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
