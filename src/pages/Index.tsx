@@ -6,6 +6,7 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { BlogPreviewSection } from "@/components/home/BlogPreviewSection";
+import { GallerySection } from "@/components/home/GallerySection";
 import { VideoBackground } from "@/components/VideoBackground";
 import { useTranslation } from "@/lib/translation-context";
 import { motion } from "framer-motion";
@@ -76,6 +77,7 @@ export default function Index() {
       </section>
 
       <FeaturesSection />
+      <GallerySection />
       <HowItWorksSection />
       <BlogPreviewSection />
       <FAQSection />
