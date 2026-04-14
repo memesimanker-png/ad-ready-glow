@@ -10,55 +10,56 @@ import { VideoBackground } from "@/components/VideoBackground";
 import { motion } from "framer-motion";
 import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/lib/translation-context";
 
 const tiers = [
   {
     id: "trial-7day",
-    name: "7-Day Trial",
+    nameKey: "7-Day Trial",
     price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    features: ["7 Days Full Access", "Instant Activation", "Great for Trying Out"],
-    buttonText: "Purchase Now",
+    featureKeys: ["7 Days Full Access", "Instant Activation", "Great for Trying Out"],
+    buttonTextKey: "Purchase Now",
     buttonStyle: "bg-primary hover:bg-primary/90",
     isSubscription: false,
   },
   {
     id: "monthly",
-    name: "Monthly Access",
+    nameKey: "Monthly Access",
     price: 9.99,
     originalPrice: "$20",
     discount: "50% OFF",
     color: "text-green-400",
     borderColor: "border-green-500/30",
-    features: ["30 Days Access", "Priority Support", "Premium Support"],
-    buttonText: "Purchase Now",
+    featureKeys: ["30 Days Access", "Priority support", "Premium Support"],
+    buttonTextKey: "Purchase Now",
     buttonStyle: "bg-green-600 hover:bg-green-700",
     popular: true,
     isSubscription: true,
     subscriptionPrice: 8,
-    subscribeText: "Subscribe & Save $2!",
-    subscribeSubtext: "$8 /month with subscription",
+    subscribeTextKey: "Subscribe & Save $2!",
+    subscribeSubtextKey: "$8 /month with subscription",
   },
   {
     id: "lifetime",
-    name: "Lifetime Key",
+    nameKey: "Lifetime Key",
     price: 49.99,
     color: "text-red-400",
     borderColor: "border-red-500/30",
-    features: ["Lifetime Access", "VIP Priority Support", "Premium Support"],
-    buttonText: "Purchase Now",
+    featureKeys: ["Lifetime Access", "VIP Priority Support", "Premium Support"],
+    buttonTextKey: "Purchase Now",
     buttonStyle: "bg-red-600 hover:bg-red-700",
     isSubscription: false,
   },
   {
     id: "custom-script",
-    name: "Custom Script Request",
+    nameKey: "Custom Script Request",
     price: 0,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    features: ["Contact on Discord", "Custom script tailored to your needs", "Professional support"],
-    buttonText: "Contact on Discord",
+    featureKeys: ["Contact on Discord", "Custom script tailored to your needs", "Professional support"],
+    buttonTextKey: "Contact on Discord",
     buttonStyle: "bg-yellow-600 hover:bg-yellow-700",
     isDiscord: true,
     isSubscription: false,
@@ -90,6 +91,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function PremiumKeys() {
+  const { t } = useTranslation();
   const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
   const [paypalClientId, setPaypalClientId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -118,13 +120,13 @@ export default function PremiumKeys() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6">
               <Key className="h-4 w-4 text-primary" />
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">Premium Features</span>
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">{t("Premium Features")}</span>
             </div>
             <h1 className="font-heading text-4xl sm:text-5xl font-bold tracking-tight mb-4 max-w-4xl mx-auto">
-              <span className="text-gradient-primary">Premium Keys</span>
+              <span className="text-gradient-primary">{t("Premium Keys")}</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get instant access to premium features with secure PayPal checkout
+              {t("prem_hero_desc")}
             </p>
           </motion.div>
         </div>
@@ -136,7 +138,7 @@ export default function PremiumKeys() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tiers.map((tier, i) => (
               <motion.div
-                key={tier.name}
+                key={tier.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -145,7 +147,7 @@ export default function PremiumKeys() {
                 <Card className={`p-6 h-full flex flex-col card-neon ${tier.borderColor}`}>
                   <div className="text-center mb-6">
                     <h3 className={`font-heading text-sm font-bold uppercase tracking-wider mb-4 ${tier.color}`}>
-                      {tier.name}
+                      {t(tier.nameKey)}
                     </h3>
                     {tier.price > 0 ? (
                       <>
@@ -156,7 +158,7 @@ export default function PremiumKeys() {
                           </div>
                         )}
                         <div className="text-4xl font-bold mb-1">${tier.price}</div>
-                        <p className="text-sm text-muted-foreground">Premium Key</p>
+                        <p className="text-sm text-muted-foreground">{t("Premium Key")}</p>
                       </>
                     ) : (
                       <div className="py-4" />
@@ -164,18 +166,18 @@ export default function PremiumKeys() {
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
-                    {tier.features.map((f, fi) => (
+                    {tier.featureKeys.map((f, fi) => (
                       <li key={f} className="flex items-center gap-3 text-sm">
                         <FeatureIcon index={fi} />
-                        <span>{f}</span>
+                        <span>{t(f)}</span>
                       </li>
                     ))}
                   </ul>
 
-                  {tier.subscribeText && (
+                  {tier.subscribeTextKey && (
                     <div className="text-center mb-3 p-3 rounded-lg bg-accent/10 border border-accent/20">
-                      <p className="text-sm font-semibold text-accent">{tier.subscribeText}</p>
-                      <p className="text-xs text-muted-foreground">{tier.subscribeSubtext}</p>
+                      <p className="text-sm font-semibold text-accent">{t(tier.subscribeTextKey)}</p>
+                      <p className="text-xs text-muted-foreground">{t(tier.subscribeSubtextKey!)}</p>
                     </div>
                   )}
 
@@ -184,7 +186,7 @@ export default function PremiumKeys() {
                     className={`w-full py-5 font-bold ${tier.buttonStyle}`}
                   >
                     {tier.isDiscord && <MessageCircle className="h-4 w-4 mr-2" />}
-                    {tier.buttonText}
+                    {t(tier.buttonTextKey)}
                   </Button>
                 </Card>
               </motion.div>
@@ -196,25 +198,25 @@ export default function PremiumKeys() {
       {/* What Are Premium Keys */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-4">What Are Premium Keys?</h2>
+          <h2 className="font-heading text-3xl font-bold text-center mb-4">{t("What Are Premium Keys?")}</h2>
           <p className="text-muted-foreground text-center max-w-3xl mx-auto mb-12 text-lg leading-relaxed">
-            Premium Keys are unique activation codes that unlock enhanced features on the ComboWick platform. When you purchase a Premium Key, it's generated instantly and tied to your account.
+            {t("prem_what_desc")}
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Unlock, title: "Early Access to New Products", desc: "Premium members get first access to new account batches and product launches before they're available to the general public." },
-              { icon: Zap, title: "Priority Queue Processing", desc: "Your orders are processed with priority during high-demand periods. Premium members always get instant delivery." },
-              { icon: Shield, title: "Extended Replacement Warranty", desc: "Premium members receive an extended 30-day replacement warranty on all purchased accounts." },
-              { icon: RefreshCw, title: "Auto-Renewal & Notifications", desc: "Monthly subscribers can enable auto-renewal. You'll also receive email notifications about restocks and sales." },
-              { icon: Award, title: "VIP Discord Channel", desc: "Lifetime and Monthly members get access to an exclusive VIP Discord channel with direct access to our team." },
-              { icon: Star, title: "Loyalty Rewards Program", desc: "Monthly subscribers receive a 10% loyalty discount after 3 consecutive months, increasing to 15% after 6 months." },
+              { icon: Unlock, titleKey: "Early Access to New Products", descKey: "prem_early_desc" },
+              { icon: Zap, titleKey: "Priority Queue Processing", descKey: "prem_priority_desc" },
+              { icon: Shield, titleKey: "Extended Replacement Warranty", descKey: "prem_warranty_desc" },
+              { icon: RefreshCw, titleKey: "Auto-Renewal & Notifications", descKey: "prem_renewal_desc" },
+              { icon: Award, titleKey: "VIP Discord Channel", descKey: "prem_vip_desc" },
+              { icon: Star, titleKey: "Loyalty Rewards Program", descKey: "prem_loyalty_desc" },
             ].map((item) => (
-              <Card key={item.title} className="p-6 bg-glass hover:border-primary/30 transition-all">
+              <Card key={item.titleKey} className="p-6 bg-glass hover:border-primary/30 transition-all">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
                   <item.icon className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-heading text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h3 className="font-heading text-lg font-semibold mb-2">{t(item.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descKey)}</p>
               </Card>
             ))}
           </div>
@@ -224,20 +226,20 @@ export default function PremiumKeys() {
       {/* How It Works */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">How Premium Keys Work</h2>
+          <h2 className="font-heading text-3xl font-bold text-center mb-12">{t("How Premium Keys Work")}</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: "1", title: "Choose a Plan", desc: "Select the Premium plan that best fits your needs — Trial, Monthly, or Lifetime." },
-              { step: "2", title: "Secure Checkout", desc: "Pay securely through PayPal or Credit/Debit card. All transactions are encrypted." },
-              { step: "3", title: "Receive Your Key", desc: "Your unique Premium Key is generated instantly right in the checkout modal." },
-              { step: "4", title: "Enjoy Benefits", desc: "Your premium features activate immediately. Access VIP channels, priority support, and more." },
+              { step: "1", titleKey: "Choose a Plan", descKey: "prem_step1_desc" },
+              { step: "2", titleKey: "Secure Checkout", descKey: "prem_step2_desc" },
+              { step: "3", titleKey: "Receive Your Key", descKey: "prem_step3_desc" },
+              { step: "4", titleKey: "Enjoy Benefits", descKey: "prem_step4_desc" },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-4">
                   <span className="font-heading text-lg font-bold text-primary">{item.step}</span>
                 </div>
-                <h3 className="font-heading text-base font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h3 className="font-heading text-base font-semibold mb-2">{t(item.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descKey)}</p>
               </div>
             ))}
           </div>
@@ -247,13 +249,13 @@ export default function PremiumKeys() {
       {/* FAQ */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">Premium Keys FAQ</h2>
+          <h2 className="font-heading text-3xl font-bold text-center mb-12">{t("Premium Keys FAQ")}</h2>
           <div className="space-y-3">
-            <FAQItem q="Can I upgrade from a Trial to Monthly or Lifetime?" a="Yes! You can upgrade at any time from your dashboard. If you upgrade during an active trial, the remaining trial days are credited proportionally toward your new plan." />
-            <FAQItem q="What happens when my Premium Key expires?" a="When your key expires, you'll revert to a free account. Your purchase history, account credentials, and dashboard data remain intact — you just lose access to premium features." />
-            <FAQItem q="Can I use my Premium Key on multiple devices?" a="It depends on your plan. The 7-Day Trial allows activation on a single device. Monthly Access supports up to 3 devices simultaneously. Lifetime Access provides unlimited device activations." />
-            <FAQItem q="Is there a refund policy for Premium Keys?" a="All sales are final. Due to the instant digital nature of premium keys, we do not offer refunds. Keys are delivered immediately upon purchase and cannot be returned. Please review your selection carefully before purchasing." />
-            <FAQItem q="Do Premium Keys work with all ComboWick products?" a="Premium Keys enhance your entire ComboWick experience. The benefits apply across all products — Roblox accounts, future product launches, and platform features." />
+            <FAQItem q={t("prem_faq1_q")} a={t("prem_faq1_a")} />
+            <FAQItem q={t("prem_faq2_q")} a={t("prem_faq2_a")} />
+            <FAQItem q={t("prem_faq3_q")} a={t("prem_faq3_a")} />
+            <FAQItem q={t("prem_faq4_q")} a={t("prem_faq4_a")} />
+            <FAQItem q={t("prem_faq5_q")} a={t("prem_faq5_a")} />
           </div>
         </div>
       </section>
@@ -261,14 +263,14 @@ export default function PremiumKeys() {
       {/* CTA */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading text-3xl font-bold mb-4">Upgrade to Premium Today</h2>
+          <h2 className="font-heading text-3xl font-bold mb-4">{t("Upgrade to Premium Today")}</h2>
           <p className="text-muted-foreground text-lg mb-8">
-            Start with a 7-day trial for just $5 and experience the full range of premium benefits. No commitment required.
+            {t("prem_cta_desc")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="text-base px-8 py-6 border-primary/20">
-                <MessageCircle className="h-5 w-5 mr-2" /> Join Discord
+                <MessageCircle className="h-5 w-5 mr-2" /> {t("Join Discord")}
               </Button>
             </a>
           </div>
@@ -280,7 +282,12 @@ export default function PremiumKeys() {
         <PayPalCheckoutModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          tier={selectedTier}
+          tier={{
+            ...selectedTier,
+            name: t(selectedTier.nameKey),
+            features: selectedTier.featureKeys.map(f => t(f)),
+            buttonText: t(selectedTier.buttonTextKey),
+          }}
           paypalClientId={paypalClientId}
         />
       )}
