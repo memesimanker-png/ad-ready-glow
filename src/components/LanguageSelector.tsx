@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "@/lib/translation-context";
 import { LANGUAGES, LangCode } from "@/lib/translations";
 import { Globe, ChevronDown } from "lucide-react";
@@ -10,8 +10,20 @@ export function LanguageSelector() {
   const ref = useRef<HTMLDivElement>(null);
   const current = LANGUAGES.find((l) => l.code === currentLanguage) || LANGUAGES[0];
 
+  // Close on click outside
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
   return (
-    <div className="relative" ref={ref} onMouseLeave={() => setOpen(false)}>
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all border border-transparent hover:border-primary/20"
