@@ -35,7 +35,7 @@ export default function VerifyStep2() {
     setTimeout(() => navigate("/verify/step3"), 500);
   };
 
-  const handleVerification = async () => {
+  const handleVerification = () => {
     setIsLoading(true);
     if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
     localStorage.setItem("verification_step", "step2");

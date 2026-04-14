@@ -25,7 +25,7 @@ export default function VerifyStep3() {
     setSelectedProvider(provider);
   }, [navigate, toast]);
 
-  const handleVerification = async () => {
+  const handleVerification = () => {
     setIsLoading(true);
     if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
     localStorage.setItem("verification_step", "step3");

@@ -24,7 +24,7 @@ export default function VerifyStep1() {
     }
   }, []);
 
-  const handleVerification = async () => {
+  const handleVerification = () => {
     setIsLoading(true);
     localStorage.setItem("verification_step", "step1");
     localStorage.setItem("selected_ad_provider", selectedProvider || "");
