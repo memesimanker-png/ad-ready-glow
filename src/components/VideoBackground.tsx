@@ -13,8 +13,8 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: "brightness(0.3) saturate(1.4)", minWidth: "100%", minHeight: "100%" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto object-cover"
+        style={{ filter: "brightness(0.3) saturate(1.4)" }}
       >
         <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>

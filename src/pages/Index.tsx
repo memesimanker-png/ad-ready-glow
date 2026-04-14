@@ -17,16 +17,16 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[100vh] flex items-end overflow-hidden">
         <VideoBackground />
         <div className="absolute inset-0 star-field opacity-40" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center z-10">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 pt-40 text-left z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/30 mb-8 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6 backdrop-blur-sm"
           >
             <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse-neon" />
             <span className="text-xs font-semibold text-primary uppercase tracking-[0.2em]">
@@ -38,7 +38,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-8 max-w-5xl mx-auto leading-[1.1]"
+            className="font-heading text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-6 max-w-3xl leading-[1.1]"
           >
             {t("Premium Verified")}{" "}
             <span className="text-gradient-neon">{t("Roblox Accounts")}</span>{" "}
@@ -49,7 +49,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
+            className="text-sm sm:text-base text-muted-foreground max-w-xl mb-8 leading-relaxed"
           >
             {t("hero_desc")}
           </motion.p>
@@ -58,7 +58,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.45 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-col sm:flex-row items-start gap-4"
           >
             <a href="#pricing">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider font-bold neon-glow group">
