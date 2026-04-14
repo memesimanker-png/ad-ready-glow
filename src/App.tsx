@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Scripts from "./pages/Scripts";
 import ScriptDetail from "./pages/ScriptDetail";
+import ScriptAdmin from "./pages/ScriptAdmin";
 import Executors from "./pages/Executors";
 import Keys from "./pages/Keys";
 import Tutorials from "./pages/Tutorials";
@@ -65,6 +66,7 @@ const App = () => (
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/scripts" element={<Scripts />} />
           <Route path="/scripts/:slug" element={<ScriptDetail />} />
+          <Route path="/admin/scripts" element={<ScriptAdmin />} />
           <Route path="/executors" element={<Executors />} />
           <Route path="/keys" element={<Keys />} />
           <Route path="/tutorials" element={<Tutorials />} />

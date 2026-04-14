@@ -1,4 +1,4 @@
-const HERO_VIDEO_URL = "/__l5e/assets-v1/73134011-4f3e-46fe-a25b-cc81de0d3633/hero-bg.mp4";
+const HERO_VIDEO_URL = "https://iphiksvnuzpteoryrdxf.supabase.co/storage/v1/object/public/site-assets/hero-bg.mp4";
 
 interface VideoBackgroundProps {
   className?: string;
