@@ -4,6 +4,7 @@ import gallery3 from "@/assets/gallery-3.png";
 import gallery4 from "@/assets/gallery-4.png";
 import gallery5 from "@/assets/gallery-5.png";
 import gallery6 from "@/assets/gallery-6.png";
+import gallery7 from "@/assets/gallery-7.png";
 
 const images = [
   { src: gallery1, alt: "Combo_WICK character with swords" },
@@ -12,6 +13,7 @@ const images = [
   { src: gallery4, alt: "Combo_WICK with cows" },
   { src: gallery5, alt: "Combo_WICK vibes" },
   { src: gallery6, alt: "Combo_WICK style" },
+  { src: gallery7, alt: "Combo_WICK drip" },
 ];
 
 export function GallerySection() {
