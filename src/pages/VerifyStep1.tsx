@@ -30,19 +30,8 @@ export default function VerifyStep1() {
     localStorage.setItem("selected_ad_provider", selectedProvider || "");
 
     if (selectedProvider === "linkvertise") {
-      try {
-        const returnUrl = `${window.location.origin}/ad-return/step1`;
-        const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
-          body: { targetUrl: returnUrl },
-        });
-        if (error || !data?.link) {
-          window.location.href = "https://link-center.net/405401/cWKDK8S88ys2";
-          return;
-        }
-        window.location.href = data.link;
-      } catch {
-        window.location.href = "https://link-center.net/405401/cWKDK8S88ys2";
-      }
+      const returnUrl = `${window.location.origin}/ad-return/step1`;
+      window.location.href = generateLinkvertiseUrl(returnUrl);
     } else if (selectedProvider === "lootlabs") {
       window.location.href = "https://lootdest.org/s?hovfnQ85";
     } else {
