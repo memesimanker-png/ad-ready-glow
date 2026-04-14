@@ -175,7 +175,8 @@ function ScriptsTab() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className="text-sm font-medium mb-1 block">Title *</label><input value={form.title} onChange={e => set("title", e.target.value)} className={inputCls} /></div>
             <div><label className="text-sm font-medium mb-1 block">Slug *</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={inputCls} /></div>
-            <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} /></div>
+            <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} placeholder="e.g. Prison Life" /></div>
+            <div><label className="text-sm font-medium mb-1 block">Game Universe ID</label><input value={form.gameUniverseId} onChange={e => set("gameUniverseId", e.target.value)} className={inputCls} placeholder="Roblox Universe ID for thumbnail" /></div>
             <div><label className="text-sm font-medium mb-1 block">Category *</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
