@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { getTodaySchedule } from "@/lib/day-schedule";
-import { supabase } from "@/integrations/supabase/client";
+import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 
 export default function VerifyStep2() {
   const navigate = useNavigate();
@@ -35,25 +35,14 @@ export default function VerifyStep2() {
     setTimeout(() => navigate("/verify/step3"), 500);
   };
 
-  const handleVerification = async () => {
+  const handleVerification = () => {
     setIsLoading(true);
     if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
     localStorage.setItem("verification_step", "step2");
 
     if (selectedProvider === "linkvertise") {
-      try {
-        const returnUrl = `${window.location.origin}/ad-return/step2`;
-        const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
-          body: { targetUrl: returnUrl },
-        });
-        if (error || !data?.link) {
-          window.location.href = "https://link-hub.net/405401/0nwkHBZjAkH8";
-          return;
-        }
-        window.location.href = data.link;
-      } catch {
-        window.location.href = "https://link-hub.net/405401/0nwkHBZjAkH8";
-      }
+      const returnUrl = `${window.location.origin}/ad-return/step2`;
+      window.location.href = generateLinkvertiseUrl(returnUrl);
     } else if (selectedProvider === "lootlabs") {
       window.location.href = "https://lootdest.org/s?0Um0OrJz";
     } else {

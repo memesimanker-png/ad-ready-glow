@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
-import { supabase } from "@/integrations/supabase/client";
+import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 
 export default function VerifyStep3() {
   const navigate = useNavigate();
@@ -25,25 +25,14 @@ export default function VerifyStep3() {
     setSelectedProvider(provider);
   }, [navigate, toast]);
 
-  const handleVerification = async () => {
+  const handleVerification = () => {
     setIsLoading(true);
     if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
     localStorage.setItem("verification_step", "step3");
 
     if (selectedProvider === "linkvertise") {
-      try {
-        const returnUrl = `${window.location.origin}/ad-return/step3`;
-        const { data, error } = await supabase.functions.invoke("generate-linkvertise", {
-          body: { targetUrl: returnUrl },
-        });
-        if (error || !data?.link) {
-          window.location.href = "https://direct-link.net/405401/TwWRE4TowD9N";
-          return;
-        }
-        window.location.href = data.link;
-      } catch {
-        window.location.href = "https://direct-link.net/405401/TwWRE4TowD9N";
-      }
+      const returnUrl = `${window.location.origin}/ad-return/step3`;
+      window.location.href = generateLinkvertiseUrl(returnUrl);
     } else if (selectedProvider === "lootlabs") {
       window.location.href = "https://lootdest.org/s?ASt4XtMq";
     } else {
