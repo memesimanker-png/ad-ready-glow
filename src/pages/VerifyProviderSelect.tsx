@@ -15,7 +15,7 @@ const adProviders = [
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
-const DIRECT_LINK_URL = "https://otieu.com/4/10494355";
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const DIRECT_LINK_COOLDOWN_MINUTES = 5;
 const WAIT_TIME_SECONDS = 3;
