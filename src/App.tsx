@@ -17,6 +17,7 @@ import Oils from "./pages/Oils";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Scripts from "./pages/Scripts";
+import ScriptDetail from "./pages/ScriptDetail";
 import Executors from "./pages/Executors";
 import Keys from "./pages/Keys";
 import Tutorials from "./pages/Tutorials";
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/scripts" element={<Scripts />} />
+          <Route path="/scripts/:slug" element={<ScriptDetail />} />
           <Route path="/executors" element={<Executors />} />
           <Route path="/keys" element={<Keys />} />
           <Route path="/tutorials" element={<Tutorials />} />
