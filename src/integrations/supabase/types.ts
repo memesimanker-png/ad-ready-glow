@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      scripts: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          description: string
+          faqs: Json | null
+          game: string
+          id: string
+          long_description: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          trending: boolean | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          description: string
+          faqs?: Json | null
+          game: string
+          id?: string
+          long_description?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          trending?: boolean | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string
+          faqs?: Json | null
+          game?: string
+          id?: string
+          long_description?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          trending?: boolean | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
