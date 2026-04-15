@@ -260,6 +260,38 @@ export default function PremiumKeys() {
         </div>
       </section>
 
+      {/* Paid Games */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-heading text-3xl font-bold text-center mb-4">{t("Paid Games Access")}</h2>
+          <p className="text-muted-foreground text-center max-w-3xl mx-auto mb-12 text-lg leading-relaxed">
+            {t("paid_games_desc")}
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: "Blox Fruits", price: "$2.99", img: "🍎" },
+              { name: "Pet Simulator 99", price: "$1.99", img: "🐾" },
+              { name: "Anime Defenders", price: "$2.49", img: "⚔️" },
+              { name: "Murder Mystery 2", price: "$1.49", img: "🔪" },
+              { name: "Adopt Me", price: "$1.99", img: "🏠" },
+              { name: "Tower Defense Simulator", price: "$2.49", img: "🏰" },
+            ].map((game) => (
+              <Card key={game.name} className="p-6 bg-glass hover:border-primary/30 transition-all text-center">
+                <div className="text-4xl mb-4">{game.img}</div>
+                <h3 className="font-heading text-lg font-semibold mb-2">{game.name}</h3>
+                <p className="text-2xl font-bold text-primary mb-4">{game.price}</p>
+                <Button
+                  onClick={() => window.open("https://discord.com/invite/ufrz9Zaqs8", "_blank")}
+                  className="w-full bg-primary hover:bg-primary/90"
+                >
+                  {t("Contact on Discord")}
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 sm:py-20 bg-muted/20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
