@@ -1,10 +1,13 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, ExternalLink } from "lucide-react";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
+import { Button } from "@/components/ui/button";
+import { isInCooldown, getCooldownRemaining, triggerDirectLink } from "@/lib/direct-link-gate";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +17,39 @@ export default function ScriptDetail() {
     script?.game || "",
     script?.category || ""
   );
+
+  const [unlocked, setUnlocked] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (isInCooldown()) {
+      setUnlocked(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (unlocked || !script) return;
+    const interval = setInterval(() => {
+      const remaining = getCooldownRemaining();
+      setCooldown(remaining);
+      if (remaining > 0) {
+        setUnlocked(true);
+        clearInterval(interval);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [unlocked, script]);
+
+  const handleUnlock = () => {
+    triggerDirectLink();
+    // Start countdown check
+    const interval = setInterval(() => {
+      if (isInCooldown()) {
+        setUnlocked(true);
+        clearInterval(interval);
+      }
+    }, 500);
+  };
 
   if (isLoading) {
     return (
@@ -88,17 +124,36 @@ export default function ScriptDetail() {
               </div>
             </header>
 
-            <section className="mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">Script Code</h2>
-                <CopyButton text={script.code} />
-              </div>
-              <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
-                <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
-                  {script.code}
-                </pre>
-              </div>
-            </section>
+            {unlocked ? (
+              <section className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold">Script Code</h2>
+                  <CopyButton text={script.code} />
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
+                  <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
+                    {script.code}
+                  </pre>
+                </div>
+              </section>
+            ) : (
+              <section className="mb-8">
+                <div className="rounded-xl border border-primary/30 bg-card p-8 text-center">
+                  <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <ExternalLink className="h-7 w-7 text-primary" />
+                  </div>
+                  <h2 className="text-xl font-bold font-heading mb-2">Unlock Script Code</h2>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                    Complete a quick step to access the full script code. This helps us keep scripts free for everyone.
+                  </p>
+                  <Button onClick={handleUnlock} size="lg" className="px-8 py-5 font-bold">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Unlock Script
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-4">Unlocks all scripts for 5 minutes</p>
+                </div>
+              </section>
+            )}
 
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Tags</h2>
@@ -142,7 +197,7 @@ export default function ScriptDetail() {
                 </dl>
               </div>
 
-              <CopyButton text={script.code} className="w-full justify-center" />
+              {unlocked && <CopyButton text={script.code} className="w-full justify-center" />}
 
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">
