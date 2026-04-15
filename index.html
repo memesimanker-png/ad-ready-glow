@@ -12,6 +12,19 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="canonical" href="https://shop-ready.lovable.app" />
 
+    <!-- E-E-A-T: Author/Publisher identity -->
+    <meta name="publisher" content="ComboWick" />
+    <link rel="me" href="https://discord.com/invite/ufrz9Zaqs8" />
+    <link rel="me" href="https://www.youtube.com/@COMBO_WICK" />
+
+    <!-- Speakable: AI voice assistants -->
+    <meta name="speakable" content="true" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://tr.rbxcdn.com" crossorigin />
+    <link rel="preconnect" href="https://img.youtube.com" crossorigin />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://shop-ready.lovable.app" />
@@ -49,18 +62,21 @@
     }
     </script>
 
-    <!-- AEO: Organization -->
+    <!-- AEO: Organization with E-E-A-T signals -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "ComboWick",
-      "alternateName": "COMBO_WICK",
+      "alternateName": ["COMBO_WICK", "Combo Wick"],
       "url": "https://shop-ready.lovable.app",
       "logo": "https://shop-ready.lovable.app/images/combo-wick-logo.png",
+      "foundingDate": "2024",
+      "knowsAbout": ["Roblox scripting", "Roblox Lua scripts", "Roblox game exploits", "Roblox executors", "Roblox accounts"],
       "sameAs": [
         "https://discord.com/invite/ufrz9Zaqs8",
-        "https://www.youtube.com/@COMBO_WICK"
+        "https://www.youtube.com/@COMBO_WICK",
+        "https://wickshop-sparkle.lovable.app"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
@@ -68,6 +84,19 @@
         "url": "https://discord.com/invite/ufrz9Zaqs8",
         "availableLanguage": ["English", "Spanish", "French", "German", "Portuguese", "Russian", "Chinese", "Japanese", "Korean", "Arabic"]
       }
+    }
+    </script>
+
+    <!-- Speakable structured data for AI voice -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1", ".ai-retrieval", "meta[name='description']"]
+      },
+      "url": "https://shop-ready.lovable.app"
     }
     </script>
 
