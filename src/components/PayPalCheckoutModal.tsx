@@ -45,13 +45,14 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     supabase.functions.invoke("paypal-create-subscription", { body: { amount: price } })
       .then(({ data, error: fnError }) => {
         if (fnError || !data?.plan_id) {
-          setError(t("modal_sub_error"));
+          setError("Failed to load subscription plan. Please try again.");
         } else {
           setPlanId(data.plan_id);
         }
       })
       .finally(() => setLoadingPlan(false));
-  }, [isOpen, paymentType, tier, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, paymentType, tier.id, tier.subscriptionPrice, tier.price]);
 
   if (!isOpen) return null;
 
