@@ -92,7 +92,7 @@ export function Navbar() {
           >
             <div className="px-4 py-4 space-y-1">
               <div className="pb-3 border-b border-border/50">
-                <LanguageSelector dropUp={false} />
+                <LanguageSelector dropUp={false} inline />
               </div>
               {navLinks.map((link) => (
                 <Link

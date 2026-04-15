@@ -16,8 +16,20 @@ const TranslationContext = createContext<TranslationContextType>({
   isTranslating: false,
 });
 
-// In-memory cache across renders
-const translationCache: Record<string, Record<string, string>> = {};
+// Load cache from localStorage on init
+const translationCache: Record<string, Record<string, string>> = (() => {
+  try {
+    const saved = localStorage.getItem("combowick-translations");
+    return saved ? JSON.parse(saved) : {};
+  } catch { return {}; }
+})();
+
+function persistCache() {
+  try {
+    localStorage.setItem("combowick-translations", JSON.stringify(translationCache));
+  } catch { /* quota exceeded, ignore */ }
+}
+
 // Queue for pending translation requests
 let pendingTexts: Set<string> = new Set();
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -27,7 +39,7 @@ let currentFlushLang: string | null = null;
 async function fetchTranslations(lang: string, texts: string[]): Promise<Record<string, string>> {
   if (!translationCache[lang]) translationCache[lang] = {};
 
-  // Filter out already cached
+  // Filter out already cached (in memory + localStorage)
   const needed = texts.filter(t => !translationCache[lang][t]);
   if (needed.length === 0) return translationCache[lang];
 
@@ -38,6 +50,7 @@ async function fetchTranslations(lang: string, texts: string[]): Promise<Record<
 
     if (!error && data?.translations) {
       Object.assign(translationCache[lang], data.translations);
+      persistCache();
     }
   } catch (e) {
     console.error("Translation fetch error:", e);

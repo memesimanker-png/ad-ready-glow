@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface LanguageSelectorProps {
   dropUp?: boolean;
+  inline?: boolean;
 }
 
-export function LanguageSelector({ dropUp = false }: LanguageSelectorProps) {
+export function LanguageSelector({ dropUp = false, inline = false }: LanguageSelectorProps) {
   const { currentLanguage, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -42,11 +43,15 @@ export function LanguageSelector({ dropUp = false }: LanguageSelectorProps) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.95 }}
+            initial={{ opacity: 0, y: inline ? 0 : (dropUp ? 8 : -8), scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.95 }}
+            exit={{ opacity: 0, y: inline ? 0 : (dropUp ? 8 : -8), scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className={`absolute left-0 ${dropdownPosition} w-48 max-h-[50vh] overflow-y-auto rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-[100]`}
+            className={
+              inline
+                ? "w-full max-h-48 overflow-y-auto overscroll-contain rounded-xl bg-card border border-primary/20 mt-2"
+                : `absolute left-0 ${dropdownPosition} w-48 max-h-[40vh] overflow-y-auto overscroll-contain rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-[100]`
+            }
           >
             {LANGUAGES.map((lang) => (
               <button
