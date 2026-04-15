@@ -255,7 +255,6 @@ const translations: Record<LangCode, TranslationMap> = {
     "faq_a6": "Our support team on Discord is available 24/7. If any account doesn't work as described, we'll replace it or resolve the issue immediately.",
     "faq_q7": "Can I purchase without creating an account?",
     "faq_a7": "While guest checkout is available, we strongly recommend creating a free ComboWick account for purchase history and support access.",
-    "Choose Your Package": "Choose Your Package",
 
     // === Keys Page ===
     "How to Get Your Free Key": "How to Get Your Free Key",
