@@ -20,6 +20,18 @@ export default function Scripts() {
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
 
+  // Fire popunder once per session
+  useEffect(() => {
+    if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
+    const s = document.createElement("script");
+    s.src = "https://al5sm.com/tag.min.js";
+    s.dataset.zone = String(POPUNDER_ZONE);
+    s.async = true;
+    document.body.appendChild(s);
+    sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
+    return () => { document.body.removeChild(s); };
+  }, []);
+
   const { data: results = [], isLoading } = useSearchScripts(query, category);
 
   const handleSearch = (q: string) => {
