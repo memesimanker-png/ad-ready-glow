@@ -124,17 +124,36 @@ export default function ScriptDetail() {
               </div>
             </header>
 
-            <section className="mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">Script Code</h2>
-                <CopyButton text={script.code} />
-              </div>
-              <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
-                <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
-                  {script.code}
-                </pre>
-              </div>
-            </section>
+            {unlocked ? (
+              <section className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold">Script Code</h2>
+                  <CopyButton text={script.code} />
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
+                  <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
+                    {script.code}
+                  </pre>
+                </div>
+              </section>
+            ) : (
+              <section className="mb-8">
+                <div className="rounded-xl border border-primary/30 bg-card p-8 text-center">
+                  <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <ExternalLink className="h-7 w-7 text-primary" />
+                  </div>
+                  <h2 className="text-xl font-bold font-heading mb-2">Unlock Script Code</h2>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                    Complete a quick step to access the full script code. This helps us keep scripts free for everyone.
+                  </p>
+                  <Button onClick={handleUnlock} size="lg" className="px-8 py-5 font-bold">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Unlock Script
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-4">Unlocks all scripts for 5 minutes</p>
+                </div>
+              </section>
+            )}
 
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Tags</h2>
