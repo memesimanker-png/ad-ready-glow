@@ -96,6 +96,7 @@ export type Database = {
           game: string
           game_universe_id: number | null
           id: string
+          is_paid: boolean | null
           long_description: string | null
           slug: string
           tags: string[] | null
@@ -103,6 +104,7 @@ export type Database = {
           trending: boolean | null
           updated_at: string | null
           verified: boolean | null
+          youtube_url: string | null
         }
         Insert: {
           category: string
@@ -113,6 +115,7 @@ export type Database = {
           game: string
           game_universe_id?: number | null
           id?: string
+          is_paid?: boolean | null
           long_description?: string | null
           slug: string
           tags?: string[] | null
@@ -120,6 +123,7 @@ export type Database = {
           trending?: boolean | null
           updated_at?: string | null
           verified?: boolean | null
+          youtube_url?: string | null
         }
         Update: {
           category?: string
@@ -130,6 +134,7 @@ export type Database = {
           game?: string
           game_universe_id?: number | null
           id?: string
+          is_paid?: boolean | null
           long_description?: string | null
           slug?: string
           tags?: string[] | null
@@ -137,6 +142,7 @@ export type Database = {
           trending?: boolean | null
           updated_at?: string | null
           verified?: boolean | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
