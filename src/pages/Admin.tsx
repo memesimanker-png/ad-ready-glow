@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -57,15 +57,93 @@ export default function Admin() {
           <TabsList className="bg-secondary/50">
             <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>
+            <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>
             <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="scripts"><ScriptsTab /></TabsContent>
           <TabsContent value="orders"><OrdersTab /></TabsContent>
+          <TabsContent value="generate"><GenerateKeyTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
         </Tabs>
       </main>
     </Layout>
+  );
+}
+
+/* ─── Generate Key Tab ─── */
+function GenerateKeyTab() {
+  const { toast } = useToast();
+  const [tier, setTier] = useState("trial-7day");
+  const [email, setEmail] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [generatedKey, setGeneratedKey] = useState<{ key: string; expires_at: string; tier: string } | null>(null);
+
+  const inputCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setGeneratedKey(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-generate-key", {
+        body: { tier, customer_email: email.trim() || undefined },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        setGeneratedKey(data);
+        toast({ title: "Key Generated!", description: `${data.tier} key created successfully.` });
+      } else {
+        toast({ variant: "destructive", title: "Error", description: data?.error || "Failed to generate key" });
+      }
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Error", description: e.message });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const copyKey = () => {
+    if (generatedKey?.key) {
+      navigator.clipboard.writeText(generatedKey.key);
+      toast({ title: "Copied!", description: "Key copied to clipboard." });
+    }
+  };
+
+  return (
+    <div className="max-w-lg mx-auto space-y-6">
+      <h2 className="text-lg font-semibold">Generate Premium Key</h2>
+      <Card className="p-6 space-y-4">
+        <div>
+          <label className="text-sm font-medium mb-1 block">Tier *</label>
+          <select value={tier} onChange={e => setTier(e.target.value)} className={inputCls}>
+            <option value="trial-7day">7-Day Trial ($5)</option>
+            <option value="monthly">Monthly Access ($9.99)</option>
+            <option value="lifetime">Lifetime Key ($49.99)</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Customer Email (optional)</label>
+          <input value={email} onChange={e => setEmail(e.target.value)} className={inputCls} placeholder="customer@example.com" />
+        </div>
+        <Button onClick={handleGenerate} disabled={generating} className="w-full">
+          {generating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
+          Generate Key
+        </Button>
+
+        {generatedKey && (
+          <div className="mt-4 p-4 rounded-lg border border-green-500/30 bg-green-500/10 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-green-400">Generated Key:</span>
+              <Button size="sm" variant="ghost" onClick={copyKey} className="text-green-400 hover:text-green-300">
+                <Copy className="h-3 w-3 mr-1" /> Copy
+              </Button>
+            </div>
+            <code className="block text-sm font-mono text-green-500 break-all select-all">{generatedKey.key}</code>
+            <p className="text-xs text-muted-foreground">Tier: {generatedKey.tier} • Expires: {new Date(generatedKey.expires_at).toLocaleDateString()}</p>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }
 
@@ -258,6 +336,9 @@ function OrdersTab() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{o.tier}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${o.status === "completed" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>{o.status}</span>
+                    {o.payment_id?.startsWith("ADMIN-") && (
+                      <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">Admin Generated</span>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">{o.customer_email || "No email"} • ${o.amount} {o.currency}</p>
                 </div>
