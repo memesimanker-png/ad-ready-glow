@@ -46,7 +46,7 @@ export function LanguageSelector({ dropUp = false }: LanguageSelectorProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className={`absolute left-0 ${dropdownPosition} w-48 max-h-[50vh] overflow-y-auto rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-[100]`}
+            className={`absolute left-0 ${dropdownPosition} w-48 max-h-[40vh] overflow-y-auto overscroll-contain rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-[100]`}
           >
             {LANGUAGES.map((lang) => (
               <button
