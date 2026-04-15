@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, ShieldCheck } from "lucide-react";
+import { TrendingUp, ShieldCheck, DollarSign } from "lucide-react";
 import { type Script } from "@/lib/scripts-data";
 import { GameThumbnail } from "@/components/GameThumbnail";
 
@@ -12,6 +12,12 @@ export function ScriptCard({ script }: { script: Script }) {
           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
             {script.game}
           </span>
+          {script.is_paid && (
+            <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+              <DollarSign className="h-3 w-3" />
+              PAID
+            </span>
+          )}
           {script.trending && (
             <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
               <TrendingUp className="h-3 w-3" />
@@ -27,7 +33,7 @@ export function ScriptCard({ script }: { script: Script }) {
       </div>
 
       <div className="flex-1 px-4 pb-3">
-        <Link to={`/scripts/${script.slug}`}>
+        <Link to={script.is_paid ? "/premium-keys" : `/scripts/${script.slug}`}>
           <h2 className="font-semibold text-base leading-snug group-hover:text-primary transition-colors">
             {script.title}
           </h2>

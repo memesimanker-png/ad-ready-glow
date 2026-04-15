@@ -11,7 +11,8 @@ const empty = {
   title: "", slug: "", description: "", longDescription: "",
   game: "", category: "Utility", tags: [] as string[],
   code: "", faqs: [] as { question: string; answer: string }[],
-  trending: false, verified: true,
+  trending: false, verified: true, is_paid: false,
+  youtube_url: "",
 };
 
 export default function ScriptAdmin() {
@@ -73,7 +74,9 @@ export default function ScriptAdmin() {
         faqs: form.faqs as any,
         trending: form.trending,
         verified: form.verified,
-      });
+        is_paid: form.is_paid,
+        youtube_url: form.youtube_url || null,
+      } as any);
       if (error) throw error;
       toast({ title: "Script saved!" });
       setForm({ ...empty });
@@ -152,6 +155,11 @@ export default function ScriptAdmin() {
           </div>
 
           <div>
+            <label className="text-sm font-medium mb-1.5 block">YouTube Video URL</label>
+            <input value={form.youtube_url} onChange={e => set("youtube_url", e.target.value)} className={inputCls} placeholder="https://www.youtube.com/watch?v=..." />
+          </div>
+
+          <div>
             <label className="text-sm font-medium mb-1.5 block">Tags</label>
             <div className="flex gap-2 mb-2">
               <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())} className={`${inputCls} flex-1`} placeholder="Add tag..." />
@@ -174,6 +182,10 @@ export default function ScriptAdmin() {
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={form.verified} onChange={e => set("verified", e.target.checked)} className="rounded" />
               Verified
+            </label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-yellow-400">
+              <input type="checkbox" checked={form.is_paid} onChange={e => set("is_paid", e.target.checked)} className="rounded" />
+              💰 Paid Script
             </label>
           </div>
 
