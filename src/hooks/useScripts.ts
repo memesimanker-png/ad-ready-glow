@@ -19,6 +19,8 @@ function mapRow(row: any): Script {
     code: row.code,
     faqs: (row.faqs as any[]) || [],
     game_universe_id: row.game_universe_id || null,
+    is_paid: row.is_paid || false,
+    youtube_url: row.youtube_url || null,
   };
 }
 

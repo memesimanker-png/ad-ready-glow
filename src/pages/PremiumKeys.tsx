@@ -260,8 +260,80 @@ export default function PremiumKeys() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Paid Game Scripts */}
       <section className="py-16 sm:py-20 bg-muted/20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-heading text-3xl font-bold text-center mb-4">{t("Paid Game Scripts")}</h2>
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-10">
+            {t("Premium scripts for popular Roblox games. Monthly or lifetime access — fixes pushed regularly.")}
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                game: "Desert War [UPDATE] 🌴",
+                title: "Desert War Script",
+                features: ["Infinite Ammo", "Kill All", "Aimbot", "ESP", "HitBox Expander", "Invisibility"],
+                monthlyPrice: 9,
+                thumbnail: "https://tr.rbxcdn.com/180DAY-07ecdc2f6af0cebd23dc934b6bbbf614/768/432/Image/Png/noFilter",
+              },
+              {
+                game: "Jurassic Blocky",
+                title: "Jurassic Blocky Script",
+                features: ["Auto Collect Amber", "Kill All Goat", "Kill Players", "Unpatched & Working"],
+                monthlyPrice: 7,
+                lifetimePrice: 11,
+                thumbnail: "https://tr.rbxcdn.com/180DAY-72007dc11099c62685db43551189ca26/768/432/Image/Png/noFilter",
+                badge: "UNPATCHED",
+              },
+              {
+                game: "State of Anarchy",
+                title: "State of Anarchy Script",
+                features: ["Kill All Players", "ESP / Wallhack", "Teleport to Loot", "Aim-Bot", "Hitbox Expander"],
+                monthlyPrice: 10,
+                lifetimePrice: 17,
+                thumbnail: "https://tr.rbxcdn.com/180DAY-43670f7186821eb93f47c92d53729cdd/768/432/Image/Png/noFilter",
+                badge: "POPULAR",
+              },
+            ].map((g) => (
+              <Card key={g.title} className="overflow-hidden card-neon border-yellow-500/20 flex flex-col">
+                <div className="relative aspect-video">
+                  <img src={g.thumbnail} alt={g.game} className="w-full h-full object-cover" loading="lazy" />
+                  {g.badge && (
+                    <span className="absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full bg-primary text-primary-foreground">{g.badge}</span>
+                  )}
+                </div>
+                <div className="p-5 flex-1 flex flex-col">
+                  <p className="text-xs text-muted-foreground mb-1">{g.game}</p>
+                  <h3 className="font-heading font-bold text-lg mb-3">{g.title}</h3>
+                  <ul className="space-y-1.5 mb-4 flex-1">
+                    {g.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm">
+                        <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex items-baseline gap-2 mb-3">
+                    <span className="text-2xl font-bold">${g.monthlyPrice}</span>
+                    <span className="text-sm text-muted-foreground">/month</span>
+                    {g.lifetimePrice && (
+                      <span className="text-sm text-muted-foreground ml-auto">or ${g.lifetimePrice} lifetime</span>
+                    )}
+                  </div>
+                  <a href="https://wickshop-sparkle.lovable.app/" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold">
+                      Purchase
+                    </Button>
+                  </a>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-heading text-3xl font-bold mb-4">{t("Upgrade to Premium Today")}</h2>
           <p className="text-muted-foreground text-lg mb-8">
