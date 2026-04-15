@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons, FUNDING } from "@paypal/react-paypal-js";
 import { X, Loader2, CheckCircle, Zap, Lock, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/lib/translation-context";
 
 interface PayPalCheckoutModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface PayPalCheckoutModalProps {
 }
 
 export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: PayPalCheckoutModalProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState<{ key: string; expires_at: string } | null>(null);
@@ -36,7 +38,6 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     }
   }, [isOpen, tier]);
 
-  // Pre-fetch the plan ID when subscription mode is active
   useEffect(() => {
     if (!isOpen || paymentType !== "subscription" || !tier.isSubscription) return;
     const price = tier.subscriptionPrice || tier.price;
@@ -44,13 +45,13 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     supabase.functions.invoke("paypal-create-subscription", { body: { amount: price } })
       .then(({ data, error: fnError }) => {
         if (fnError || !data?.plan_id) {
-          setError("Failed to load subscription plan. Try one-time payment.");
+          setError(t("modal_sub_error"));
         } else {
           setPlanId(data.plan_id);
         }
       })
       .finally(() => setLoadingPlan(false));
-  }, [isOpen, paymentType, tier]);
+  }, [isOpen, paymentType, tier, t]);
 
   if (!isOpen) return null;
 
@@ -66,7 +67,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
       if (fnError || !data?.order_id) throw new Error("Failed to create order");
       return data.order_id;
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || t("modal_generic_error"));
       throw err;
     }
   };
@@ -113,7 +114,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
         setSuccess({ key: result.key, expires_at: result.expires_at });
       }
     } catch {
-      setError("Payment approved but key generation failed. Contact support on Discord.");
+      setError(t("modal_capture_error"));
     } finally {
       setProcessing(false);
     }
@@ -141,17 +142,17 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               <div className="h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="h-8 w-8 text-green-400" />
               </div>
-              <h2 className="font-heading text-xl font-bold mb-2">Payment Successful!</h2>
-              <p className="text-sm text-muted-foreground mb-6">Your premium key has been generated.</p>
+              <h2 className="font-heading text-xl font-bold mb-2">{t("Payment Successful!")}</h2>
+              <p className="text-sm text-muted-foreground mb-6">{t("modal_key_generated")}</p>
               <div className="bg-background/50 backdrop-blur-sm p-4 rounded-lg mb-4 border border-border/50">
-                <p className="text-xs text-muted-foreground mb-2 font-medium">Your License Key:</p>
+                <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Your License Key:")}</p>
                 <code className="text-sm font-mono break-all font-semibold text-primary">{success.key}</code>
               </div>
               <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-3 hover:bg-primary/90 transition-colors">
-                Copy Key
+                {t("Copy Key")}
               </button>
-              <p className="text-xs text-muted-foreground">Expires: {new Date(success.expires_at).toLocaleDateString()}</p>
-              <p className="text-xs text-muted-foreground mt-1">Your key is also saved to your dashboard if you're logged in.</p>
+              <p className="text-xs text-muted-foreground">{t("Expires:")} {new Date(success.expires_at).toLocaleDateString()}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("modal_key_saved_dashboard")}</p>
             </div>
           ) : (
             <>
@@ -160,32 +161,32 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                 <div className="mt-2 inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
                   <Zap className="w-3.5 h-3.5 text-primary" />
                   <span className="text-primary font-bold text-lg">${displayPrice}</span>
-                  <span className="text-muted-foreground text-sm">{isSubscription ? "/month" : " one-time"}</span>
+                  <span className="text-muted-foreground text-sm">{isSubscription ? t("/month") : t(" one-time")}</span>
                 </div>
               </div>
 
               {tier.isSubscription && (
                 <div className="flex gap-2 mb-5">
                   <button onClick={() => setPaymentType("onetime")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "onetime" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}>
-                    One-Time ${tier.price}
+                    {t("One-Time")} ${tier.price}
                   </button>
                   <button onClick={() => setPaymentType("subscription")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "subscription" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}>
-                    Subscribe ${tier.subscriptionPrice}/mo
+                    {t("Subscribe")} ${tier.subscriptionPrice}/{t("mo")}
                   </button>
                 </div>
               )}
 
               <div className="bg-secondary/50 border border-border rounded-lg p-3 mb-5">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">What you get</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t("What you get")}</p>
                 <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> Instant license key delivery</div>
-                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> {isSubscription ? "Auto-renewal & priority support" : "Full duration access"}</div>
-                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> Discord VIP access</div>
+                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> {t("Instant license key delivery")}</div>
+                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> {isSubscription ? t("Auto-renewal & priority support") : t("Full duration access")}</div>
+                  <div className="flex items-center gap-2 text-xs"><CheckCircle className="w-3.5 h-3.5 text-primary shrink-0" /> {t("Discord VIP access")}</div>
                 </div>
               </div>
 
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="flex items-center gap-1.5 bg-secondary rounded-full px-3 py-1 text-[10px] text-muted-foreground"><CreditCard className="w-3 h-3 text-primary" /> Credit / Debit</div>
+                <div className="flex items-center gap-1.5 bg-secondary rounded-full px-3 py-1 text-[10px] text-muted-foreground"><CreditCard className="w-3 h-3 text-primary" /> {t("Credit / Debit")}</div>
                 <div className="flex items-center gap-1.5 bg-secondary rounded-full px-3 py-1 text-[10px] text-muted-foreground"><Lock className="w-3 h-3 text-primary" /> PayPal</div>
               </div>
 
@@ -196,7 +197,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               {processing || loadingPlan ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-10 text-muted-foreground">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  <span className="text-sm font-medium">{processing ? "Processing your payment..." : "Loading payment options..."}</span>
+                  <span className="text-sm font-medium">{processing ? t("Processing your payment...") : t("Loading payment options...")}</span>
                 </div>
               ) : (
                 <PayPalScriptProvider
@@ -216,7 +217,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                       style={{ layout: "vertical", shape: "rect", label: "subscribe", color: "gold", height: 45 }}
                       createSubscription={createSubscriptionHandler}
                       onApprove={captureHandler}
-                      onError={() => setError("Payment failed. Please try again.")}
+                      onError={() => setError(t("Payment failed. Please try again."))}
                       onCancel={() => setError(null)}
                     />
                   ) : (
@@ -226,7 +227,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                         style={{ layout: "vertical", shape: "rect", label: "pay", color: "gold", height: 45 }}
                         createOrder={createOrderHandler}
                         onApprove={captureHandler}
-                        onError={() => setError("Payment failed. Please try again.")}
+                        onError={() => setError(t("Payment failed. Please try again."))}
                         onCancel={() => setError(null)}
                       />
                       <PayPalButtons
@@ -234,7 +235,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                         style={{ layout: "vertical", shape: "rect", height: 45 }}
                         createOrder={createOrderHandler}
                         onApprove={captureHandler}
-                        onError={() => setError("Payment failed. Please try again.")}
+                        onError={() => setError(t("Payment failed. Please try again."))}
                         onCancel={() => setError(null)}
                       />
                     </>
@@ -243,7 +244,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               )}
 
               <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-muted-foreground">
-                <Lock className="w-3 h-3" /> Secure payment powered by PayPal
+                <Lock className="w-3 h-3" /> {t("Secure payment powered by PayPal")}
               </div>
             </>
           )}
