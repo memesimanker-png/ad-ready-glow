@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { SEOHead } from "@/components/SEOHead";
 
 const faqs = [
   { question: "What is COMBO WICK?", answer: "COMBO WICK is a free Roblox script distribution platform that uses time-limited verification keys. Founded in 2023, it serves 50,000+ users with premium executor scripts. The system generates 24-hour access keys through a 3-step ad-verification process. Keys can be regenerated unlimited times at no cost." },
@@ -22,13 +23,39 @@ const faqs = [
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  const faqJsonLd = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(faq => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  }), []);
+
   return (
     <Layout>
+      <SEOHead
+        title="FAQ — ComboWick | Roblox Scripts, Keys & Executor Questions Answered"
+        description="Find answers to common questions about ComboWick's free Roblox scripts, 24-hour key system, premium keys, executors, and how to get started instantly."
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "FAQ", url: "/faq" },
+        ]}
+        jsonLd={faqJsonLd}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          {/* AI-retrieval paragraph */}
           <header className="text-center space-y-4 mb-12">
             <h1 className="font-heading text-4xl font-bold">Frequently Asked Questions</h1>
             <p className="text-xl text-muted-foreground">Find answers to common questions about COMBO WICK</p>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              ComboWick is a free Roblox script platform offering 24-hour access keys generated through a 3-step verification process. Premium keys are available for $5 (7-day), $9.99 (monthly), and $49.99 (lifetime). Scripts are updated daily for compatibility with the latest Roblox patches.
+            </p>
           </header>
 
           <div className="space-y-3">
