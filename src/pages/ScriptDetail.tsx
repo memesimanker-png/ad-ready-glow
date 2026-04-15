@@ -33,6 +33,33 @@ export default function ScriptDetail() {
     return () => { document.body.removeChild(s); };
   }, []);
 
+  const scriptJsonLd = useMemo(() => {
+    if (!script) return [];
+    return [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        name: script.title,
+        description: script.longDescription || script.description,
+        programmingLanguage: "Lua",
+        runtimePlatform: "Roblox",
+        codeRepository: "https://shop-ready.lovable.app/scripts/" + script.slug,
+        author: { "@type": "Organization", name: "ComboWick" },
+        dateCreated: script.createdAt,
+        dateModified: script.updatedAt,
+      },
+      ...(script.faqs.length > 0 ? [{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: script.faqs.map((faq: any) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: { "@type": "Answer", text: faq.answer },
+        })),
+      }] : []),
+    ];
+  }, [script]);
+
   if (isLoading) {
     return (
       <Layout>
@@ -56,30 +83,6 @@ export default function ScriptDetail() {
       </Layout>
     );
   }
-
-  const scriptJsonLd = useMemo(() => [
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareSourceCode",
-      name: script.title,
-      description: script.longDescription || script.description,
-      programmingLanguage: "Lua",
-      runtimePlatform: "Roblox",
-      codeRepository: "https://shop-ready.lovable.app/scripts/" + script.slug,
-      author: { "@type": "Organization", name: "ComboWick" },
-      dateCreated: script.createdAt,
-      dateModified: script.updatedAt,
-    },
-    ...(script.faqs.length > 0 ? [{
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: script.faqs.map((faq: any) => ({
-        "@type": "Question",
-        name: faq.question,
-        acceptedAnswer: { "@type": "Answer", text: faq.answer },
-      })),
-    }] : []),
-  ], [script]);
 
   return (
     <Layout>
