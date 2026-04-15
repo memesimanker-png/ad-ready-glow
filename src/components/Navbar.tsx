@@ -91,6 +91,9 @@ export function Navbar() {
             className="lg:hidden border-t border-primary/10 bg-background/95 backdrop-blur-2xl overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
+              <div className="pb-3 border-b border-border/50">
+                <LanguageSelector dropUp={false} />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -106,7 +109,6 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="pt-3 border-t border-border/50 space-y-2">
-                <LanguageSelector />
                 <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="sm" className="w-full border-primary/20">{t("Discord")}</Button>
                 </a>

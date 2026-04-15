@@ -4,13 +4,16 @@ import { LANGUAGES, LangCode } from "@/lib/translations";
 import { Globe, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function LanguageSelector() {
+interface LanguageSelectorProps {
+  dropUp?: boolean;
+}
+
+export function LanguageSelector({ dropUp = false }: LanguageSelectorProps) {
   const { currentLanguage, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = LANGUAGES.find((l) => l.code === currentLanguage) || LANGUAGES[0];
 
-  // Close on click outside
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -22,6 +25,10 @@ export function LanguageSelector() {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  const dropdownPosition = dropUp
+    ? "bottom-full mb-2"
+    : "top-full mt-2";
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -29,17 +36,17 @@ export function LanguageSelector() {
         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all border border-transparent hover:border-primary/20"
       >
         <Globe className="h-4 w-4 text-primary" />
-        <span className="hidden sm:inline">{current.label}</span>
+        <span>{current.label}</span>
         <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            initial={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            exit={{ opacity: 0, y: dropUp ? 8 : -8, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-48 max-h-[60vh] overflow-y-auto rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-50"
+            className={`absolute left-0 ${dropdownPosition} w-48 max-h-[50vh] overflow-y-auto rounded-xl bg-card border border-primary/20 shadow-2xl shadow-primary/5 z-[100]`}
           >
             {LANGUAGES.map((lang) => (
               <button
