@@ -14,6 +14,8 @@ export type Script = {
   code: string;
   faqs: { question: string; answer: string }[];
   game_universe_id?: number | null;
+  is_paid?: boolean;
+  youtube_url?: string | null;
 };
 
 export const CATEGORIES = [
