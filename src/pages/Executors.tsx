@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Monitor, Smartphone } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
+import { SEOHead } from "@/components/SEOHead";
 
 type Executor = {
   name: string;
@@ -68,8 +70,40 @@ export default function Executors() {
     { label: "Mac", platform: "Mac" as const, icon: <Monitor className="h-4 w-4" /> },
   ];
 
+  const executorJsonLd = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Best Roblox Script Executors 2026",
+    description: "Comprehensive list of trusted Roblox script executors for Windows, Android, iOS, and Mac with UNC/SUNC compatibility scores.",
+    numberOfItems: executors.length,
+    itemListElement: executors.map((exec, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "SoftwareApplication",
+        name: exec.name,
+        operatingSystem: exec.platform,
+        applicationCategory: "GameApplication",
+        offers: {
+          "@type": "Offer",
+          price: exec.type === "Paid" ? "varies" : "0",
+          priceCurrency: "USD",
+        },
+      },
+    })),
+  }), []);
+
   return (
     <Layout>
+      <SEOHead
+        title="Best Roblox Executors 2026 — Free & Paid | UNC Scores | ComboWick"
+        description="Compare 18+ trusted Roblox script executors for Windows, Android, iOS & Mac. UNC/SUNC scores, features like Decompiler & Multi-Instance. Updated April 2026."
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Executors", url: "/executors" },
+        ]}
+        jsonLd={executorJsonLd}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
