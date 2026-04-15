@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, ExternalLink } from "lucide-react";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -49,9 +50,12 @@ export default function VerifyStep1() {
       <SkipAdsFloatButton />
       <div className="min-h-screen bg-black/70 flex flex-col pt-12">
         <header className="container py-6">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">{t("SecureVerify")}</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-bold">{t("SecureVerify")}</h1>
+            </div>
+            <LanguageSelector />
           </div>
         </header>
         <main className="flex-1 container flex flex-col items-center justify-center py-12">
