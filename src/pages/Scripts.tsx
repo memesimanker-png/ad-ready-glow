@@ -5,6 +5,10 @@ import { CATEGORIES } from "@/lib/scripts-data";
 import { useSearchScripts } from "@/hooks/useScripts";
 import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
+import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
+
+const POPUNDER_ZONE = 10877295;
+const POPUNDER_SESSION_KEY = "combowick-popunder-scripts";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,6 +19,18 @@ export default function Scripts() {
     setQuery(searchParams.get("q") ?? "");
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
+
+  // Fire popunder once per session
+  useEffect(() => {
+    if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
+    const s = document.createElement("script");
+    s.src = "https://al5sm.com/tag.min.js";
+    s.dataset.zone = String(POPUNDER_ZONE);
+    s.async = true;
+    document.body.appendChild(s);
+    sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
+    return () => { document.body.removeChild(s); };
+  }, []);
 
   const { data: results = [], isLoading } = useSearchScripts(query, category);
 
@@ -36,6 +52,7 @@ export default function Scripts() {
 
   return (
     <Layout>
+      <DirectLinkOverlay />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-heading" style={{ textWrap: "balance" as any }}>
