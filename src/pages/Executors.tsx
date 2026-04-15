@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Monitor, Smartphone } from "lucide-react";
+import { useTranslation } from "@/lib/translation-context";
 
 type Executor = {
   name: string;
@@ -57,52 +58,54 @@ function UncBar({ value, label }: { value: number; label: string }) {
   );
 }
 
-const platformGroups = [
-  { label: "Windows", platform: "Windows" as const, icon: <Monitor className="h-4 w-4" /> },
-  { label: "Android", platform: "Android" as const, icon: <Smartphone className="h-4 w-4" /> },
-  { label: "iOS", platform: "iOS" as const, icon: <Smartphone className="h-4 w-4" /> },
-  { label: "Mac", platform: "Mac" as const, icon: <Monitor className="h-4 w-4" /> },
-];
-
 export default function Executors() {
+  const { t } = useTranslation();
+
+  const platformGroups = [
+    { label: "Windows", platform: "Windows" as const, icon: <Monitor className="h-4 w-4" /> },
+    { label: "Android", platform: "Android" as const, icon: <Smartphone className="h-4 w-4" /> },
+    { label: "iOS", platform: "iOS" as const, icon: <Smartphone className="h-4 w-4" /> },
+    { label: "Mac", platform: "Mac" as const, icon: <Monitor className="h-4 w-4" /> },
+  ];
+
   return (
     <Layout>
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h1 className="font-heading text-4xl font-bold mb-3">Roblox Executors</h1>
+            <h1 className="font-heading text-4xl font-bold mb-3">{t("Roblox Executors")}</h1>
             <p className="text-muted-foreground max-w-xl mx-auto text-sm">
-              A reference list of known Roblox executors compatible with COMBO WICK scripts. Includes PC, Android, iOS and Mac options.
+              {t("executors_subtitle")}
             </p>
             <div className="flex items-center justify-center gap-6 mt-5 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><Shield className="h-3 w-3" /> {executors.length} Executors</span>
+              <span className="flex items-center gap-1"><Shield className="h-3 w-3" /> {executors.length} {t("Executors")}</span>
               <span className="flex items-center gap-1"><Monitor className="h-3 w-3" /> Windows</span>
               <span className="flex items-center gap-1"><Smartphone className="h-3 w-3" /> Android & iOS</span>
             </div>
           </div>
 
           <div className="bg-card border border-border/50 rounded-lg p-4 mb-8">
-            <p className="text-muted-foreground text-xs mb-3 font-semibold uppercase tracking-wider">Legend</p>
+            <p className="text-muted-foreground text-xs mb-3 font-semibold uppercase tracking-wider">{t("Legend")}</p>
             <div className="flex flex-wrap gap-4 text-xs">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Free"]}>Free</Badge>
-                <span className="text-muted-foreground">No cost</span>
+                <Badge variant="outline" className={typeColors["Free"]}>{t("Free")}</Badge>
+                <span className="text-muted-foreground">{t("No cost")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Free (Key)"]}>Free (Key)</Badge>
-                <span className="text-muted-foreground">Requires key system</span>
+                <Badge variant="outline" className={typeColors["Free (Key)"]}>{t("Free (Key)")}</Badge>
+                <span className="text-muted-foreground">{t("Requires key system")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Paid"]}>Paid</Badge>
-                <span className="text-muted-foreground">Requires purchase</span>
+                <Badge variant="outline" className={typeColors["Paid"]}>{t("Paid")}</Badge>
+                <span className="text-muted-foreground">{t("Requires purchase")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={categoryColors["Internal"]}>Internal</Badge>
-                <span className="text-muted-foreground">Injects into process</span>
+                <Badge variant="outline" className={categoryColors["Internal"]}>{t("Internal")}</Badge>
+                <span className="text-muted-foreground">{t("Injects into process")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={categoryColors["External"]}>External</Badge>
-                <span className="text-muted-foreground">Runs externally</span>
+                <Badge variant="outline" className={categoryColors["External"]}>{t("External")}</Badge>
+                <span className="text-muted-foreground">{t("Runs externally")}</span>
               </div>
             </div>
           </div>
@@ -123,13 +126,13 @@ export default function Executors() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="font-semibold">{exec.name}</h3>
-                            <Badge variant="outline" className={typeColors[exec.type]}>{exec.type}</Badge>
-                            <Badge variant="outline" className={categoryColors[exec.category]}>{exec.category}</Badge>
+                            <Badge variant="outline" className={typeColors[exec.type]}>{t(exec.type)}</Badge>
+                            <Badge variant="outline" className={categoryColors[exec.category]}>{t(exec.category)}</Badge>
                           </div>
                           {exec.features.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mb-2">
                               {exec.features.map((f) => (
-                                <span key={f} className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{f}</span>
+                                <span key={f} className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{t(f)}</span>
                               ))}
                             </div>
                           )}

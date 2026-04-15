@@ -40,7 +40,7 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="font-heading text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-6 max-w-3xl leading-[1.1]"
           >
-            Welcome to{" "}
+            {t("Welcome to")}{" "}
             <span className="text-gradient-neon">Combo_WICK</span>
           </motion.h1>
 
@@ -50,7 +50,7 @@ export default function Index() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-sm sm:text-base text-muted-foreground max-w-xl mb-8 leading-relaxed"
           >
-            Your one-stop hub for free Roblox scripts, premium keys, and more. Trusted by our growing community of gamers and developers.
+            {t("hero_main_desc")}
           </motion.p>
 
           <motion.div
@@ -61,18 +61,18 @@ export default function Index() {
           >
             <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider font-bold neon-glow group">
-                Browse Scripts
+                {t("Browse Scripts")}
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link to="/premium-keys">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
-                Premium Keys
+                {t("Premium Keys")}
               </Button>
             </Link>
             <Link to="/keys">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
-                Get Key
+                {t("Get Key")}
               </Button>
             </Link>
           </motion.div>
@@ -102,12 +102,12 @@ export default function Index() {
             {t("Ready to Get Started?")}
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-            Join the community and explore our collection of scripts, premium keys, and tools.
+            {t("cta_main_desc")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider neon-glow">
-                Explore Scripts
+                {t("Explore Scripts")}
               </Button>
             </Link>
             <Link to="/blog">
