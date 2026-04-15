@@ -197,7 +197,7 @@ export default function ScriptDetail() {
                 </dl>
               </div>
 
-              <CopyButton text={script.code} className="w-full justify-center" />
+              {unlocked && <CopyButton text={script.code} className="w-full justify-center" />}
 
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">
