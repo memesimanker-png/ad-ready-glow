@@ -141,7 +141,6 @@ export const EN_TEXTS: Record<string, string> = {
   "Multi-Instance": "Multi-Instance",
   "Client Mod Bypass": "Client Mod Bypass",
   "Key System": "Key System",
-  "Executors": "Executors",
   // Premium page
   "Premium Features": "Premium Features",
   "prem_hero_desc": "Skip all verification steps and get instant access to premium keys with extended validity, priority support, and exclusive features.",
