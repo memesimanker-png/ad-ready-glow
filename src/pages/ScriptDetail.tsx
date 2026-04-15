@@ -57,8 +57,42 @@ export default function ScriptDetail() {
     );
   }
 
+  const scriptJsonLd = useMemo(() => [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareSourceCode",
+      name: script.title,
+      description: script.longDescription || script.description,
+      programmingLanguage: "Lua",
+      runtimePlatform: "Roblox",
+      codeRepository: "https://shop-ready.lovable.app/scripts/" + script.slug,
+      author: { "@type": "Organization", name: "ComboWick" },
+      dateCreated: script.createdAt,
+      dateModified: script.updatedAt,
+    },
+    ...(script.faqs.length > 0 ? [{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: script.faqs.map((faq: any) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: { "@type": "Answer", text: faq.answer },
+      })),
+    }] : []),
+  ], [script]);
+
   return (
     <Layout>
+      <SEOHead
+        title={`${script.title} — Free Roblox Script | ComboWick`}
+        description={`${script.description} Free ${script.game} script for Roblox. Verified safe, copy & execute instantly with any executor.`}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Scripts", url: "/scripts" },
+          { name: script.title, url: `/scripts/${script.slug}` },
+        ]}
+        jsonLd={scriptJsonLd}
+      />
       <DirectLinkOverlay />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-6">

@@ -10,6 +10,7 @@ import { GallerySection } from "@/components/home/GallerySection";
 import { VideoBackground } from "@/components/VideoBackground";
 import { useTranslation } from "@/lib/translation-context";
 import { motion } from "framer-motion";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Index() {
   const { t } = useTranslation();
