@@ -1,10 +1,13 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, ExternalLink } from "lucide-react";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
+import { Button } from "@/components/ui/button";
+import { isInCooldown, getCooldownRemaining, triggerDirectLink } from "@/lib/direct-link-gate";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +17,39 @@ export default function ScriptDetail() {
     script?.game || "",
     script?.category || ""
   );
+
+  const [unlocked, setUnlocked] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (isInCooldown()) {
+      setUnlocked(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (unlocked || !script) return;
+    const interval = setInterval(() => {
+      const remaining = getCooldownRemaining();
+      setCooldown(remaining);
+      if (remaining > 0) {
+        setUnlocked(true);
+        clearInterval(interval);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [unlocked, script]);
+
+  const handleUnlock = () => {
+    triggerDirectLink();
+    // Start countdown check
+    const interval = setInterval(() => {
+      if (isInCooldown()) {
+        setUnlocked(true);
+        clearInterval(interval);
+      }
+    }, 500);
+  };
 
   if (isLoading) {
     return (
