@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ShieldCheck, ChevronRight, TrendingUp } from "lucide-react";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
@@ -7,6 +7,7 @@ import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
+import { SEOHead } from "@/components/SEOHead";
 
 const POPUNDER_ZONE = 10877295;
 const POPUNDER_SESSION_KEY = "combowick-popunder-fired";
