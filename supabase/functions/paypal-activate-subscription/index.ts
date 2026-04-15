@@ -6,15 +6,27 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-function generateKey(): string {
-  const prefix = "MONTH";
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let key = prefix + "-";
-  for (let i = 0; i < 20; i++) {
-    if (i > 0 && i % 5 === 0) key += "-";
-    key += chars.charAt(Math.floor(Math.random() * chars.length));
+const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
+
+async function generateKeyFromAPI(subscriptionId: string): Promise<string> {
+  const response = await fetch(HWID_KEY_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ username: `Sub-${subscriptionId}`, hours: 720 }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error("[subscription] External API error:", errText);
+    throw new Error("Failed to generate key from external API");
   }
-  return key;
+
+  const data = await response.json();
+  return data.key || data.licenseKey;
 }
 
 serve(async (req) => {
@@ -32,7 +44,7 @@ serve(async (req) => {
       });
     }
 
-    const generatedKey = generateKey();
+    const generatedKey = await generateKeyFromAPI(subscription_id);
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const supabase = createClient(
