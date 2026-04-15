@@ -6,7 +6,7 @@ import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
-import { isInCooldown, triggerDirectLink } from "@/lib/direct-link-gate";
+import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 
 const POPUNDER_ZONE = 10877295;
 const POPUNDER_SESSION_KEY = "combowick-popunder-fired";
@@ -23,13 +23,13 @@ export default function ScriptDetail() {
   // Fire popunder once per session on page load
   useEffect(() => {
     if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
-    const script = document.createElement("script");
-    script.src = `https://alwingulla.com/88/tag.min.js`;
-    script.dataset.zone = String(POPUNDER_ZONE);
-    script.async = true;
-    document.body.appendChild(script);
+    const s = document.createElement("script");
+    s.src = "https://al5sm.com/tag.min.js";
+    s.dataset.zone = String(POPUNDER_ZONE);
+    s.async = true;
+    document.body.appendChild(s);
     sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
-    return () => { document.body.removeChild(script); };
+    return () => { document.body.removeChild(s); };
   }, []);
 
   if (isLoading) {
@@ -58,6 +58,7 @@ export default function ScriptDetail() {
 
   return (
     <Layout>
+      <DirectLinkOverlay />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-6">
           <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -108,9 +109,7 @@ export default function ScriptDetail() {
             <section className="mb-8">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold">Script Code</h2>
-                <CopyButton text={script.code} onBeforeCopy={() => {
-                  if (!isInCooldown()) { triggerDirectLink(); }
-                }} />
+                <CopyButton text={script.code} />
               </div>
               <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
                 <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
@@ -161,9 +160,7 @@ export default function ScriptDetail() {
                 </dl>
               </div>
 
-              <CopyButton text={script.code} className="w-full justify-center" onBeforeCopy={() => {
-                if (!isInCooldown()) { triggerDirectLink(); }
-              }} />
+              <CopyButton text={script.code} className="w-full justify-center" />
 
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">

@@ -5,6 +5,10 @@ import { CATEGORIES } from "@/lib/scripts-data";
 import { useSearchScripts } from "@/hooks/useScripts";
 import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
+import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
+
+const POPUNDER_ZONE = 10877295;
+const POPUNDER_SESSION_KEY = "combowick-popunder-scripts";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
