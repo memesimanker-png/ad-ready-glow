@@ -278,7 +278,6 @@ const translations: Record<LangCode, TranslationMap> = {
     // === Executors Page ===
     "Roblox Executors": "Roblox Executors",
     "executors_subtitle": "A reference list of known Roblox executors compatible with COMBO WICK scripts. Includes PC, Android, iOS and Mac options.",
-    "Executors": "Executors",
     "Legend": "Legend",
     "Free": "Free", "Paid": "Paid", "Free (Key)": "Free (Key)",
     "No cost": "No cost", "Requires key system": "Requires key system",
