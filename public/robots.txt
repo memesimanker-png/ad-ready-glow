@@ -60,3 +60,4 @@ Disallow: /ad-return
 Disallow: /verify/
 
 Sitemap: https://shop-ready.lovable.app/sitemap.xml
+Sitemap: https://iphiksvnuzpteoryrdxf.supabase.co/functions/v1/dynamic-sitemap
