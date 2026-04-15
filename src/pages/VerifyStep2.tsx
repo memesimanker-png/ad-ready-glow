@@ -11,6 +11,7 @@ import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function VerifyStep2() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export default function VerifyStep2() {
   const [buttonEnabled, setButtonEnabled] = useState(true);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
   const [skipLoading, setSkipLoading] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
   const todaySchedule = getTodaySchedule();
 
   useEffect(() => {
@@ -31,7 +33,22 @@ export default function VerifyStep2() {
     }
     const provider = localStorage.getItem("selected_ad_provider");
     setSelectedProvider(provider);
+
+    // Check if user signed in with Google
+    const checkGoogleUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.app_metadata?.provider === "google") {
+          setIsGoogleUser(true);
+        }
+      } catch {
+        setIsGoogleUser(false);
+      }
+    };
+    checkGoogleUser();
   }, [navigate, toast, t]);
+
+  const canSkip = isGoogleUser && todaySchedule.skipStep2;
 
   const handleSkipStep2 = () => {
     setSkipLoading(true);
@@ -84,11 +101,19 @@ export default function VerifyStep2() {
                 <CardDescription>{t("verify_watch_desc")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {todaySchedule.skipStep2 && (
+                {canSkip && (
                   <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3 flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-yellow-400 mt-0.5 shrink-0" />
                     <p className="text-sm text-yellow-400 font-medium">
                       {todaySchedule.label} — {t("verify_skip_label")}
+                    </p>
+                  </div>
+                )}
+                {!isGoogleUser && todaySchedule.skipStep2 && (
+                  <div className="rounded-lg border border-primary/40 bg-primary/10 p-3 flex items-start gap-2">
+                    <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <p className="text-sm text-primary font-medium">
+                      {t("Sign in with Google to skip this step on reward days!")}
                     </p>
                   </div>
                 )}
@@ -101,7 +126,7 @@ export default function VerifyStep2() {
                 )}
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
-                {todaySchedule.skipStep2 && (
+                {canSkip && (
                   <Button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold gap-2" onClick={handleSkipStep2} disabled={skipLoading}>
                     <Sparkles className="h-4 w-4" />
                     {skipLoading ? t("Skipping...") : t("Skip Step 2 (Reward Day)")}
