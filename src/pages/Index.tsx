@@ -17,6 +17,10 @@ export default function Index() {
 
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Official — Free Roblox Scripts, Premium Keys & Executors 2026"
+        description="ComboWick is the #1 trusted source for free Roblox scripts, premium keys, executors, and gaming resources. Instant automated delivery, secure PayPal payments, and 24/7 Discord support."
+      />
       {/* Hero */}
       <section className="relative min-h-[100vh] flex items-end overflow-hidden">
         <VideoBackground />
