@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
+
 async function getPayPalAccessToken(): Promise<string> {
   const clientId = Deno.env.get("PAYPAL_CLIENT_ID")!;
   const clientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
@@ -25,22 +27,39 @@ async function getPayPalAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-function generateKey(tier: string): string {
-  const prefix = tier === "trial-7day" ? "TRIAL" : tier === "monthly" ? "MONTH" : "LIFE";
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let key = prefix + "-";
-  for (let i = 0; i < 20; i++) {
-    if (i > 0 && i % 5 === 0) key += "-";
-    key += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return key;
+function getTierHours(tier: string): number {
+  if (tier === "trial-7day") return 168;
+  if (tier === "monthly") return 720;
+  return 876000; // lifetime
 }
 
 function calculateExpiry(tier: string): string {
   const now = new Date();
   if (tier === "trial-7day") return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
   if (tier === "monthly") return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
-  return new Date(now.getTime() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString(); // lifetime
+  return new Date(now.getTime() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString();
+}
+
+async function generateKeyFromAPI(tier: string, paymentId: string): Promise<string> {
+  const hours = getTierHours(tier);
+  const response = await fetch(HWID_KEY_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ username: `PayPal-${paymentId}`, hours }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error("[capture] External API error:", errText);
+    throw new Error("Failed to generate key from external API");
+  }
+
+  const data = await response.json();
+  return data.key || data.licenseKey;
 }
 
 serve(async (req) => {
@@ -76,9 +95,9 @@ serve(async (req) => {
       });
     }
 
-    // Generate key and store purchase
-    const generatedKey = generateKey(tier || "lifetime");
-    const expiresAt = calculateExpiry(tier || "lifetime");
+    const usedTier = tier || "lifetime";
+    const generatedKey = await generateKeyFromAPI(usedTier, order_id);
+    const expiresAt = calculateExpiry(usedTier);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -87,7 +106,7 @@ serve(async (req) => {
 
     const { error: dbError } = await supabase.from("premium_key_purchases").insert({
       payment_id: order_id,
-      tier: tier || "lifetime",
+      tier: usedTier,
       key_generated: generatedKey,
       amount: Number(amount) || 0,
       currency: "USD",
@@ -105,7 +124,7 @@ serve(async (req) => {
       status: "COMPLETED",
       key: generatedKey,
       expires_at: expiresAt,
-      tier,
+      tier: usedTier,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
