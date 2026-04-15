@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, DollarSign } from "lucide-react";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
+import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 
 const POPUNDER_ZONE = 10877295;
@@ -21,7 +22,6 @@ export default function ScriptDetail() {
     script?.category || ""
   );
 
-  // Fire popunder once per session on page load
   useEffect(() => {
     if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
     const s = document.createElement("script");
@@ -121,6 +121,11 @@ export default function ScriptDetail() {
                     <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
                       {script.game}
                     </span>
+                    {script.is_paid && (
+                      <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                        <DollarSign className="h-3 w-3" /> PAID
+                      </span>
+                    )}
                     {script.trending && (
                       <span className="flex items-center gap-1 text-xs text-primary">
                         <TrendingUp className="h-3 w-3" /> Trending
@@ -144,17 +149,40 @@ export default function ScriptDetail() {
               </div>
             </header>
 
-            <section className="mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">Script Code</h2>
-                <CopyButton text={script.code} />
-              </div>
-              <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
-                <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
-                  {script.code}
-                </pre>
-              </div>
-            </section>
+            {/* YouTube Video Tutorial */}
+            {script.youtube_url && (
+              <section className="mb-8">
+                <h2 className="text-lg font-semibold mb-3">Video Tutorial</h2>
+                <YouTubeEmbed url={script.youtube_url} />
+              </section>
+            )}
+
+            {/* Script Code - show purchase CTA for paid scripts */}
+            {script.is_paid ? (
+              <section className="mb-8">
+                <h2 className="text-lg font-semibold mb-3">Script Code</h2>
+                <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
+                  <DollarSign className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
+                  <p className="text-lg font-semibold mb-2">This is a Premium Script</p>
+                  <p className="text-sm text-muted-foreground mb-4">Purchase a premium key to access this script.</p>
+                  <Link to="/premium-keys" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
+                    Purchase Access
+                  </Link>
+                </div>
+              </section>
+            ) : (
+              <section className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold">Script Code</h2>
+                  <CopyButton text={script.code} />
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
+                  <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
+                    {script.code}
+                  </pre>
+                </div>
+              </section>
+            )}
 
             <section className="mb-8">
               <h2 className="text-lg font-semibold mb-3">Tags</h2>
@@ -195,10 +223,19 @@ export default function ScriptDetail() {
                   <div className="flex justify-between"><dt className="text-muted-foreground">Category</dt><dd>{script.category}</dd></div>
                   <div className="flex justify-between"><dt className="text-muted-foreground">Added</dt><dd>{script.createdAt}</dd></div>
                   <div className="flex justify-between"><dt className="text-muted-foreground">Updated</dt><dd>{script.updatedAt}</dd></div>
+                  {script.is_paid && (
+                    <div className="flex justify-between"><dt className="text-muted-foreground">Access</dt><dd className="text-yellow-400 font-semibold">Premium</dd></div>
+                  )}
                 </dl>
               </div>
 
-              <CopyButton text={script.code} className="w-full justify-center" />
+              {script.is_paid ? (
+                <Link to="/premium-keys" className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
+                  <DollarSign className="h-4 w-4" /> Purchase Access
+                </Link>
+              ) : (
+                <CopyButton text={script.code} className="w-full justify-center" />
+              )}
 
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">
@@ -207,12 +244,15 @@ export default function ScriptDetail() {
                     {related.map((s) => (
                       <Link
                         key={s.id}
-                        to={`/scripts/${s.slug}`}
+                        to={s.is_paid ? "/premium-keys" : `/scripts/${s.slug}`}
                         className="block rounded-lg border border-border bg-secondary/30 p-3 hover:border-primary/50 transition-colors"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <GameThumbnail gameName={s.game} universeId={(s as any).game_universe_id} size="sm" />
                           <span className="text-xs text-muted-foreground">{s.game}</span>
+                          {s.is_paid && (
+                            <span className="text-xs px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-bold">PAID</span>
+                          )}
                           {s.verified && (
                             <span className="text-xs px-1.5 py-0.5 rounded bg-green-400/10 text-green-400 font-medium">Safe</span>
                           )}
