@@ -86,6 +86,78 @@ export type Database = {
         }
         Relationships: []
       }
+      roblox_account_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          package_size: number
+          payment_id: string
+          quantity: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          package_size: number
+          payment_id: string
+          quantity?: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          package_size?: number
+          payment_id?: string
+          quantity?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      roblox_accounts: {
+        Row: {
+          claimed: boolean
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          id: string
+          package_size: number
+          password: string
+          purchase_id: string | null
+          username: string
+        }
+        Insert: {
+          claimed?: boolean
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          id?: string
+          package_size: number
+          password: string
+          purchase_id?: string | null
+          username: string
+        }
+        Update: {
+          claimed?: boolean
+          claimed_at?: string | null
+          claimed_by?: string | null
+          created_at?: string
+          id?: string
+          package_size?: number
+          password?: string
+          purchase_id?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       scripts: {
         Row: {
           category: string
@@ -193,6 +265,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_accounts_for_purchase: {
+        Args: {
+          _package_size: number
+          _purchase_id: string
+          _quantity: number
+          _user_id: string
+        }
+        Returns: {
+          claimed: boolean
+          claimed_at: string | null
+          claimed_by: string | null
+          created_at: string
+          id: string
+          package_size: number
+          password: string
+          purchase_id: string | null
+          username: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "roblox_accounts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_account_stock: { Args: { _package_size: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

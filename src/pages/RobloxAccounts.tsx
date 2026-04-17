@@ -3,17 +3,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Shield, Zap, Check, Lock, HeadphonesIcon,
-  ChevronDown, ChevronUp, Clock, Download, Eye
+  ChevronDown, ChevronUp, Download, Eye
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { AccountsCheckoutModal } from "@/components/AccountsCheckoutModal";
 
 const packages = [
-  { size: 25, price: 6, perAccount: "0.24", label: "Starter", popular: false },
   { size: 50, price: 11, perAccount: "0.22", label: "Popular", popular: true },
   { size: 100, price: 20, perAccount: "0.20", label: "Pro", popular: false },
 ];
-
-const EXTERNAL_SHOP_URL = "https://combooo-wickshop.vercel.app/roblox-accounts";
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -34,6 +33,27 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function RobloxAccounts() {
+  const [selected, setSelected] = useState<typeof packages[number] | null>(null);
+  const [paypalClientId, setPaypalClientId] = useState<string>("");
+  const [stock, setStock] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    supabase.functions.invoke("paypal-config").then(({ data }) => {
+      if (data?.client_id) setPaypalClientId(data.client_id);
+    });
+
+    // Live stock counts via public RPC
+    Promise.all(
+      packages.map(p =>
+        supabase.rpc("get_account_stock", { _package_size: p.size })
+      )
+    ).then(results => {
+      const map: Record<number, number> = {};
+      results.forEach((r, i) => { map[packages[i].size] = (r.data as number) ?? 0; });
+      setStock(map);
+    });
+  }, []);
+
   return (
     <Layout>
       <section className="py-16 sm:py-20 bg-gradient-hero">
@@ -46,7 +66,7 @@ export default function RobloxAccounts() {
             Verified <span className="text-gradient-primary">Roblox Accounts</span> in Bulk
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            ComboWick provides verified, ready-to-use Roblox accounts for developers, content creators, and studios. Every account is manually verified with working credentials.
+            ComboWick provides verified, ready-to-use Roblox accounts. Pay with PayPal and your accounts are delivered instantly to your dashboard.
           </p>
         </div>
       </section>
@@ -58,10 +78,10 @@ export default function RobloxAccounts() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: Shield, title: "Manual Verification", desc: "Each account is individually checked to ensure credentials work correctly and the account isn't flagged." },
-              { icon: Zap, title: "Instant Delivery", desc: "Automated delivery within seconds of payment confirmation." },
-              { icon: Lock, title: "Secure Storage", desc: "Credentials stored securely. We recommend changing passwords immediately." },
-              { icon: Download, title: "Bulk Export", desc: "Download all credentials as a formatted text file for easy management." },
-              { icon: Eye, title: "Full Transparency", desc: "View each account's username, password, and verification status." },
+              { icon: Zap, title: "Instant Delivery", desc: "Automated delivery to your dashboard within seconds of payment confirmation." },
+              { icon: Lock, title: "Secure Storage", desc: "Credentials stored securely in your dashboard. We recommend changing passwords immediately." },
+              { icon: Download, title: "Bulk Export", desc: "Download all credentials as a formatted text file directly from your dashboard." },
+              { icon: Eye, title: "Full Transparency", desc: "View each account's username and password in your dashboard." },
               { icon: HeadphonesIcon, title: "24/7 Support", desc: "Discord support team available around the clock for replacements or issues." },
             ].map((item) => (
               <Card key={item.title} className="p-6 bg-glass hover:border-primary/30 transition-all">
@@ -80,43 +100,54 @@ export default function RobloxAccounts() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-heading text-3xl font-bold text-center mb-4">Account Packages & Pricing</h2>
           <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">
-            All packages include verified accounts with instant delivery.
+            All packages include verified accounts with instant delivery to your dashboard.
           </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {packages.map((pkg) => (
-              <Card
-                key={pkg.size}
-                className={`p-6 sm:p-8 relative transition-all duration-300 ${
-                  pkg.popular
-                    ? "border-primary/50 bg-primary/5 animate-glow scale-105"
-                    : "bg-glass hover:border-primary/30"
-                }`}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full uppercase tracking-wider">
-                    Most Popular
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {packages.map((pkg) => {
+              const remaining = stock[pkg.size];
+              const inStock = remaining === undefined || remaining >= pkg.size;
+              return (
+                <Card
+                  key={pkg.size}
+                  className={`p-6 sm:p-8 relative transition-all duration-300 ${
+                    pkg.popular
+                      ? "border-primary/50 bg-primary/5 animate-glow scale-105"
+                      : "bg-glass hover:border-primary/30"
+                  }`}
+                >
+                  {pkg.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full uppercase tracking-wider">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="text-center mb-6">
+                    <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">{pkg.label}</h3>
+                    <div className="text-4xl font-bold mb-1">${pkg.price}</div>
+                    <p className="text-sm text-muted-foreground">{pkg.size} Accounts • ${pkg.perAccount}/account</p>
+                    {remaining !== undefined && (
+                      <p className="text-xs mt-1 text-muted-foreground">
+                        {inStock ? `${remaining} accounts in stock` : `Only ${remaining} left — out of stock for full pack`}
+                      </p>
+                    )}
                   </div>
-                )}
-                <div className="text-center mb-6">
-                  <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">{pkg.label}</h3>
-                  <div className="text-4xl font-bold mb-1">${pkg.price}</div>
-                  <p className="text-sm text-muted-foreground">{pkg.size} Accounts • ${pkg.perAccount}/account</p>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Verified accounts</li>
-                  <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Instant delivery</li>
-                  <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> PayPal buyer protection</li>
-                  <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Dashboard access</li>
-                  {pkg.size >= 50 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Bulk discount applied</li>}
-                  {pkg.size >= 100 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Priority support</li>}
-                </ul>
-                <a href={EXTERNAL_SHOP_URL} target="_blank" rel="noopener noreferrer">
-                  <Button className="w-full" variant={pkg.popular ? "default" : "outline"}>
-                    Purchase Now
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Verified accounts</li>
+                    <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Instant dashboard delivery</li>
+                    <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> PayPal buyer protection</li>
+                    <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Bulk export from dashboard</li>
+                    {pkg.size >= 100 && <li className="flex items-center gap-2 text-sm"><Check className="h-4 w-4 text-success" /> Priority support</li>}
+                  </ul>
+                  <Button
+                    className="w-full"
+                    variant={pkg.popular ? "default" : "outline"}
+                    onClick={() => setSelected(pkg)}
+                    disabled={!inStock || !paypalClientId}
+                  >
+                    {!paypalClientId ? "Loading…" : !inStock ? "Out of Stock" : "Purchase Now"}
                   </Button>
-                </a>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -125,8 +156,9 @@ export default function RobloxAccounts() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-heading text-3xl font-bold text-center mb-12">FAQ</h2>
           <div className="space-y-3">
-            <FAQItem q="What do I receive after purchasing?" a="Account credentials (username and password) delivered to your dashboard. Each account has a verified email and working login." />
-            <FAQItem q="How long does delivery take?" a="Delivery is fully automated and happens within seconds of payment confirmation." />
+            <FAQItem q="What do I receive after purchasing?" a="Account credentials (username and password) delivered directly to the Accounts tab in your dashboard. Each account has a verified email and working login." />
+            <FAQItem q="How long does delivery take?" a="Delivery is fully automated and happens within seconds of payment confirmation — your accounts will appear in your dashboard immediately." />
+            <FAQItem q="Do I need an account to purchase?" a="Yes — you must be signed in so we can deliver the accounts to your dashboard. If you don't have an account yet, we'll prompt you to sign up." />
             <FAQItem q="What if an account doesn't work?" a="Contact our 24/7 Discord support team for a replacement or resolution." />
             <FAQItem q="Do you offer custom bulk orders?" a="Yes. For orders exceeding 100 accounts, contact us through Discord for custom pricing." />
           </div>
@@ -142,6 +174,15 @@ export default function RobloxAccounts() {
           </a>
         </div>
       </section>
+
+      {selected && paypalClientId && (
+        <AccountsCheckoutModal
+          isOpen={!!selected}
+          onClose={() => setSelected(null)}
+          pkg={selected}
+          paypalClientId={paypalClientId}
+        />
+      )}
     </Layout>
   );
 }

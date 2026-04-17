@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Key, XCircle, Copy, Check, LogIn } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +17,14 @@ type KeyPurchase = {
   created_at: string;
 };
 
+type RobloxAccount = {
+  id: string;
+  username: string;
+  password: string;
+  package_size: number;
+  claimed_at: string;
+};
+
 const tierNames: Record<string, string> = {
   "trial-7day": "7-Day Trial",
   monthly: "Monthly Access",
@@ -27,32 +35,41 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [keys, setKeys] = useState<KeyPurchase[]>([]);
+  const [accounts, setAccounts] = useState<RobloxAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
+  const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
+  const [tab, setTab] = useState<"keys" | "accounts">("keys");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        setLoading(false);
-        return;
-      }
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { setLoading(false); return; }
       setUser(data.user);
-      supabase
-        .from("premium_key_purchases")
-        .select("*")
-        .eq("user_id", data.user.id)
-        .order("created_at", { ascending: false })
-        .then(({ data: purchases }) => {
-          setKeys((purchases as KeyPurchase[]) || []);
-          setLoading(false);
-        });
+      const [keysRes, accountsRes] = await Promise.all([
+        supabase.from("premium_key_purchases").select("*").eq("user_id", data.user.id).order("created_at", { ascending: false }),
+        supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
+      ]);
+      setKeys((keysRes.data as KeyPurchase[]) || []);
+      setAccounts((accountsRes.data as RobloxAccount[]) || []);
+      setLoading(false);
     });
   }, []);
 
-  const copyKey = (key: string, id: string) => {
-    navigator.clipboard.writeText(key);
+  const copyText = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const exportAccounts = () => {
+    const txt = accounts.map(a => `${a.username}:${a.password}`).join("\n");
+    const blob = new Blob([txt], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `combowick-accounts-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -72,10 +89,8 @@ export default function Dashboard() {
           <Card className="p-12 text-center max-w-md">
             <LogIn className="h-12 w-12 text-primary mx-auto mb-4" />
             <h2 className="font-heading text-2xl font-bold mb-2">Login Required</h2>
-            <p className="text-muted-foreground mb-6">Sign in to view your purchased premium keys.</p>
-            <Button onClick={() => navigate("/login")} className="w-full">
-              Sign In
-            </Button>
+            <p className="text-muted-foreground mb-6">Sign in to view your purchased premium keys and Roblox accounts.</p>
+            <Button onClick={() => navigate("/login")} className="w-full">Sign In</Button>
           </Card>
         </div>
       </Layout>
@@ -88,87 +103,132 @@ export default function Dashboard() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="font-heading text-3xl font-bold mb-2">My Dashboard</h1>
-            <p className="text-muted-foreground">Manage your premium keys and purchases</p>
+            <p className="text-muted-foreground">Manage your premium keys and Roblox accounts</p>
           </div>
 
-          <div className="flex items-center gap-3 mb-8 p-4 rounded-lg bg-muted/30 border border-border/50">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-muted/30 border border-border/50">
+            <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
             <span className="text-sm">{user.email}</span>
           </div>
 
-          <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-            <Key className="h-5 w-5 text-primary" />
-            Premium Keys ({keys.length})
-          </h2>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b border-border">
+            <button
+              onClick={() => setTab("keys")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "keys" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              <Key className="h-4 w-4" /> Premium Keys ({keys.length})
+            </button>
+            <button
+              onClick={() => setTab("accounts")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "accounts" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              <User2 className="h-4 w-4" /> Roblox Accounts ({accounts.length})
+            </button>
+          </div>
 
-          {keys.length === 0 ? (
-            <Card className="p-12 text-center border-dashed">
-              <Key className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-semibold mb-2">No Premium Keys Yet</p>
-              <p className="text-muted-foreground mb-6">Purchase a premium key to get started</p>
-              <Button onClick={() => navigate("/premium-keys")}>Browse Premium Keys</Button>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {keys.map((purchase) => {
-                const isExpired = new Date(purchase.expires_at) < new Date();
-                return (
-                  <Card
-                    key={purchase.id}
-                    className={`p-6 transition-all hover:shadow-lg ${
-                      isExpired ? "border-red-500/20" : "border-primary/20"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Key className={`h-5 w-5 ${isExpired ? "text-red-500" : "text-primary"}`} />
-                          <div>
-                            <h3 className="font-bold text-lg">{tierNames[purchase.tier] || purchase.tier}</h3>
-                            <div className="flex items-center gap-2 text-sm">
-                              {isExpired ? (
-                                <>
-                                  <XCircle className="h-4 w-4 text-red-500" />
-                                  <span className="text-red-500 font-medium">Expired</span>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                  <span className="text-green-500 font-medium">Active</span>
-                                </>
-                              )}
+          {tab === "keys" && (
+            keys.length === 0 ? (
+              <Card className="p-12 text-center border-dashed">
+                <Key className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg font-semibold mb-2">No Premium Keys Yet</p>
+                <p className="text-muted-foreground mb-6">Purchase a premium key to get started</p>
+                <Button onClick={() => navigate("/premium-keys")}>Browse Premium Keys</Button>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {keys.map((purchase) => {
+                  const isExpired = new Date(purchase.expires_at) < new Date();
+                  return (
+                    <Card key={purchase.id} className={`p-6 transition-all hover:shadow-lg ${isExpired ? "border-destructive/20" : "border-primary/20"}`}>
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Key className={`h-5 w-5 ${isExpired ? "text-destructive" : "text-primary"}`} />
+                            <div>
+                              <h3 className="font-bold text-lg">{tierNames[purchase.tier] || purchase.tier}</h3>
+                              <div className="flex items-center gap-2 text-sm">
+                                {isExpired ? (
+                                  <><XCircle className="h-4 w-4 text-destructive" /><span className="text-destructive font-medium">Expired</span></>
+                                ) : (
+                                  <><div className="w-2 h-2 bg-success rounded-full animate-pulse" /><span className="text-success font-medium">Active</span></>
+                                )}
+                              </div>
                             </div>
                           </div>
+                          <div className="bg-background/50 p-4 rounded-lg mb-3 border border-border/50">
+                            <p className="text-xs text-muted-foreground mb-1">License Key:</p>
+                            <code className="text-sm font-mono break-all font-semibold">{purchase.key_generated}</code>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>Purchased: {new Date(purchase.created_at).toLocaleDateString()}</span>
+                            <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>
+                            <span>${purchase.amount}</span>
+                          </div>
                         </div>
-
-                        <div className="bg-background/50 p-4 rounded-lg mb-3 border border-border/50">
-                          <p className="text-xs text-muted-foreground mb-1">License Key:</p>
-                          <code className="text-sm font-mono break-all font-semibold">{purchase.key_generated}</code>
-                        </div>
-
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span>Purchased: {new Date(purchase.created_at).toLocaleDateString()}</span>
-                          <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>
-                          <span>${purchase.amount}</span>
-                        </div>
+                        <Button variant="outline" size="sm" onClick={() => copyText(purchase.key_generated, purchase.id)}>
+                          {copied === purchase.id ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                        </Button>
                       </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )
+          )}
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyKey(purchase.key_generated, purchase.id)}
-                      >
-                        {copied === purchase.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+          {tab === "accounts" && (
+            accounts.length === 0 ? (
+              <Card className="p-12 text-center border-dashed">
+                <User2 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg font-semibold mb-2">No Roblox Accounts Yet</p>
+                <p className="text-muted-foreground mb-6">Purchase an account package to get started</p>
+                <Button onClick={() => navigate("/accounts")}>Browse Account Packages</Button>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">{accounts.length} accounts delivered</p>
+                  <Button variant="outline" size="sm" onClick={exportAccounts}>
+                    <Download className="h-4 w-4 mr-2" /> Export as .txt
+                  </Button>
+                </div>
+                <div className="grid gap-3">
+                  {accounts.map((acc) => {
+                    const visible = !!showPwd[acc.id];
+                    return (
+                      <Card key={acc.id} className="p-4 border-primary/20">
+                        <div className="flex items-center justify-between gap-4 flex-wrap">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Pkg {acc.package_size}</span>
+                              <span className="text-xs text-muted-foreground">Delivered {new Date(acc.claimed_at).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2">
+                              <code className="text-sm font-mono font-semibold">{acc.username}</code>
+                              <code className="text-xs font-mono text-muted-foreground break-all">
+                                {visible ? acc.password : "•".repeat(Math.min(16, acc.password.length))}
+                              </code>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => setShowPwd(p => ({ ...p, [acc.id]: !p[acc.id] }))} title={visible ? "Hide password" : "Show password"}>
+                              {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.username, `u-${acc.id}`)} title="Copy username">
+                              {copied === `u-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.password, `p-${acc.id}`)} title="Copy password">
+                              {copied === `p-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )
           )}
         </div>
       </section>

@@ -32,22 +32,43 @@ export default function ScriptAdmin() {
     }
     setAiLoading(true);
     try {
+      // Send manual hints so AI extends them instead of overwriting them
       const { data, error } = await supabase.functions.invoke("ai-script-autofill", {
-        body: { code: form.code },
+        body: {
+          code: form.code,
+          existing: {
+            title: form.title || undefined,
+            slug: form.slug || undefined,
+            description: form.description || undefined,
+            longDescription: form.longDescription || undefined,
+            game: form.game || undefined,
+            category: form.category && form.category !== "Utility" ? form.category : undefined,
+            tags: form.tags.length ? form.tags : undefined,
+          },
+        },
       });
       if (error) throw error;
+      // ONLY fill fields that are still empty — never overwrite manual input
       setForm(prev => ({
         ...prev,
-        title: data.title || prev.title,
-        slug: data.slug || prev.slug,
-        description: data.description || prev.description,
-        longDescription: data.longDescription || prev.longDescription,
-        game: data.game || prev.game,
-        category: data.category || prev.category,
-        tags: data.tags || prev.tags,
-        faqs: data.faqs || prev.faqs,
+        title: prev.title || data.title || "",
+        slug: prev.slug || data.slug || "",
+        description: prev.description || data.description || "",
+        longDescription: prev.longDescription || data.longDescription || "",
+        game: prev.game || data.game || "",
+        // Category default is "Utility"; only override if user didn't change it
+        category: prev.category && prev.category !== "Utility" ? prev.category : (data.category || prev.category),
+        tags: prev.tags.length ? prev.tags : (data.tags || []),
+        faqs: prev.faqs.length ? prev.faqs : (data.faqs || []),
       }));
-      toast({ title: "AI filled fields successfully" });
+      const filled: string[] = [];
+      if (!form.title && data.title) filled.push("title");
+      if (!form.description && data.description) filled.push("description");
+      if (!form.game && data.game) filled.push("game");
+      toast({
+        title: filled.length ? `AI filled: ${filled.join(", ")}` : "Nothing to fill — all fields already have values",
+        description: filled.length ? "Your manual input was preserved." : undefined,
+      });
     } catch (e: any) {
       toast({ title: "AI autofill failed", description: e.message, variant: "destructive" });
     } finally {
