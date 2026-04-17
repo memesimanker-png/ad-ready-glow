@@ -42,14 +42,14 @@ export default function RobloxAccounts() {
       if (data?.client_id) setPaypalClientId(data.client_id);
     });
 
-    // Live stock counts (public RPC-like via select count)
+    // Live stock counts via public RPC
     Promise.all(
       packages.map(p =>
-        supabase.from("roblox_accounts").select("id", { count: "exact", head: true }).eq("package_size", p.size).eq("claimed", false)
+        supabase.rpc("get_account_stock", { _package_size: p.size })
       )
     ).then(results => {
       const map: Record<number, number> = {};
-      results.forEach((r, i) => { map[packages[i].size] = r.count ?? 0; });
+      results.forEach((r, i) => { map[packages[i].size] = (r.data as number) ?? 0; });
       setStock(map);
     });
   }, []);

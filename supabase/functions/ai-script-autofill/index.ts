@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { code } = await req.json();
+    const { code, existing } = await req.json();
     if (!code || typeof code !== "string") {
       return new Response(JSON.stringify({ error: "code is required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -18,6 +18,24 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const existingHints = existing && typeof existing === "object"
+      ? Object.entries(existing).filter(([_, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => `- ${k}: ${JSON.stringify(v)}`).join("\n")
+      : "";
+
+    const systemPrompt = `You are a Roblox script metadata generator. Given a Lua script, analyze it and return structured metadata.
+
+CRITICAL RULES:
+1. The user may have already filled some fields manually. Their manual input is the source of truth and MUST be respected.
+2. If "existing" hints are provided, treat them as authoritative — do NOT contradict, rewrite, or replace them.
+3. For fields the user already filled, you may leave them as-is OR slightly enhance them, but never change the meaning or the wording substantially.
+4. For fields not provided by the user, generate accurate metadata from the script.
+5. Always call the extract_script_metadata function with your analysis.`;
+
+    const userContent = `Analyze this Roblox Lua script and extract metadata.
+
+${existingHints ? `The user has already manually filled these fields — respect them and DO NOT change their wording:\n${existingHints}\n\n` : ""}Script:
+${code.slice(0, 8000)}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -28,30 +46,24 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          {
-            role: "system",
-            content: `You are a Roblox script metadata generator. Given a Lua script, analyze it and return structured metadata. You must call the extract_script_metadata function with your analysis.`
-          },
-          {
-            role: "user",
-            content: `Analyze this Roblox Lua script and extract metadata:\n\n${code.slice(0, 8000)}`
-          }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userContent },
         ],
         tools: [{
           type: "function",
           function: {
             name: "extract_script_metadata",
-            description: "Extract metadata from a Roblox Lua script",
+            description: "Extract metadata from a Roblox Lua script. Respect any user-provided existing values verbatim.",
             parameters: {
               type: "object",
               properties: {
-                title: { type: "string", description: "A descriptive title for the script (e.g. 'Blox Fruits Auto Farm V3')" },
-                description: { type: "string", description: "A short 1-2 sentence description of what the script does" },
-                longDescription: { type: "string", description: "A detailed 3-4 sentence description including features and compatibility" },
-                game: { type: "string", description: "The Roblox game this script is for (e.g. 'Blox Fruits', 'Universal')" },
-                category: { type: "string", enum: ["Auto Farm", "ESP", "Aimbot", "Speed Hack", "Infinite Jump", "Kill Aura", "Admin", "Trolling", "Utility"], description: "The primary category" },
-                tags: { type: "array", items: { type: "string" }, description: "5-8 relevant search tags" },
-                slug: { type: "string", description: "URL-friendly slug (lowercase, hyphens, no special chars)" },
+                title: { type: "string", description: "A descriptive title (e.g. 'Blox Fruits Auto Farm V3'). If existing.title is provided, return it UNCHANGED." },
+                description: { type: "string", description: "A short 1-2 sentence description. If existing.description is provided, return it unchanged." },
+                longDescription: { type: "string", description: "A detailed 3-4 sentence description. If existing.longDescription is provided, return it unchanged." },
+                game: { type: "string", description: "The Roblox game (e.g. 'Blox Fruits', 'Universal'). If existing.game is provided, return it unchanged." },
+                category: { type: "string", enum: ["Auto Farm", "ESP", "Aimbot", "Speed Hack", "Infinite Jump", "Kill Aura", "Admin", "Trolling", "Utility"], description: "The primary category. If existing.category is provided, return it." },
+                tags: { type: "array", items: { type: "string" }, description: "5-8 relevant search tags. If existing.tags is provided, return them unchanged." },
+                slug: { type: "string", description: "URL-friendly slug (lowercase, hyphens). If existing.slug is provided, return it unchanged." },
                 faqs: {
                   type: "array",
                   items: {
