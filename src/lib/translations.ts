@@ -264,7 +264,6 @@ export const EN_TEXTS: Record<string, string> = {
   "Welcome to": "Welcome to",
   "hero_main_desc": "Combo_WICK is the trusted source for free Roblox scripts, premium keys, executors, and verified accounts. Instant delivery, secure payments, and 24/7 Discord support — built for serious gamers and developers.",
   "Browse Scripts": "Browse Scripts",
-  "Premium Keys": "Premium Keys",
   "Get Key": "Get Key",
   "Ready to Get Started?": "Ready to Get Started?",
   "cta_main_desc": "Join thousands of users using Combo_WICK every day. Free scripts, premium keys, and Roblox accounts — all in one place.",
@@ -276,7 +275,6 @@ export const EN_TEXTS: Record<string, string> = {
   "Resources": "Resources",
   "Community": "Community",
   "Legal": "Legal",
-  "Accounts": "Accounts",
   "Paid Game Scripts": "Paid Game Scripts",
   "Premium scripts for popular Roblox games. Monthly or lifetime access — fixes pushed regularly.": "Premium scripts for popular Roblox games. Monthly or lifetime access — fixes pushed regularly.",
   // PayPal modal extras
