@@ -290,6 +290,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_account_stock: { Args: { _package_size: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
