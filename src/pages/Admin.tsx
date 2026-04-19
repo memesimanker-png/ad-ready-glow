@@ -16,6 +16,7 @@ const emptyScript = {
   game: "", category: "Utility", tags: [] as string[],
   code: "", faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
+  youtube_url: "" as string, is_paid: false,
 };
 
 export default function Admin() {
