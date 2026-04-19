@@ -259,11 +259,12 @@ export default function PremiumKeys() {
                       <span className="text-sm text-muted-foreground ml-auto">or ${g.lifetimePrice} lifetime</span>
                     )}
                   </div>
-                  <a href="https://wickshop-sparkle.lovable.app/" target="_blank" rel="noopener noreferrer">
-                    <Button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold">
-                      Purchase
-                    </Button>
-                  </a>
+                  <Button
+                    onClick={() => window.open("https://wickshop-sparkle.lovable.app/", "_blank", "noopener,noreferrer")}
+                    className="w-full py-6 text-base bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold shadow-lg shadow-yellow-500/30 animate-pulse"
+                  >
+                    🛒 Purchase Script - ${g.monthlyPrice}/mo
+                  </Button>
                 </div>
               </Card>
             ))}
