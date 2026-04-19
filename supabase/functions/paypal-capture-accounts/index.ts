@@ -23,6 +23,12 @@ async function getPayPalAccessToken(): Promise<string> {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Endpoint temporarily disabled
+  return new Response(
+    JSON.stringify({ error: "Account purchases are temporarily unavailable." }),
+    { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+
   try {
     const { order_id, package_size, amount, user_id } = await req.json();
     if (!order_id || !package_size || !user_id) {
