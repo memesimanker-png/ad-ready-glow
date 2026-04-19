@@ -165,10 +165,37 @@ function ScriptsTab() {
     if (!form.code.trim()) { toast({ title: "Paste script code first", variant: "destructive" }); return; }
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-script-autofill", { body: { code: form.code } });
+      const { data, error } = await supabase.functions.invoke("ai-script-autofill", {
+        body: {
+          code: form.code,
+          existing: {
+            title: form.title || undefined,
+            slug: form.slug || undefined,
+            description: form.description || undefined,
+            longDescription: form.longDescription || undefined,
+            game: form.game || undefined,
+            category: form.category && form.category !== "Utility" ? form.category : undefined,
+            tags: form.tags.length ? form.tags : undefined,
+          },
+        },
+      });
       if (error) throw error;
-      setForm(prev => ({ ...prev, title: data.title || prev.title, slug: data.slug || prev.slug, description: data.description || prev.description, longDescription: data.longDescription || prev.longDescription, game: data.game || prev.game, category: data.category || prev.category, tags: data.tags || prev.tags, faqs: data.faqs || prev.faqs }));
-      toast({ title: "AI filled fields" });
+      const filled: string[] = [];
+      setForm(prev => {
+        const next = { ...prev };
+        if (!prev.title && data.title) { next.title = data.title; filled.push("title"); }
+        if (!prev.slug && data.slug) { next.slug = data.slug; filled.push("slug"); }
+        if (!prev.description && data.description) { next.description = data.description; filled.push("description"); }
+        if (!prev.longDescription && data.longDescription) { next.longDescription = data.longDescription; filled.push("long description"); }
+        if (!prev.game && data.game) { next.game = data.game; filled.push("game"); }
+        if ((!prev.category || prev.category === "Utility") && data.category) { next.category = data.category; filled.push("category"); }
+        if (!prev.tags.length && data.tags?.length) { next.tags = data.tags; filled.push("tags"); }
+        if (!prev.faqs.length && data.faqs?.length) { next.faqs = data.faqs; filled.push("faqs"); }
+        return next;
+      });
+      toast({
+        title: filled.length ? `AI filled: ${filled.join(", ")}` : "All fields already filled — manual input preserved",
+      });
     } catch (e: any) { toast({ title: "AI autofill failed", description: e.message, variant: "destructive" }); }
     finally { setAiLoading(false); }
   };
@@ -185,6 +212,8 @@ function ScriptsTab() {
         tags: form.tags, code: form.code, faqs: form.faqs as any,
         trending: form.trending, verified: form.verified,
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
+        youtube_url: form.youtube_url || null,
+        is_paid: form.is_paid,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -217,6 +246,8 @@ function ScriptsTab() {
       tags: s.tags || [], code: s.code, faqs: s.faqs || [],
       trending: !!s.trending, verified: !!s.verified,
       gameUniverseId: s.game_universe_id ? String(s.game_universe_id) : "",
+      youtube_url: s.youtube_url || "",
+      is_paid: !!s.is_paid,
     });
     setEditingId(s.id);
     setShowForm(true);
