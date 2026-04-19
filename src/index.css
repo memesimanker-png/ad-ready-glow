@@ -214,4 +214,32 @@
       radial-gradient(1px 1px at 200px 60px, hsl(280 70% 70% / 0.2), transparent);
     background-size: 220px 100px;
   }
+
+  /* Animated glow ring around the language selector to catch attention */
+  .lang-glow-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 12px;
+    padding: 2px;
+    background: conic-gradient(
+      from 0deg,
+      hsl(250 90% 65%) 0%,
+      hsl(280 90% 70%) 25%,
+      hsl(190 90% 60%) 50%,
+      hsl(280 90% 70%) 75%,
+      hsl(250 90% 65%) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: lang-spin 3s linear infinite;
+    filter: drop-shadow(0 0 6px hsl(250 90% 65% / 0.55));
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes lang-spin {
+    to { transform: rotate(360deg); }
+  }
 }
