@@ -238,32 +238,32 @@ export default function PremiumKeys() {
                 <div className="relative aspect-video">
                   <img src={g.thumbnail} alt={g.game} className="w-full h-full object-cover" loading="lazy" />
                   {g.badge && (
-                    <span className={`absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full ${g.badgeColor} text-white`}>{g.badge}</span>
+                    <span className={`absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full ${g.badgeColor} text-white`}>{t(g.badge)}</span>
                   )}
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
                   <p className="text-xs text-muted-foreground mb-1">{g.game}</p>
-                  <h3 className="font-heading font-bold text-lg mb-3">{g.title}</h3>
+                  <h3 className="font-heading font-bold text-lg mb-3">{t(g.title)}</h3>
                   <ul className="space-y-1.5 mb-4 flex-1">
                     {g.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm">
                         <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
-                        <span>{f}</span>
+                        <span>{t(f)}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="flex items-baseline gap-2 mb-3">
                     <span className="text-2xl font-bold">${g.monthlyPrice}</span>
-                    <span className="text-sm text-muted-foreground">/month</span>
+                    <span className="text-sm text-muted-foreground">/{t("month")}</span>
                     {g.lifetimePrice && (
-                      <span className="text-sm text-muted-foreground ml-auto">or ${g.lifetimePrice} lifetime</span>
+                      <span className="text-sm text-muted-foreground ml-auto">{t("or")} ${g.lifetimePrice} {t("lifetime")}</span>
                     )}
                   </div>
                   <Button
                     onClick={() => window.open("https://wickshop-sparkle.lovable.app/", "_blank", "noopener,noreferrer")}
                     className="w-full py-6 text-base bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold shadow-lg shadow-yellow-500/30 animate-pulse"
                   >
-                    🛒 Purchase Script - ${g.monthlyPrice}/mo
+                    🛒 {t("Purchase Script")} - ${g.monthlyPrice}/{t("mo")}
                   </Button>
                 </div>
               </Card>
