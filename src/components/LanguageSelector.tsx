@@ -31,15 +31,18 @@ export function LanguageSelector({ dropUp = false, inline = false }: LanguageSel
     : "top-full mt-2";
 
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all border border-transparent hover:border-primary/20"
-      >
-        <Globe className="h-4 w-4 text-primary" />
-        <span>{current.label}</span>
-        <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
+    <div className="relative" ref={ref} data-no-translate>
+      <div className="relative rounded-lg p-[1.5px] overflow-hidden lang-glow-wrap">
+        <span aria-hidden className="lang-glow-ring" />
+        <button
+          onClick={() => setOpen(!open)}
+          className="relative z-10 flex items-center gap-2 px-3 py-2 rounded-[7px] text-sm font-medium text-muted-foreground hover:text-foreground bg-background/80 backdrop-blur-sm transition-all"
+        >
+          <Globe className="h-4 w-4 text-primary" />
+          <span>{current.label}</span>
+          <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+      </div>
       <AnimatePresence>
         {open && (
           <motion.div

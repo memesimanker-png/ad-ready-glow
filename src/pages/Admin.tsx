@@ -16,6 +16,7 @@ const emptyScript = {
   game: "", category: "Utility", tags: [] as string[],
   code: "", faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
+  youtube_url: "" as string, is_paid: false,
 };
 
 export default function Admin() {
@@ -164,10 +165,37 @@ function ScriptsTab() {
     if (!form.code.trim()) { toast({ title: "Paste script code first", variant: "destructive" }); return; }
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-script-autofill", { body: { code: form.code } });
+      const { data, error } = await supabase.functions.invoke("ai-script-autofill", {
+        body: {
+          code: form.code,
+          existing: {
+            title: form.title || undefined,
+            slug: form.slug || undefined,
+            description: form.description || undefined,
+            longDescription: form.longDescription || undefined,
+            game: form.game || undefined,
+            category: form.category && form.category !== "Utility" ? form.category : undefined,
+            tags: form.tags.length ? form.tags : undefined,
+          },
+        },
+      });
       if (error) throw error;
-      setForm(prev => ({ ...prev, title: data.title || prev.title, slug: data.slug || prev.slug, description: data.description || prev.description, longDescription: data.longDescription || prev.longDescription, game: data.game || prev.game, category: data.category || prev.category, tags: data.tags || prev.tags, faqs: data.faqs || prev.faqs }));
-      toast({ title: "AI filled fields" });
+      const filled: string[] = [];
+      setForm(prev => {
+        const next = { ...prev };
+        if (!prev.title && data.title) { next.title = data.title; filled.push("title"); }
+        if (!prev.slug && data.slug) { next.slug = data.slug; filled.push("slug"); }
+        if (!prev.description && data.description) { next.description = data.description; filled.push("description"); }
+        if (!prev.longDescription && data.longDescription) { next.longDescription = data.longDescription; filled.push("long description"); }
+        if (!prev.game && data.game) { next.game = data.game; filled.push("game"); }
+        if ((!prev.category || prev.category === "Utility") && data.category) { next.category = data.category; filled.push("category"); }
+        if (!prev.tags.length && data.tags?.length) { next.tags = data.tags; filled.push("tags"); }
+        if (!prev.faqs.length && data.faqs?.length) { next.faqs = data.faqs; filled.push("faqs"); }
+        return next;
+      });
+      toast({
+        title: filled.length ? `AI filled: ${filled.join(", ")}` : "All fields already filled — manual input preserved",
+      });
     } catch (e: any) { toast({ title: "AI autofill failed", description: e.message, variant: "destructive" }); }
     finally { setAiLoading(false); }
   };
@@ -184,6 +212,8 @@ function ScriptsTab() {
         tags: form.tags, code: form.code, faqs: form.faqs as any,
         trending: form.trending, verified: form.verified,
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
+        youtube_url: form.youtube_url || null,
+        is_paid: form.is_paid,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -216,6 +246,8 @@ function ScriptsTab() {
       tags: s.tags || [], code: s.code, faqs: s.faqs || [],
       trending: !!s.trending, verified: !!s.verified,
       gameUniverseId: s.game_universe_id ? String(s.game_universe_id) : "",
+      youtube_url: s.youtube_url || "",
+      is_paid: !!s.is_paid,
     });
     setEditingId(s.id);
     setShowForm(true);
@@ -264,6 +296,16 @@ function ScriptsTab() {
           <div><label className="text-sm font-medium mb-1 block">Short Description</label><input value={form.description} onChange={e => set("description", e.target.value)} className={inputCls} /></div>
           <div><label className="text-sm font-medium mb-1 block">Long Description</label><textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)} rows={3} className={inputCls} /></div>
           <div>
+            <label className="text-sm font-medium mb-1 block">🎬 YouTube Video URL (optional)</label>
+            <input
+              value={form.youtube_url}
+              onChange={e => set("youtube_url", e.target.value)}
+              className={inputCls}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">Embed a tutorial video on the script detail page.</p>
+          </div>
+          <div>
             <label className="text-sm font-medium mb-1 block">Tags</label>
             <div className="flex gap-2 mb-2">
               <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())} className={`${inputCls} flex-1`} placeholder="Add tag..." />
@@ -275,9 +317,10 @@ function ScriptsTab() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.trending} onChange={e => set("trending", e.target.checked)} className="rounded" /> Trending</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.verified} onChange={e => set("verified", e.target.checked)} className="rounded" /> Verified</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-yellow-400"><input type="checkbox" checked={form.is_paid} onChange={e => set("is_paid", e.target.checked)} className="rounded" /> 💰 Paid Script</label>
           </div>
           <Button onClick={save} disabled={saving} className="w-full">
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}

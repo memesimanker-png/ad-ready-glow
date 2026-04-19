@@ -159,7 +159,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
             <>
               <div className="text-center mb-6">
                 <h2 className="font-heading text-xl font-bold">{tier.name}</h2>
-                <div className="mt-2 inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
+                <div className="mt-2 inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1" data-no-translate>
                   <Zap className="w-3.5 h-3.5 text-primary" />
                   <span className="text-primary font-bold text-lg">${displayPrice}</span>
                   <span className="text-muted-foreground text-sm">{isSubscription ? t("/month") : t(" one-time")}</span>
@@ -167,11 +167,19 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               </div>
 
               {tier.isSubscription && (
-                <div className="flex gap-2 mb-5">
-                  <button onClick={() => setPaymentType("onetime")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "onetime" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}>
+                <div className="flex gap-2 mb-5" data-no-translate>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentType("onetime")}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "onetime" ? "bg-primary text-primary-foreground ring-2 ring-primary" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}
+                  >
                     {t("One-Time")} ${tier.price}
                   </button>
-                  <button onClick={() => setPaymentType("subscription")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "subscription" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentType("subscription")}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "subscription" ? "bg-primary text-primary-foreground ring-2 ring-primary" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}
+                  >
                     {t("Subscribe")} ${tier.subscriptionPrice}/{t("mo")}
                   </button>
                 </div>
