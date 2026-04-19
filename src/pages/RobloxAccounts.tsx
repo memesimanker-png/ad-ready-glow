@@ -140,10 +140,9 @@ export default function RobloxAccounts() {
                   <Button
                     className="w-full"
                     variant={pkg.popular ? "default" : "outline"}
-                    onClick={() => setSelected(pkg)}
-                    disabled={!inStock || !paypalClientId}
+                    disabled
                   >
-                    {!paypalClientId ? "Loading…" : !inStock ? "Out of Stock" : "Purchase Now"}
+                    Temporarily Unavailable
                   </Button>
                 </Card>
               );
