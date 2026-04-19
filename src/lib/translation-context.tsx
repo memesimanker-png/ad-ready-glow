@@ -77,15 +77,22 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     document.documentElement.lang = langCode;
   }, []);
 
-  // When language changes, preload all EN_TEXTS translations
+  // When language changes, preload all EN_TEXTS translations + start DOM auto-translator
   useEffect(() => {
-    if (currentLanguage === "en") return;
+    if (currentLanguage === "en") {
+      stopAutoTranslator();
+      startAutoTranslator("en");
+      return;
+    }
     setIsTranslating(true);
     const allTexts = Object.values(EN_TEXTS);
     fetchTranslations(currentLanguage, allTexts).then(() => {
       setIsTranslating(false);
       forceUpdate(n => n + 1);
+      // Start auto-translating any DOM text not handled by t()
+      startAutoTranslator(currentLanguage);
     });
+    return () => { stopAutoTranslator(); };
   }, [currentLanguage]);
 
   // Flush queued texts
