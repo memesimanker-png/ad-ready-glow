@@ -296,6 +296,16 @@ function ScriptsTab() {
           <div><label className="text-sm font-medium mb-1 block">Short Description</label><input value={form.description} onChange={e => set("description", e.target.value)} className={inputCls} /></div>
           <div><label className="text-sm font-medium mb-1 block">Long Description</label><textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)} rows={3} className={inputCls} /></div>
           <div>
+            <label className="text-sm font-medium mb-1 block">🎬 YouTube Video URL (optional)</label>
+            <input
+              value={form.youtube_url}
+              onChange={e => set("youtube_url", e.target.value)}
+              className={inputCls}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">Embed a tutorial video on the script detail page.</p>
+          </div>
+          <div>
             <label className="text-sm font-medium mb-1 block">Tags</label>
             <div className="flex gap-2 mb-2">
               <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())} className={`${inputCls} flex-1`} placeholder="Add tag..." />
@@ -307,9 +317,10 @@ function ScriptsTab() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.trending} onChange={e => set("trending", e.target.checked)} className="rounded" /> Trending</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.verified} onChange={e => set("verified", e.target.checked)} className="rounded" /> Verified</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-yellow-400"><input type="checkbox" checked={form.is_paid} onChange={e => set("is_paid", e.target.checked)} className="rounded" /> 💰 Paid Script</label>
           </div>
           <Button onClick={save} disabled={saving} className="w-full">
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
