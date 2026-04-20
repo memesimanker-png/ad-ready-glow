@@ -7,9 +7,7 @@ import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
-
-const POPUNDER_ZONE = 10877295;
-const POPUNDER_SESSION_KEY = "combowick-popunder-scripts";
+import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
