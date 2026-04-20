@@ -36,6 +36,10 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Throttle: 60 thumbnail lookups per IP per minute (most are cached anyway)
+  const ip = getClientIp(req);
+  if (!rateLimit(`thumb:${ip}`, 60, 60_000)) return tooManyRequests(corsHeaders);
+
   try {
     const url = new URL(req.url);
     const rawId = url.searchParams.get("id");
