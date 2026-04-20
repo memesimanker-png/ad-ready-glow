@@ -156,9 +156,15 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({
-      translations: { ...cachedMap, ...allTranslated },
-    }), {
+    const merged = { ...cachedMap, ...allTranslated };
+    // Populate hot cache & lightly bound its size so isolates don't leak memory.
+    hot.set(hk, { value: merged, ts: Date.now() });
+    if (hot.size > 500) {
+      const oldest = hot.keys().next().value;
+      if (oldest) hot.delete(oldest);
+    }
+
+    return new Response(JSON.stringify({ translations: merged }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
