@@ -35,11 +35,23 @@ let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let currentLang = "en";
 let observer: MutationObserver | null = null;
 
+// Roles whose visible label is meaningful for state machines (Radix etc.) — skip translation
+const SKIP_ROLES = new Set([
+  "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio",
+  "radio", "switch", "combobox", "listbox", "treeitem",
+]);
+
 function shouldTranslate(node: Text): boolean {
   const parent = node.parentElement;
   if (!parent) return false;
   if (SKIP_TAGS.has(parent.tagName)) return false;
   if (parent.closest("[data-no-translate]")) return false;
+  // Skip Radix interactive primitives (tabs, selects, toggles, switches, etc.)
+  // Their visible text is used as state identifiers — translating breaks them.
+  const interactiveAncestor = parent.closest(
+    "[role='tab'],[role='option'],[role='menuitem'],[role='menuitemcheckbox'],[role='menuitemradio'],[role='radio'],[role='switch'],[role='combobox'],[role='listbox'],[role='treeitem'],[data-radix-collection-item]"
+  );
+  if (interactiveAncestor) return false;
   if (parent.isContentEditable) return false;
   const text = node.nodeValue?.trim() || "";
   if (text.length < 2) return false;
