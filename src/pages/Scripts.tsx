@@ -19,16 +19,9 @@ export default function Scripts() {
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
 
-  // Fire popunder once per session
+  // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
-    if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
-    const s = document.createElement("script");
-    s.src = "https://al5sm.com/tag.min.js";
-    s.dataset.zone = String(POPUNDER_ZONE);
-    s.async = true;
-    document.body.appendChild(s);
-    sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
-    return () => { document.body.removeChild(s); };
+    loadMonetagPopunder();
   }, []);
 
   const { data: results = [], isLoading } = useSearchScripts(query, category);
