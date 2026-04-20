@@ -7,6 +7,7 @@ import { Copy, User, Clock, Shield, Key, MousePointerClick, Loader2 } from "luci
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 interface StoredKeyData {
   key: string;
@@ -30,13 +31,9 @@ export default function AccessKey() {
   const [showDirectLinkGate, setShowDirectLinkGate] = useState(true);
   const [error, setError] = useState("");
 
-  // Load onclick pounder on access key page only
+  // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
-    const script = document.createElement("script");
-    script.dataset.zone = "10877295";
-    script.src = "https://al5sm.com/tag.min.js";
-    document.body.appendChild(script);
-    return () => { script.remove(); };
+    loadMonetagPopunder();
   }, []);
 
   // Verify steps are completed & load stored key

@@ -7,9 +7,7 @@ import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
-
-const POPUNDER_ZONE = 10877295;
-const POPUNDER_SESSION_KEY = "combowick-popunder-scripts";
+import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,16 +19,9 @@ export default function Scripts() {
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
 
-  // Fire popunder once per session
+  // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
-    if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
-    const s = document.createElement("script");
-    s.src = "https://al5sm.com/tag.min.js";
-    s.dataset.zone = String(POPUNDER_ZONE);
-    s.async = true;
-    document.body.appendChild(s);
-    sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
-    return () => { document.body.removeChild(s); };
+    loadMonetagPopunder();
   }, []);
 
   const { data: results = [], isLoading } = useSearchScripts(query, category);
