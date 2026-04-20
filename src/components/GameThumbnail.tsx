@@ -23,6 +23,11 @@ export function GameThumbnail({ gameName, universeId, className = "", size = "sm
       alt={`${gameName} icon`}
       className={`${sizeMap[size]} object-cover shrink-0 ${className}`}
       loading="lazy"
+      decoding="async"
+      // @ts-ignore — fetchpriority is a valid HTML attr, types lag behind
+      fetchpriority="low"
+      width={size === "lg" ? 80 : size === "md" ? 48 : 32}
+      height={size === "lg" ? 80 : size === "md" ? 48 : 32}
     />
   ) : (
     <div className={`${sizeMap[size]} bg-secondary flex items-center justify-center shrink-0 ${className}`}>

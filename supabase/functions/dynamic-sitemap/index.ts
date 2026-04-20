@@ -125,7 +125,10 @@ ${entries.join("\n")}
   return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      // Cloudflare-style SWR: serve cached for 1h, allow stale for 24h while refreshing.
+      // Cuts edge function invocations during traffic spikes.
+      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+      "CDN-Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
       "Access-Control-Allow-Origin": "*",
     },
   });

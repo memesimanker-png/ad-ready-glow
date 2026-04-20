@@ -5,7 +5,19 @@ import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts"
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  // Cloudflare-style stale-while-revalidate: cache identical translation batches for 1h,
+  // serve stale up to 24h while a background refresh hits the AI gateway.
+  "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
 };
+
+// Tiny in-memory hot cache (per isolate). Skips DB roundtrip for repeated batches
+// from the same warm worker — the DB cache is still authoritative for cold starts.
+const HOT_TTL_MS = 5 * 60 * 1000;
+const hot = new Map<string, { value: Record<string, string>; ts: number }>();
+function hotKey(lang: string, texts: string[]) {
+  return lang + "|" + texts.slice().sort().join("\u0001");
+}
 
 const LANG_NAMES: Record<string, string> = {
   fr: "French", th: "Thai", ko: "Korean", "zh-CN": "Simplified Chinese",
@@ -33,6 +45,15 @@ serve(async (req) => {
     if (!langName) {
       return new Response(JSON.stringify({ error: "Unsupported language" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Hot in-memory cache: skip DB hit entirely if this exact batch was served recently.
+    const hk = hotKey(language, texts);
+    const hotHit = hot.get(hk);
+    if (hotHit && Date.now() - hotHit.ts < HOT_TTL_MS) {
+      return new Response(JSON.stringify({ translations: hotHit.value }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -135,9 +156,15 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({
-      translations: { ...cachedMap, ...allTranslated },
-    }), {
+    const merged = { ...cachedMap, ...allTranslated };
+    // Populate hot cache & lightly bound its size so isolates don't leak memory.
+    hot.set(hk, { value: merged, ts: Date.now() });
+    if (hot.size > 500) {
+      const oldest = hot.keys().next().value;
+      if (oldest) hot.delete(oldest);
+    }
+
+    return new Response(JSON.stringify({ translations: merged }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
