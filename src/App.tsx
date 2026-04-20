@@ -41,7 +41,20 @@ import ClaimAccess from "./pages/ClaimAccess";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Tuned defaults to massively cut Lovable Cloud DB load on a 5K-visits/day site.
+// Without these, react-query refetches on every window focus + retries 3× on 429/5xx,
+// which can amplify a single user click into ~10 DB calls.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,            // 1 min — most data isn't time-critical
+      gcTime: 10 * 60 * 1000,          // keep cache 10 min
+      refetchOnWindowFocus: false,     // don't refetch when user switches tabs
+      refetchOnReconnect: false,       // don't refetch on flaky mobile reconnects
+      retry: 1,                        // 1 retry instead of 3 — avoids amplifying outages
+    },
+  },
+});
 
 import { TranslationProvider } from "@/lib/translation-context";
 
