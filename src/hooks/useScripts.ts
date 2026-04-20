@@ -55,11 +55,18 @@ export function useScriptBySlug(slug: string | undefined) {
   });
 }
 
+// Lightweight projection for list/card views — skips the heavy `code`,
+// `long_description`, and `faqs` columns. Cuts row payload by ~80% on /scripts.
+const LIST_COLS = "id,slug,title,description,game,category,tags,created_at,updated_at,trending,verified,game_universe_id,is_paid,youtube_url";
+
 export function useSearchScripts(query: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "search", query, category],
+    // Cards rarely change minute-to-minute. Cache aggressively to cut DB hits.
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      let q = supabase.from("scripts").select("*");
+      let q = supabase.from("scripts").select(LIST_COLS);
       if (category && category !== "All") q = q.eq("category", category);
       if (query) q = q.or(`title.ilike.%${query}%,game.ilike.%${query}%,description.ilike.%${query}%`);
       const { data, error } = await q.order("updated_at", { ascending: false });
@@ -72,10 +79,11 @@ export function useSearchScripts(query: string, category: string) {
 export function useRelatedScripts(scriptId: string, game: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "related", scriptId],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scripts")
-        .select("*")
+        .select(LIST_COLS)
         .neq("id", scriptId)
         .or(`game.eq.${game},category.eq.${category}`)
         .limit(3);
