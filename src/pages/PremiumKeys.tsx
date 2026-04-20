@@ -236,7 +236,7 @@ export default function PremiumKeys() {
             ].map((g) => (
               <Card key={g.title} className="overflow-hidden card-neon border-yellow-500/20 flex flex-col">
                 <div className="relative aspect-video">
-                  <img src={g.thumbnail} alt={g.game} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={g.thumbnail} alt={g.game} className="w-full h-full object-cover" loading="lazy" decoding="async" width={640} height={360} />
                   {g.badge && (
                     <span className={`absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full ${g.badgeColor} text-white`}>{t(g.badge)}</span>
                   )}
