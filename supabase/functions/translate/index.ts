@@ -48,6 +48,15 @@ serve(async (req) => {
       });
     }
 
+    // Hot in-memory cache: skip DB hit entirely if this exact batch was served recently.
+    const hk = hotKey(language, texts);
+    const hotHit = hot.get(hk);
+    if (hotHit && Date.now() - hotHit.ts < HOT_TTL_MS) {
+      return new Response(JSON.stringify({ translations: hotHit.value }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
