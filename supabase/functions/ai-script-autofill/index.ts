@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,6 +8,10 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  // Throttle: AI auto-fill is expensive — max 10/min per IP
+  const ip = getClientIp(req);
+  if (!rateLimit(`ai-autofill:${ip}`, 10, 60_000)) return tooManyRequests(corsHeaders);
 
   try {
     const { code, existing } = await req.json();
