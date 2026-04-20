@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +15,10 @@ const LANG_NAMES: Record<string, string> = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  // Throttle: max 30 translate requests per IP per minute
+  const ip = getClientIp(req);
+  if (!rateLimit(`translate:${ip}`, 30, 60_000)) return tooManyRequests(corsHeaders);
 
   try {
     const { texts, language } = await req.json();

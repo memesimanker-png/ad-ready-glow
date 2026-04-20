@@ -1,8 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
 };
 
 const BUCKET = "game-thumbnails";
