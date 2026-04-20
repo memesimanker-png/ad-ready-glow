@@ -9,9 +9,7 @@ import { GameThumbnail } from "@/components/GameThumbnail";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
-
-const POPUNDER_ZONE = 10877295;
-const POPUNDER_SESSION_KEY = "combowick-popunder-fired";
+import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,15 +20,9 @@ export default function ScriptDetail() {
     script?.category || ""
   );
 
+  // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
-    if (sessionStorage.getItem(POPUNDER_SESSION_KEY)) return;
-    const s = document.createElement("script");
-    s.src = "https://al5sm.com/tag.min.js";
-    s.dataset.zone = String(POPUNDER_ZONE);
-    s.async = true;
-    document.body.appendChild(s);
-    sessionStorage.setItem(POPUNDER_SESSION_KEY, "1");
-    return () => { document.body.removeChild(s); };
+    loadMonetagPopunder();
   }, []);
 
   const scriptJsonLd = useMemo(() => {
