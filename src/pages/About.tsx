@@ -105,7 +105,7 @@ export default function About() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: Users, label: "Discord Members", value: "500+" },
+              { icon: Users, label: "Discord Members", value: "50k+" },
               { icon: Globe, label: "Worldwide", value: "Global" },
               { icon: Clock, label: "Delivery", value: "Instant" },
               { icon: Award, label: "Support", value: "24/7" },

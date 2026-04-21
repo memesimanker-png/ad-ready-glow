@@ -14,16 +14,33 @@ interface VideoBackgroundProps {
   overlay?: boolean;
 }
 
+// Persist slideshow index across route navigations so it doesn't restart from
+// image #1 each time the user comes back to /. Saves a re-render of the heavy
+// hero animation and matches user expectation ("don't loop on every nav").
+let cachedIndex = 0;
+
 export function VideoBackground({ className = "", overlay = true }: VideoBackgroundProps) {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(cachedIndex);
   const [prev, setPrev] = useState<number | null>(null);
   const [sliding, setSliding] = useState(false);
+  const [paused, setPaused] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Honor prefers-reduced-motion + tab visibility + element off-screen.
+  // Saves CPU on low-end mobile (your largest segment).
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   const goNext = useCallback(() => {
     setPrev(current);
     setSliding(true);
-    setCurrent((c) => (c + 1) % images.length);
+    setCurrent((c) => {
+      const next = (c + 1) % images.length;
+      cachedIndex = next;
+      return next;
+    });
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
@@ -32,10 +49,29 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
     }, 1800);
   }, [current]);
 
+  // Pause when off-screen
   useEffect(() => {
+    if (!containerRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setPaused(!entry.isIntersecting),
+      { threshold: 0.05 }
+    );
+    obs.observe(containerRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  // Pause when the tab is hidden
+  useEffect(() => {
+    const onVis = () => setPaused(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion || paused) return;
     const id = setInterval(goNext, 6000);
     return () => clearInterval(id);
-  }, [goNext]);
+  }, [goNext, prefersReducedMotion, paused]);
 
   useEffect(() => {
     return () => {
@@ -44,8 +80,8 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
   }, []);
 
   return (
-    <div className={`absolute inset-0 overflow-hidden ${className}`}>
-      {prev !== null && (
+    <div ref={containerRef} className={`absolute inset-0 overflow-hidden ${className}`}>
+      {prev !== null && !prefersReducedMotion && (
         <div
           className="absolute inset-0 z-[1]"
           style={{
@@ -66,7 +102,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
       <div
         className="absolute inset-0 z-[2]"
         style={{
-          animation: sliding ? "slideIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards" : "none",
+          animation: sliding && !prefersReducedMotion ? "slideIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards" : "none",
         }}
       >
         <img
