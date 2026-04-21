@@ -88,7 +88,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden border-t border-primary/10 bg-background/95 backdrop-blur-2xl overflow-hidden"
+            className="xl:hidden border-t border-primary/10 bg-background/95 backdrop-blur-2xl overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
               <div className="pb-3 border-b border-border/50">
