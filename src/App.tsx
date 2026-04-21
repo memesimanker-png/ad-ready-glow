@@ -1,10 +1,12 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TranslationProvider } from "@/lib/translation-context";
+import { DiscordCapturePopup } from "@/components/DiscordCapturePopup";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
