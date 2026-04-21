@@ -26,6 +26,15 @@ export default function Scripts() {
   }, []);
 
   const { data: results = [], isLoading } = useSearchScripts(query, category);
+  // Always-fetched (cached 15min, near zero cost) — used to surface a featured/sponsored
+  // paid script even when the user is searching/filtering. Today the only paid script
+  // is "Jurassic Blocky"; this auto-promotes whatever paid script exists.
+  const { data: allScripts = [] } = useSearchScripts("", "All");
+  const featured = useMemo(
+    () => allScripts.find((s) => s.is_paid) || null,
+    [allScripts]
+  );
+  const isDefaultView = !query && category === "All";
 
   const handleSearch = (q: string) => {
     setQuery(q);
