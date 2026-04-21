@@ -82,7 +82,8 @@ export function useSearchScripts(query: string, category: string) {
 export function useRelatedScripts(scriptId: string, game: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "related", scriptId],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scripts")
