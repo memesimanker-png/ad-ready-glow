@@ -167,21 +167,26 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               </div>
 
               {tier.isSubscription && (
-                <div className="flex gap-2 mb-5" data-no-translate>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentType("onetime")}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "onetime" ? "bg-primary text-primary-foreground ring-2 ring-primary" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}
-                  >
-                    {t("One-Time")} ${tier.price}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentType("subscription")}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${paymentType === "subscription" ? "bg-primary text-primary-foreground ring-2 ring-primary" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}
-                  >
-                    {t("Subscribe")} ${tier.subscriptionPrice}/{t("mo")}
-                  </button>
+                <div className="mb-5 rounded-lg border border-primary/20 bg-primary/5 p-3" data-no-translate>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">{t("Choose payment")}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentType("onetime")}
+                      className={`rounded-lg p-2.5 text-left transition-all ${paymentType === "onetime" ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary/60 hover:bg-secondary"}`}
+                    >
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("One-Time")}</div>
+                      <div className="text-base font-bold">${tier.price}<span className="text-[11px] font-normal text-muted-foreground"> / {t("month")}</span></div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentType("subscription")}
+                      className={`rounded-lg p-2.5 text-left transition-all ${paymentType === "subscription" ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary/60 hover:bg-secondary"}`}
+                    >
+                      <div className="text-[10px] uppercase tracking-wider text-accent">{t("Auto-Renew")}</div>
+                      <div className="text-base font-bold">${tier.subscriptionPrice}<span className="text-[11px] font-normal text-muted-foreground"> / {t("mo")}</span></div>
+                    </button>
+                  </div>
                 </div>
               )}
 
