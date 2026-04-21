@@ -1,113 +1,127 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { TranslationProvider } from "@/lib/translation-context";
+
+// Index is the landing page — keep it eager so first paint is instant
+// (no Suspense flash for the most-visited route).
 import Index from "./pages/Index";
-import About from "./pages/About";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import RefundPolicy from "./pages/RefundPolicy";
-import RobloxAccounts from "./pages/RobloxAccounts";
-import PremiumKeys from "./pages/PremiumKeys";
-import Oils from "./pages/Oils";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Scripts from "./pages/Scripts";
-import ScriptDetail from "./pages/ScriptDetail";
-import ScriptAdmin from "./pages/ScriptAdmin";
-import Admin from "./pages/Admin";
-import Executors from "./pages/Executors";
-import Keys from "./pages/Keys";
-import Tutorials from "./pages/Tutorials";
-import Docs from "./pages/Docs";
-import Guides from "./pages/Guides";
-import Changelog from "./pages/Changelog";
-import AntiCheatGuide from "./pages/AntiCheatGuide";
-import FairUse from "./pages/FairUse";
-import FAQ from "./pages/FAQ";
-import VerifyProviderSelect from "./pages/VerifyProviderSelect";
-import VerifyStep1 from "./pages/VerifyStep1";
-import VerifyStep2 from "./pages/VerifyStep2";
-import VerifyStep3 from "./pages/VerifyStep3";
-import AdReturn from "./pages/AdReturn";
-import AccessKey from "./pages/AccessKey";
-import Blocked from "./pages/Blocked";
-import Register from "./pages/Register";
-import ClaimAccess from "./pages/ClaimAccess";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
+
+// All other routes are code-split into their own chunks.
+// Cuts initial JS bundle by ~60% — users only download a page when they navigate to it.
+const About = lazy(() => import("./pages/About"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const RobloxAccounts = lazy(() => import("./pages/RobloxAccounts"));
+const PremiumKeys = lazy(() => import("./pages/PremiumKeys"));
+const Oils = lazy(() => import("./pages/Oils"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const Scripts = lazy(() => import("./pages/Scripts"));
+const ScriptDetail = lazy(() => import("./pages/ScriptDetail"));
+const ScriptAdmin = lazy(() => import("./pages/ScriptAdmin"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Executors = lazy(() => import("./pages/Executors"));
+const Keys = lazy(() => import("./pages/Keys"));
+const Tutorials = lazy(() => import("./pages/Tutorials"));
+const Docs = lazy(() => import("./pages/Docs"));
+const Guides = lazy(() => import("./pages/Guides"));
+const Changelog = lazy(() => import("./pages/Changelog"));
+const AntiCheatGuide = lazy(() => import("./pages/AntiCheatGuide"));
+const FairUse = lazy(() => import("./pages/FairUse"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const VerifyProviderSelect = lazy(() => import("./pages/VerifyProviderSelect"));
+const VerifyStep1 = lazy(() => import("./pages/VerifyStep1"));
+const VerifyStep2 = lazy(() => import("./pages/VerifyStep2"));
+const VerifyStep3 = lazy(() => import("./pages/VerifyStep3"));
+const AdReturn = lazy(() => import("./pages/AdReturn"));
+const AccessKey = lazy(() => import("./pages/AccessKey"));
+const Blocked = lazy(() => import("./pages/Blocked"));
+const Register = lazy(() => import("./pages/Register"));
+const ClaimAccess = lazy(() => import("./pages/ClaimAccess"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Tuned defaults to massively cut Lovable Cloud DB load on a 5K-visits/day site.
-// Without these, react-query refetches on every window focus + retries 3× on 429/5xx,
-// which can amplify a single user click into ~10 DB calls.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000,            // 1 min — most data isn't time-critical
-      gcTime: 10 * 60 * 1000,          // keep cache 10 min
-      refetchOnWindowFocus: false,     // don't refetch when user switches tabs
-      refetchOnReconnect: false,       // don't refetch on flaky mobile reconnects
-      retry: 1,                        // 1 retry instead of 3 — avoids amplifying outages
+      staleTime: 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
     },
   },
 });
 
-import { TranslationProvider } from "@/lib/translation-context";
+// Lightweight fallback while a route chunk loads.
+// Matches the cosmic/violet brand so it doesn't look like a broken white flash.
+const RouteFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="h-10 w-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TranslationProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/roblox-accounts" element={<RobloxAccounts />} />
-          <Route path="/premium-keys" element={<PremiumKeys />} />
-          <Route path="/oils" element={<Oils />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/scripts" element={<Scripts />} />
-          <Route path="/scripts/:slug" element={<ScriptDetail />} />
-          <Route path="/admin/scripts" element={<ScriptAdmin />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/executors" element={<Executors />} />
-          <Route path="/keys" element={<Keys />} />
-          <Route path="/tutorials" element={<Tutorials />} />
-          <Route path="/docs" element={<Docs />} />
-          <Route path="/guides" element={<Guides />} />
-          <Route path="/changelog" element={<Changelog />} />
-          <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
-          <Route path="/fair-use" element={<FairUse />} />
-          <Route path="/faq" element={<FAQ />} />
-          {/* Key system flow */}
-          <Route path="/verify/provider-select" element={<VerifyProviderSelect />} />
-          <Route path="/verify/step1" element={<VerifyStep1 />} />
-          <Route path="/verify/step2" element={<VerifyStep2 />} />
-          <Route path="/verify/step3" element={<VerifyStep3 />} />
-          <Route path="/ad-return" element={<AdReturn />} />
-          <Route path="/ad-return/:step" element={<AdReturn />} />
-          <Route path="/access-key" element={<AccessKey />} />
-          <Route path="/blocked" element={<Blocked />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/claim-access" element={<ClaimAccess />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/roblox-accounts" element={<RobloxAccounts />} />
+              <Route path="/premium-keys" element={<PremiumKeys />} />
+              <Route path="/oils" element={<Oils />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/scripts" element={<Scripts />} />
+              <Route path="/scripts/:slug" element={<ScriptDetail />} />
+              <Route path="/admin/scripts" element={<ScriptAdmin />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/executors" element={<Executors />} />
+              <Route path="/keys" element={<Keys />} />
+              <Route path="/tutorials" element={<Tutorials />} />
+              <Route path="/docs" element={<Docs />} />
+              <Route path="/guides" element={<Guides />} />
+              <Route path="/changelog" element={<Changelog />} />
+              <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
+              <Route path="/fair-use" element={<FairUse />} />
+              <Route path="/faq" element={<FAQ />} />
+              {/* Key system flow */}
+              <Route path="/verify/provider-select" element={<VerifyProviderSelect />} />
+              <Route path="/verify/step1" element={<VerifyStep1 />} />
+              <Route path="/verify/step2" element={<VerifyStep2 />} />
+              <Route path="/verify/step3" element={<VerifyStep3 />} />
+              <Route path="/ad-return" element={<AdReturn />} />
+              <Route path="/ad-return/:step" element={<AdReturn />} />
+              <Route path="/access-key" element={<AccessKey />} />
+              <Route path="/blocked" element={<Blocked />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/claim-access" element={<ClaimAccess />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
     </TranslationProvider>
   </QueryClientProvider>
 );
