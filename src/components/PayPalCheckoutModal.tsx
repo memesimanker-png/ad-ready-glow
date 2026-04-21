@@ -170,24 +170,47 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
 
               {tier.isSubscription && (
                 <div className="mb-5 rounded-lg border border-primary/20 bg-primary/5 p-3" data-no-translate>
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">{t("Choose payment")}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentType("onetime")}
-                      className={`rounded-lg p-2.5 text-left transition-all ${paymentType === "onetime" ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary/60 hover:bg-secondary"}`}
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">{t("Choose your plan")}</p>
+                  <div className="space-y-2">
+                    <label
+                      className={`flex items-center justify-between gap-3 rounded-lg p-3 cursor-pointer transition-all border ${paymentType === "subscription" ? "border-primary bg-primary/15" : "border-border bg-secondary/40 hover:bg-secondary"}`}
                     >
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("One-Time")}</div>
-                      <div className="text-base font-bold">${tier.price}<span className="text-[11px] font-normal text-muted-foreground"> / {t("month")}</span></div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPaymentType("subscription")}
-                      className={`rounded-lg p-2.5 text-left transition-all ${paymentType === "subscription" ? "bg-primary/15 ring-2 ring-primary" : "bg-secondary/60 hover:bg-secondary"}`}
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="payment-plan"
+                          checked={paymentType === "subscription"}
+                          onChange={() => setPaymentType("subscription")}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        <div>
+                          <div className="text-sm font-semibold flex items-center gap-2">
+                            {t("Auto-Renew")}
+                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary text-primary-foreground">{t("Best value")}</span>
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">{t("Cancel anytime in PayPal")}</div>
+                        </div>
+                      </div>
+                      <div className="text-base font-bold whitespace-nowrap">${tier.subscriptionPrice}<span className="text-[11px] font-normal text-muted-foreground">/{t("mo")}</span></div>
+                    </label>
+                    <label
+                      className={`flex items-center justify-between gap-3 rounded-lg p-3 cursor-pointer transition-all border ${paymentType === "onetime" ? "border-primary bg-primary/15" : "border-border bg-secondary/40 hover:bg-secondary"}`}
                     >
-                      <div className="text-[10px] uppercase tracking-wider text-accent">{t("Auto-Renew")}</div>
-                      <div className="text-base font-bold">${tier.subscriptionPrice}<span className="text-[11px] font-normal text-muted-foreground"> / {t("mo")}</span></div>
-                    </button>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="payment-plan"
+                          checked={paymentType === "onetime"}
+                          onChange={() => setPaymentType("onetime")}
+                          className="h-4 w-4 accent-primary"
+                        />
+                        <div>
+                          <div className="text-sm font-semibold">{t("One-Time")}</div>
+                          <div className="text-[11px] text-muted-foreground">{t("Single 30-day key, no renewal")}</div>
+                        </div>
+                      </div>
+                      <div className="text-base font-bold whitespace-nowrap">${tier.price}<span className="text-[11px] font-normal text-muted-foreground">/{t("mo")}</span></div>
+                    </label>
                   </div>
                 </div>
               )}
