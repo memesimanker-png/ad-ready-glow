@@ -38,7 +38,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-0.5">
+          <nav className="hidden xl:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -61,7 +61,7 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             <LanguageSelector />
             <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" className="border-primary/20 text-primary hover:bg-primary/10 text-xs uppercase tracking-wider">
@@ -75,7 +75,7 @@ export function Navbar() {
             </Link>
           </div>
 
-          <button className="lg:hidden p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="xl:hidden p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
@@ -88,7 +88,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden border-t border-primary/10 bg-background/95 backdrop-blur-2xl overflow-hidden"
+            className="xl:hidden border-t border-primary/10 bg-background/95 backdrop-blur-2xl overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
               <div className="pb-3 border-b border-border/50">

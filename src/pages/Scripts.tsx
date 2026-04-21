@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Search, SlidersHorizontal, Crown, ArrowRight } from "lucide-react";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { useSearchScripts } from "@/hooks/useScripts";
 import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
+import { GameThumbnail } from "@/components/GameThumbnail";
 import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
@@ -25,6 +26,15 @@ export default function Scripts() {
   }, []);
 
   const { data: results = [], isLoading } = useSearchScripts(query, category);
+  // Always-fetched (cached 15min, near zero cost) — used to surface a featured/sponsored
+  // paid script even when the user is searching/filtering. Today the only paid script
+  // is "Jurassic Blocky"; this auto-promotes whatever paid script exists.
+  const { data: allScripts = [] } = useSearchScripts("", "All");
+  const featured = useMemo(
+    () => allScripts.find((s) => s.is_paid) || null,
+    [allScripts]
+  );
+  const isDefaultView = !query && category === "All";
 
   const handleSearch = (q: string) => {
     setQuery(q);
@@ -102,6 +112,32 @@ export default function Scripts() {
           </aside>
 
           <div className="flex-1 min-w-0">
+            {/* Featured / Sponsored slot — promotes the only paid script (Jurassic Blocky)
+                without breaking the listing for filtered/search views. */}
+            {featured && isDefaultView && (
+              <Link
+                to="/premium-keys"
+                className="group relative block mb-6 overflow-hidden rounded-xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 via-card to-primary/10 p-4 sm:p-5 hover:border-yellow-500/60 transition-all"
+              >
+                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/40 text-[10px] font-bold uppercase tracking-wider text-yellow-400">
+                  <Crown className="h-3 w-3" /> Featured
+                </div>
+                <div className="flex items-center gap-4">
+                  <GameThumbnail gameName={featured.game} universeId={(featured as any).game_universe_id} size="lg" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold text-yellow-400 uppercase tracking-wider mb-1">Premium • {featured.game}</p>
+                    <h2 className="font-heading font-bold text-base sm:text-lg leading-tight group-hover:text-primary transition-colors truncate">
+                      {featured.title}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{featured.description}</p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-1 text-xs font-semibold text-primary whitespace-nowrap">
+                    Unlock <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </div>
+              </Link>
+            )}
+
             <div className="relative mb-6">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input

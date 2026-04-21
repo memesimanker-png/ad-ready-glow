@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, ShieldCheck, DollarSign } from "lucide-react";
+import { TrendingUp, ShieldCheck, DollarSign, Calendar } from "lucide-react";
 import { type Script } from "@/lib/scripts-data";
 import { GameThumbnail } from "@/components/GameThumbnail";
 
+function formatDate(iso: string): string {
+  if (!iso) return "Recently";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
 export function ScriptCard({ script }: { script: Script }) {
+  const dateIso = script.updatedAt || script.createdAt;
   return (
     <article className="group relative flex flex-col rounded-lg border border-border bg-card hover:border-primary/50 transition-all duration-200 overflow-hidden">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
@@ -53,8 +61,12 @@ export function ScriptCard({ script }: { script: Script }) {
 
       <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
         <span className="text-xs px-2 py-0.5 rounded-full bg-secondary">{script.category}</span>
-        <span>Updated {script.updatedAt}</span>
+        <time dateTime={dateIso} className="flex items-center gap-1">
+          <Calendar className="h-3 w-3" />
+          Updated {formatDate(dateIso)}
+        </time>
       </div>
     </article>
   );
 }
+

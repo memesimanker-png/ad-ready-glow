@@ -22,11 +22,11 @@ export default function Index() {
         description="ComboWick is the #1 trusted source for free Roblox scripts, premium keys, executors, and gaming resources. Instant automated delivery, secure PayPal payments, and 24/7 Discord support."
       />
       {/* Hero */}
-      <section className="relative min-h-[100vh] flex items-end overflow-hidden">
+      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-end overflow-hidden">
         <VideoBackground />
         <div className="absolute inset-0 star-field opacity-40" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 pt-40 text-left z-10">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20 pt-24 sm:pt-32 text-left z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
