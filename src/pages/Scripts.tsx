@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Search, SlidersHorizontal, Crown, ArrowRight } from "lucide-react";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { useSearchScripts } from "@/hooks/useScripts";
 import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
+import { GameThumbnail } from "@/components/GameThumbnail";
 import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
