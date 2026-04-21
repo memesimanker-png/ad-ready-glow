@@ -62,9 +62,12 @@ const LIST_COLS = "id,slug,title,description,game,category,tags,created_at,updat
 export function useSearchScripts(query: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "search", query, category],
-    // Cards rarely change minute-to-minute. Cache aggressively to cut DB hits.
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    // Cards rarely change. Cache aggressively — 15 min stale, 30 min in-memory.
+    // This is a safer alternative to a service worker cache: no preview-iframe
+    // breakage, no conflict with the existing Monetag sw_2.js, and repeat
+    // navigations within a session hit ZERO DB queries.
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       let q = supabase.from("scripts").select(LIST_COLS);
       if (category && category !== "All") q = q.eq("category", category);
@@ -79,7 +82,8 @@ export function useSearchScripts(query: string, category: string) {
 export function useRelatedScripts(scriptId: string, game: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "related", scriptId],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("scripts")
