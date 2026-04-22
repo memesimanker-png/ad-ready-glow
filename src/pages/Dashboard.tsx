@@ -211,9 +211,9 @@ export default function Dashboard() {
 
           {/* Missing keys helper — for visitors arriving from a PayPal email with the wrong account */}
           {keys.length === 0 && (
-            <Card className="p-5 mb-6 border-amber-500/30 bg-amber-500/5">
+            <Card className="p-5 mb-6 border-warning/30 bg-warning/5">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-sm font-semibold mb-1">Don't see a key you paid for?</p>
                   <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
