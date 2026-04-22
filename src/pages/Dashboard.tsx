@@ -154,10 +154,22 @@ export default function Dashboard() {
             <p className="text-muted-foreground">Manage your premium keys and Roblox accounts</p>
           </div>
 
-          <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-muted/30 border border-border/50">
-            <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-            <span className="text-sm">{user.email}</span>
-          </div>
+          {(() => {
+            const badge = getUserBadge(keys, accounts.length);
+            const Icon = badge?.icon;
+            return (
+              <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-muted/30 border border-border/50 flex-wrap">
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                <span className="text-sm font-medium">{user.email}</span>
+                {badge && Icon && (
+                  <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 text-xs font-semibold ${badge.className}`}>
+                    <Icon className="h-3.5 w-3.5" />
+                    {badge.label}
+                  </Badge>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Tabs */}
           <div className="flex gap-2 mb-6 border-b border-border">
