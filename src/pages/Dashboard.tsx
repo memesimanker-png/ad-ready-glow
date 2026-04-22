@@ -130,6 +130,39 @@ export default function Dashboard() {
     URL.revokeObjectURL(url);
   };
 
+  const submitSupport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportForm.paypalEmail.trim()) {
+      toast({ title: "Missing PayPal email", description: "Please enter the email address shown on your PayPal receipt.", variant: "destructive" });
+      return;
+    }
+    setSupportSubmitting(true);
+    const subject = `[Missing Key Support] ${supportForm.paypalEmail}`;
+    const body =
+`A buyer needs help locating their purchase.
+
+Account email: ${user?.email || "unknown"}
+PayPal receipt email: ${supportForm.paypalEmail}
+PayPal Order/Transaction ID: ${supportForm.orderId || "(not provided)"}
+Message: ${supportForm.message || "(none)"}
+
+— Sent from /dashboard support form`;
+
+    // Best-effort: open email client AND Discord invite so the buyer reaches us either way.
+    const mailto = `mailto:support@combowick.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailto, "_self");
+    setTimeout(() => {
+      window.open("https://discord.com/invite/ufrz9Zaqs8", "_blank", "noopener,noreferrer");
+      toast({
+        title: "Support request prepared",
+        description: "Email draft opened + Discord invite launched. We respond fastest in Discord.",
+      });
+      setSupportSubmitting(false);
+      setSupportOpen(false);
+      setSupportForm({ paypalEmail: "", orderId: "", message: "" });
+    }, 400);
+  };
+
   if (loading) {
     return (
       <Layout>
