@@ -104,6 +104,23 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const finalEmail = customer_email || captureData.payer?.email_address || null;
+
+    // If client didn't pass user_id, try to resolve it from the email so the
+    // dashboard can show this purchase to the buyer after they log in.
+    let resolvedUserId: string | null = user_id || null;
+    if (!resolvedUserId && finalEmail) {
+      try {
+        const { data: usersList } = await supabase.auth.admin.listUsers();
+        const match = usersList?.users?.find(
+          (u: any) => (u.email || "").toLowerCase() === String(finalEmail).toLowerCase()
+        );
+        if (match) resolvedUserId = match.id;
+      } catch (e) {
+        console.error("[capture] user lookup failed:", e);
+      }
+    }
+
     const { error: dbError } = await supabase.from("premium_key_purchases").insert({
       payment_id: order_id,
       tier: usedTier,
@@ -111,8 +128,8 @@ serve(async (req) => {
       amount: Number(amount) || 0,
       currency: "USD",
       status: "completed",
-      customer_email: customer_email || captureData.payer?.email_address || null,
-      user_id: user_id || null,
+      customer_email: finalEmail,
+      user_id: resolvedUserId,
       expires_at: expiresAt,
     });
 
