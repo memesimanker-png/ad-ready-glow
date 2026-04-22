@@ -63,9 +63,8 @@ export function AdProviderSelector({ providers, onSelect, selectedProvider }: Ad
         <div className="pt-4 border-t border-border">
           <p className="text-sm text-muted-foreground mb-3 font-medium">Looking for something else?</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              onClick={() => window.open("https://comboo-wickshopp.vercel.app/", "_blank")}
-              type="button"
+            <a
+              href="/premium-keys"
               className="group relative bg-purple-600 hover:bg-purple-500 rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] text-left overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -77,13 +76,12 @@ export function AdProviderSelector({ providers, onSelect, selectedProvider }: Ad
                   <h3 className="text-white font-bold text-xs">Request Script/Buy Keys</h3>
                 </div>
                 <div className="flex items-center gap-1 text-purple-200 text-xs font-semibold">
-                  Visit Shop <ExternalLink size={10} />
+                  Premium Keys <ExternalLink size={10} />
                 </div>
               </div>
-            </button>
-            <button
-              onClick={() => window.open("https://cooombo-wick.vercel.app", "_blank")}
-              type="button"
+            </a>
+            <a
+              href="/scripts"
               className="group relative bg-green-600 hover:bg-green-500 rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] text-left overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -100,8 +98,13 @@ export function AdProviderSelector({ providers, onSelect, selectedProvider }: Ad
                   Browse Scripts <ExternalLink size={10} />
                 </div>
               </div>
-            </button>
+            </a>
           </div>
+
+          {/* Linkvertise wait-time disclaimer */}
+          <p className="mt-4 text-[11px] text-muted-foreground leading-relaxed border border-border/40 rounded-md p-3 bg-muted/20">
+            <span className="font-semibold text-foreground">Heads up:</span> Linkvertise sets the wait timers (including the ~1 hour cooldown) on their end — <span className="font-semibold text-foreground">we don't control them</span>. They use those timers to pay creators per verification. Want to skip ad-walls completely? Grab a <a href="/premium-keys" className="text-primary underline underline-offset-2 hover:no-underline">Premium Key</a>.
+          </p>
         </div>
       </CardContent>
     </Card>

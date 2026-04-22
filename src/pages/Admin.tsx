@@ -377,19 +377,28 @@ function OrdersTab() {
           {orders.map(o => (
             <Card key={o.id} className="p-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-sm">{o.tier}</span>
                     <span className={`text-xs px-2 py-0.5 rounded ${o.status === "completed" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>{o.status}</span>
                     {o.payment_id?.startsWith("ADMIN-") && (
                       <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">Admin Generated</span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground">{o.customer_email || "No email"} • ${o.amount} {o.currency}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{o.customer_email || "No email"} • ${o.amount} {o.currency}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Order ID:</span>
+                    <code className="text-[11px] font-mono bg-secondary px-1.5 py-0.5 rounded break-all">{o.payment_id}</code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(o.payment_id)}
+                      className="text-muted-foreground hover:text-foreground text-[10px] underline"
+                      title="Copy order ID"
+                    >copy</button>
+                  </div>
                 </div>
                 <div className="text-right">
                   <KeyDisplay value={o.key_generated} />
-                  <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{new Date(o.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
             </Card>

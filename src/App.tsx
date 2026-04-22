@@ -6,7 +6,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TranslationProvider } from "@/lib/translation-context";
-import { DiscordCapturePopup } from "@/components/DiscordCapturePopup";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
@@ -126,7 +125,6 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-            <DiscordCapturePopup />
           </BrowserRouter>
         </MotionConfig>
       </TooltipProvider>

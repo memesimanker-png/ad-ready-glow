@@ -3,9 +3,13 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 type KeyPurchase = {
   id: string;
@@ -61,6 +65,7 @@ function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | n
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [keys, setKeys] = useState<KeyPurchase[]>([]);
   const [accounts, setAccounts] = useState<RobloxAccount[]>([]);
@@ -68,6 +73,9 @@ export default function Dashboard() {
   const [copied, setCopied] = useState<string | null>(null);
   const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
   const [tab, setTab] = useState<"keys" | "accounts">("keys");
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
+  const [supportSubmitting, setSupportSubmitting] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -120,6 +128,39 @@ export default function Dashboard() {
     a.download = `combowick-accounts-${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const submitSupport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportForm.paypalEmail.trim()) {
+      toast({ title: "Missing PayPal email", description: "Please enter the email address shown on your PayPal receipt.", variant: "destructive" });
+      return;
+    }
+    setSupportSubmitting(true);
+    const subject = `[Missing Key Support] ${supportForm.paypalEmail}`;
+    const body =
+`A buyer needs help locating their purchase.
+
+Account email: ${user?.email || "unknown"}
+PayPal receipt email: ${supportForm.paypalEmail}
+PayPal Order/Transaction ID: ${supportForm.orderId || "(not provided)"}
+Message: ${supportForm.message || "(none)"}
+
+— Sent from /dashboard support form`;
+
+    // Best-effort: open email client AND Discord invite so the buyer reaches us either way.
+    const mailto = `mailto:support@combowick.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailto, "_self");
+    setTimeout(() => {
+      window.open("https://discord.com/invite/ufrz9Zaqs8", "_blank", "noopener,noreferrer");
+      toast({
+        title: "Support request prepared",
+        description: "Email draft opened + Discord invite launched. We respond fastest in Discord.",
+      });
+      setSupportSubmitting(false);
+      setSupportOpen(false);
+      setSupportForm({ paypalEmail: "", orderId: "", message: "" });
+    }, 400);
   };
 
   if (loading) {
@@ -214,23 +255,70 @@ export default function Dashboard() {
             <Card className="p-5 mb-6 border-warning/30 bg-warning/5">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold mb-1">Don't see a key you paid for?</p>
                   <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                    If you got a PayPal receipt but no key shows here, your purchase was likely made as a guest with a different email.
-                    Sign in with the <span className="font-semibold text-foreground">same email address</span> shown on your PayPal receipt — your key will appear instantly.
+                    Most "missing key" issues = your PayPal receipt was sent to a <span className="font-semibold text-foreground">different email</span> than the one you signed in with.
+                    Sign in with the <span className="font-semibold text-foreground">exact email</span> on your PayPal receipt and your key will appear instantly.
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mb-3">
                     Currently signed in as: <span className="font-mono text-foreground">{user.email}</span>
                   </p>
-                  <div className="flex gap-2 mt-3 flex-wrap">
+                  <div className="flex gap-2 flex-wrap">
                     <Button size="sm" variant="outline" onClick={async () => { await supabase.auth.signOut(); navigate("/login"); }}>
-                      Sign in with different email
+                      <Mail className="h-3.5 w-3.5 mr-1.5" /> Sign in with PayPal email
                     </Button>
-                    <Button size="sm" variant="ghost" asChild>
-                      <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">Contact support</a>
+                    <Button size="sm" variant="default" onClick={() => setSupportOpen((o) => !o)}>
+                      <LifeBuoy className="h-3.5 w-3.5 mr-1.5" /> {supportOpen ? "Hide support form" : "Contact support"}
                     </Button>
                   </div>
+
+                  {supportOpen && (
+                    <form onSubmit={submitSupport} className="mt-5 space-y-3 p-4 rounded-lg bg-background/50 border border-border">
+                      <div>
+                        <Label htmlFor="paypalEmail" className="text-xs">PayPal receipt email *</Label>
+                        <Input
+                          id="paypalEmail"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          placeholder="the email PayPal sent your receipt to"
+                          value={supportForm.paypalEmail}
+                          onChange={(e) => setSupportForm((f) => ({ ...f, paypalEmail: e.target.value }))}
+                          className="mt-1 h-9 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="orderId" className="text-xs">PayPal Order / Transaction ID</Label>
+                        <Input
+                          id="orderId"
+                          placeholder="e.g. 9XR12345AB678901C (from your PayPal email)"
+                          value={supportForm.orderId}
+                          onChange={(e) => setSupportForm((f) => ({ ...f, orderId: e.target.value }))}
+                          className="mt-1 h-9 text-sm font-mono"
+                        />
+                        <p className="text-[10px] text-muted-foreground mt-1">Found in your PayPal receipt email — speeds up our lookup massively.</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="message" className="text-xs">Anything else? (optional)</Label>
+                        <Textarea
+                          id="message"
+                          rows={2}
+                          placeholder="What did you buy? When? Any error messages?"
+                          value={supportForm.message}
+                          onChange={(e) => setSupportForm((f) => ({ ...f, message: e.target.value }))}
+                          className="mt-1 text-sm resize-none"
+                        />
+                      </div>
+                      <div className="flex gap-2 flex-wrap items-center">
+                        <Button type="submit" size="sm" disabled={supportSubmitting}>
+                          <Send className="h-3.5 w-3.5 mr-1.5" />
+                          {supportSubmitting ? "Sending..." : "Send & open Discord"}
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground">We reply fastest in Discord — usually under 1 hour.</p>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </div>
             </Card>
