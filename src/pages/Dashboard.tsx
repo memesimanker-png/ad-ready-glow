@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -31,6 +32,31 @@ const tierNames: Record<string, string> = {
   lifetime: "Lifetime Access",
 };
 
+type BadgeInfo = {
+  label: string;
+  icon: typeof Crown;
+  className: string;
+};
+
+// Highest tier wins (lifetime > monthly > trial). Only counts non-expired keys.
+function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | null {
+  const now = Date.now();
+  const active = keys.filter(k => !k.expires_at || new Date(k.expires_at).getTime() > now);
+  if (active.some(k => k.tier === "lifetime")) {
+    return { label: "Lifetime Member", icon: Crown, className: "bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border-amber-500/40" };
+  }
+  if (active.some(k => k.tier === "monthly")) {
+    return { label: "Monthly Subscriber", icon: Sparkles, className: "bg-gradient-to-r from-primary/20 to-accent/20 text-primary border-primary/40" };
+  }
+  if (active.some(k => k.tier === "trial-7day")) {
+    return { label: "Trial Member", icon: Zap, className: "bg-success/15 text-success border-success/40" };
+  }
+  if (accountsCount > 0) {
+    return { label: "Verified Buyer", icon: ShieldCheck, className: "bg-secondary text-secondary-foreground border-border" };
+  }
+  return null;
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
@@ -45,11 +71,33 @@ export default function Dashboard() {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { setLoading(false); return; }
       setUser(data.user);
+      const email = (data.user.email || "").toLowerCase();
+
+      // Query by user_id OR matching customer_email (covers guest checkouts that
+      // didn't capture a user_id but used the same email as the buyer's account).
+      const keysQuery = email
+        ? supabase
+            .from("premium_key_purchases")
+            .select("*")
+            .or(`user_id.eq.${data.user.id},customer_email.eq.${email}`)
+            .order("created_at", { ascending: false })
+        : supabase
+            .from("premium_key_purchases")
+            .select("*")
+            .eq("user_id", data.user.id)
+            .order("created_at", { ascending: false });
+
       const [keysRes, accountsRes] = await Promise.all([
-        supabase.from("premium_key_purchases").select("*").eq("user_id", data.user.id).order("created_at", { ascending: false }),
+        keysQuery,
         supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
       ]);
-      setKeys((keysRes.data as KeyPurchase[]) || []);
+
+      // Dedupe by id in case a row matches both filters
+      const rawKeys = (keysRes.data as KeyPurchase[]) || [];
+      const seen = new Set<string>();
+      const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
+
+      setKeys(uniqKeys);
       setAccounts((accountsRes.data as RobloxAccount[]) || []);
       setLoading(false);
     });
