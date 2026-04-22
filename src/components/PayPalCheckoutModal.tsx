@@ -34,9 +34,21 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     if (isOpen) {
       setError(null);
       setProcessing(false);
-      setSuccess(null);
       setPlanId(null);
       setPaymentType(tier.isSubscription ? "subscription" : "onetime");
+      // Restore last key for this tier if the modal was accidentally re-opened
+      // right after a successful purchase (PayPal redirect can briefly steal focus).
+      try {
+        const cached = localStorage.getItem(`last_purchase_${tier.id}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed?.key && Date.now() - (parsed.savedAt || 0) < 10 * 60 * 1000) {
+            setSuccess({ key: parsed.key, expires_at: parsed.expires_at });
+            return;
+          }
+        }
+      } catch {}
+      setSuccess(null);
     }
   }, [isOpen, tier]);
 
@@ -80,6 +92,15 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     return actions.subscription.create({ plan_id: planId });
   };
 
+  const persistKey = (key: string, expires_at: string) => {
+    try {
+      localStorage.setItem(
+        `last_purchase_${tier.id}`,
+        JSON.stringify({ key, expires_at, savedAt: Date.now() })
+      );
+    } catch {}
+  };
+
   const captureHandler = async (data: any) => {
     setProcessing(true);
     try {
@@ -99,6 +120,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Subscription activation failed");
+        persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       } else {
         const { data: result, error: fnError } = await supabase.functions.invoke(
@@ -114,6 +136,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Payment capture failed");
+        persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       }
     } catch {
@@ -121,6 +144,19 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     } finally {
       setProcessing(false);
     }
+  };
+
+  // Block accidental close while we're mid-payment OR the success screen is up.
+  // The user must click the X explicitly to dismiss the success view.
+  const guardedClose = () => {
+    if (processing || success) return;
+    onClose();
+  };
+
+  const dismissSuccess = () => {
+    try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
+    setSuccess(null);
+    onClose();
   };
 
   const copyKey = () => {
