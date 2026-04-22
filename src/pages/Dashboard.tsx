@@ -65,6 +65,7 @@ function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | n
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [keys, setKeys] = useState<KeyPurchase[]>([]);
   const [accounts, setAccounts] = useState<RobloxAccount[]>([]);
@@ -72,6 +73,9 @@ export default function Dashboard() {
   const [copied, setCopied] = useState<string | null>(null);
   const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
   const [tab, setTab] = useState<"keys" | "accounts">("keys");
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
+  const [supportSubmitting, setSupportSubmitting] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
