@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -16,6 +16,8 @@ type KeyPurchase = {
   status: string;
   expires_at: string;
   created_at: string;
+  user_id: string | null;
+  customer_email: string | null;
 };
 
 type RobloxAccount = {
@@ -170,6 +172,69 @@ export default function Dashboard() {
               </div>
             );
           })()}
+
+          {/* Purchase link status — explains how each key was matched to this account */}
+          {keys.length > 0 && (() => {
+            const emailLower = (user.email || "").toLowerCase();
+            const linkedById = keys.filter(k => k.user_id === user.id).length;
+            const linkedByEmail = keys.filter(
+              k => k.user_id !== user.id && (k.customer_email || "").toLowerCase() === emailLower
+            ).length;
+            return (
+              <Card className="p-4 mb-6 border-primary/20 bg-primary/5">
+                <div className="flex items-start gap-3">
+                  <Link2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold mb-1">Purchase Link Status</p>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      {linkedById > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-success/15 text-success border border-success/30">
+                          <Check className="h-3 w-3" /> {linkedById} linked to your account
+                        </span>
+                      )}
+                      {linkedByEmail > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/15 text-primary border border-primary/30">
+                          <Mail className="h-3 w-3" /> {linkedByEmail} matched by email
+                        </span>
+                      )}
+                    </div>
+                    {linkedByEmail > 0 && (
+                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                        These keys were purchased as a guest using <span className="font-mono text-foreground">{user.email}</span> and have been automatically attached to your account.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            );
+          })()}
+
+          {/* Missing keys helper — for visitors arriving from a PayPal email with the wrong account */}
+          {keys.length === 0 && (
+            <Card className="p-5 mb-6 border-warning/30 bg-warning/5">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold mb-1">Don't see a key you paid for?</p>
+                  <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                    If you got a PayPal receipt but no key shows here, your purchase was likely made as a guest with a different email.
+                    Sign in with the <span className="font-semibold text-foreground">same email address</span> shown on your PayPal receipt — your key will appear instantly.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Currently signed in as: <span className="font-mono text-foreground">{user.email}</span>
+                  </p>
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    <Button size="sm" variant="outline" onClick={async () => { await supabase.auth.signOut(); navigate("/login"); }}>
+                      Sign in with different email
+                    </Button>
+                    <Button size="sm" variant="ghost" asChild>
+                      <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">Contact support</a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Tabs */}
           <div className="flex gap-2 mb-6 border-b border-border">

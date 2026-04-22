@@ -34,9 +34,21 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     if (isOpen) {
       setError(null);
       setProcessing(false);
-      setSuccess(null);
       setPlanId(null);
       setPaymentType(tier.isSubscription ? "subscription" : "onetime");
+      // Restore last key for this tier if the modal was accidentally re-opened
+      // right after a successful purchase (PayPal redirect can briefly steal focus).
+      try {
+        const cached = localStorage.getItem(`last_purchase_${tier.id}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed?.key && Date.now() - (parsed.savedAt || 0) < 10 * 60 * 1000) {
+            setSuccess({ key: parsed.key, expires_at: parsed.expires_at });
+            return;
+          }
+        }
+      } catch {}
+      setSuccess(null);
     }
   }, [isOpen, tier]);
 
@@ -80,6 +92,15 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     return actions.subscription.create({ plan_id: planId });
   };
 
+  const persistKey = (key: string, expires_at: string) => {
+    try {
+      localStorage.setItem(
+        `last_purchase_${tier.id}`,
+        JSON.stringify({ key, expires_at, savedAt: Date.now() })
+      );
+    } catch {}
+  };
+
   const captureHandler = async (data: any) => {
     setProcessing(true);
     try {
@@ -99,6 +120,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Subscription activation failed");
+        persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       } else {
         const { data: result, error: fnError } = await supabase.functions.invoke(
@@ -114,6 +136,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Payment capture failed");
+        persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       }
     } catch {
@@ -123,36 +146,57 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     }
   };
 
+  // Block accidental close while we're mid-payment OR the success screen is up.
+  // The user must click the X explicitly to dismiss the success view.
+  const guardedClose = () => {
+    if (processing || success) return;
+    onClose();
+  };
+
+  const dismissSuccess = () => {
+    try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
+    setSuccess(null);
+    onClose();
+  };
+
   const copyKey = () => {
     if (success?.key) navigator.clipboard.writeText(success.key);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={guardedClose} />
       <div
         className="relative bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl z-10 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="h-1.5 bg-gradient-to-r from-primary via-accent to-primary/40" />
         <div className="p-6">
-          <button onClick={onClose} className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors rounded-full p-1.5 hover:bg-secondary">
+          <button
+            onClick={success ? dismissSuccess : guardedClose}
+            disabled={processing}
+            className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors rounded-full p-1.5 hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Close"
+          >
             <X className="w-4 h-4" />
           </button>
 
           {success ? (
             <div className="text-center py-6">
-              <div className="h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-green-400" />
+              <div className="h-16 w-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-success" />
               </div>
               <h2 className="font-heading text-xl font-bold mb-2">{t("Payment Successful!")}</h2>
               <p className="text-sm text-muted-foreground mb-6">{t("modal_key_generated")}</p>
-              <div className="bg-background/50 backdrop-blur-sm p-4 rounded-lg mb-4 border border-border/50">
+              <div className="bg-background/50 backdrop-blur-sm p-4 rounded-lg mb-4 border border-primary/30">
                 <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Your License Key:")}</p>
-                <code className="text-sm font-mono break-all font-semibold text-primary">{success.key}</code>
+                <code className="text-sm font-mono break-all font-semibold text-primary select-all">{success.key}</code>
               </div>
-              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-3 hover:bg-primary/90 transition-colors">
+              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-2 hover:bg-primary/90 transition-colors">
                 {t("Copy Key")}
+              </button>
+              <button onClick={dismissSuccess} className="w-full py-2.5 rounded-lg bg-secondary text-secondary-foreground font-medium text-sm mb-3 hover:bg-secondary/80 transition-colors">
+                {t("Done")}
               </button>
               <p className="text-xs text-muted-foreground">{t("Expires:")} {new Date(success.expires_at).toLocaleDateString()}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("modal_key_saved_dashboard")}</p>
