@@ -9,6 +9,7 @@ import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
+import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 
 export default function VerifyStep3() {
@@ -73,7 +74,7 @@ export default function VerifyStep3() {
                 <CardTitle>{t("Final Verification")}</CardTitle>
                 <CardDescription>{t("verify_watch_desc")}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 {selectedProvider && (
                   <div className="text-sm text-center">
                     <p>{t("Using provider:")} <span className="font-medium">
@@ -81,6 +82,7 @@ export default function VerifyStep3() {
                     </span></p>
                   </div>
                 )}
+                <LinkvertiseTimerNotice />
               </CardContent>
               <CardFooter>
                 <Button

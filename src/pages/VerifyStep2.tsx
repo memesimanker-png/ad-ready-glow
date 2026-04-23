@@ -10,6 +10,7 @@ import { getTodaySchedule } from "@/lib/day-schedule";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
+import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -124,6 +125,7 @@ export default function VerifyStep2() {
                     </span></p>
                   </div>
                 )}
+                <LinkvertiseTimerNotice />
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
                 {canSkip && (

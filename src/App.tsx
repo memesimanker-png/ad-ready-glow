@@ -6,6 +6,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TranslationProvider } from "@/lib/translation-context";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
@@ -72,64 +74,63 @@ const RouteFallback = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TranslationProvider>
-      <TooltipProvider>
-        {/* Globally honor prefers-reduced-motion — disables all framer-motion
-            animations for users who request reduced motion. Big CPU savings on
-            low-end mobile (largest traffic segment). */}
-        <MotionConfig reducedMotion="user">
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<RouteFallback />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/roblox-accounts" element={<RobloxAccounts />} />
-                <Route path="/premium-keys" element={<PremiumKeys />} />
-                <Route path="/oils" element={<Oils />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/refund-policy" element={<RefundPolicy />} />
-                <Route path="/scripts" element={<Scripts />} />
-                <Route path="/scripts/:slug" element={<ScriptDetail />} />
-                <Route path="/admin/scripts" element={<ScriptAdmin />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/executors" element={<Executors />} />
-                <Route path="/keys" element={<Keys />} />
-                <Route path="/tutorials" element={<Tutorials />} />
-                <Route path="/docs" element={<Docs />} />
-                <Route path="/guides" element={<Guides />} />
-                <Route path="/changelog" element={<Changelog />} />
-                <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
-                <Route path="/fair-use" element={<FairUse />} />
-                <Route path="/faq" element={<FAQ />} />
-                {/* Key system flow */}
-                <Route path="/verify/provider-select" element={<VerifyProviderSelect />} />
-                <Route path="/verify/step1" element={<VerifyStep1 />} />
-                <Route path="/verify/step2" element={<VerifyStep2 />} />
-                <Route path="/verify/step3" element={<VerifyStep3 />} />
-                <Route path="/ad-return" element={<AdReturn />} />
-                <Route path="/ad-return/:step" element={<AdReturn />} />
-                <Route path="/access-key" element={<AccessKey />} />
-                <Route path="/blocked" element={<Blocked />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/claim-access" element={<ClaimAccess />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </MotionConfig>
-      </TooltipProvider>
-    </TranslationProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TranslationProvider>
+        <TooltipProvider>
+          <MotionConfig reducedMotion="user">
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<RouteFallback />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/roblox-accounts" element={<RobloxAccounts />} />
+                  <Route path="/premium-keys" element={<PremiumKeys />} />
+                  <Route path="/oils" element={<Oils />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/scripts" element={<Scripts />} />
+                  <Route path="/scripts/:slug" element={<ScriptDetail />} />
+                  <Route path="/admin/scripts" element={<ScriptAdmin />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/executors" element={<Executors />} />
+                  <Route path="/keys" element={<Keys />} />
+                  <Route path="/tutorials" element={<Tutorials />} />
+                  <Route path="/docs" element={<Docs />} />
+                  <Route path="/guides" element={<Guides />} />
+                  <Route path="/changelog" element={<Changelog />} />
+                  <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />
+                  <Route path="/fair-use" element={<FairUse />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/verify/provider-select" element={<VerifyProviderSelect />} />
+                  <Route path="/verify/step1" element={<VerifyStep1 />} />
+                  <Route path="/verify/step2" element={<VerifyStep2 />} />
+                  <Route path="/verify/step3" element={<VerifyStep3 />} />
+                  <Route path="/ad-return" element={<AdReturn />} />
+                  <Route path="/ad-return/:step" element={<AdReturn />} />
+                  <Route path="/access-key" element={<AccessKey />} />
+                  <Route path="/blocked" element={<Blocked />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/claim-access" element={<ClaimAccess />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+              <StickyMobileCTA />
+            </BrowserRouter>
+          </MotionConfig>
+        </TooltipProvider>
+      </TranslationProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
