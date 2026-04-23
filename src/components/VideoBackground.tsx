@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import gallery1 from "@/assets/gallery-1.png";
 import gallery2 from "@/assets/gallery-2.png";
 import gallery3 from "@/assets/gallery-3.png";
@@ -15,46 +15,26 @@ interface VideoBackgroundProps {
 }
 
 // Persist slideshow index across route navigations so it doesn't restart from
-// image #1 each time the user comes back to /. Saves a re-render of the heavy
-// hero animation and matches user expectation ("don't loop on every nav").
+// image #1 each time the user comes back to /.
 let cachedIndex = 0;
+
+const SLIDE_INTERVAL = 5000;
 
 export function VideoBackground({ className = "", overlay = true }: VideoBackgroundProps) {
   const [current, setCurrent] = useState(cachedIndex);
-  const [prev, setPrev] = useState<number | null>(null);
-  const [sliding, setSliding] = useState(false);
   const [paused, setPaused] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Honor prefers-reduced-motion + tab visibility + element off-screen.
-  // Saves CPU on low-end mobile (your largest segment).
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-  const goNext = useCallback(() => {
-    setPrev(current);
-    setSliding(true);
-    setCurrent((c) => {
-      const next = (c + 1) % images.length;
-      cachedIndex = next;
-      return next;
-    });
-
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setSliding(false);
-      setPrev(null);
-    }, 1800);
-  }, [current]);
 
   // Pause when off-screen
   useEffect(() => {
     if (!containerRef.current) return;
     const obs = new IntersectionObserver(
       ([entry]) => setPaused(!entry.isIntersecting),
-      { threshold: 0.05 }
+      { threshold: 0 }
     );
     obs.observe(containerRef.current);
     return () => obs.disconnect();
@@ -67,58 +47,38 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
+  // Auto-advance slideshow
   useEffect(() => {
     if (prefersReducedMotion || paused) return;
-    const id = setInterval(goNext, 6000);
+    const id = setInterval(() => {
+      setCurrent((c) => {
+        const next = (c + 1) % images.length;
+        cachedIndex = next;
+        return next;
+      });
+    }, SLIDE_INTERVAL);
     return () => clearInterval(id);
-  }, [goNext, prefersReducedMotion, paused]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
+  }, [prefersReducedMotion, paused]);
 
   return (
     <div ref={containerRef} className={`absolute inset-0 overflow-hidden ${className}`}>
-      {prev !== null && !prefersReducedMotion && (
-        <div
-          className="absolute inset-0 z-[1]"
-          style={{
-            transform: sliding ? "translateX(-35%)" : "translateX(0)",
-            opacity: sliding ? 0 : 1,
-            transition: "transform 1.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.8s cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-        >
-          <img
-            src={images[prev]}
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ filter: "brightness(0.55) saturate(1.15)" }}
-          />
-        </div>
-      )}
-
-      <div
-        className="absolute inset-0 z-[2]"
-        style={{
-          animation: sliding && !prefersReducedMotion ? "slideIn 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards" : "none",
-        }}
-      >
+      {images.map((src, i) => (
         <img
-          src={images[current]}
+          key={i}
+          src={src}
           alt=""
-          className="w-full h-full object-cover"
-          style={{ filter: "brightness(0.55) saturate(1.15)" }}
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            opacity: i === current ? 1 : 0,
+            filter: "brightness(0.55) saturate(1.15)",
+            transition: "opacity 1.4s ease-in-out",
+            zIndex: 1,
+          }}
+          loading={i === 0 ? "eager" : "lazy"}
+          decoding="async"
         />
-      </div>
-
-      <style>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-      `}</style>
+      ))}
 
       {overlay && (
         <>
