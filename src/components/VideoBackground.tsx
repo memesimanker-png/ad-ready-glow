@@ -75,8 +75,11 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
             transition: "opacity 1.4s ease-in-out",
             zIndex: 1,
           }}
-          loading={i === 0 ? "eager" : "lazy"}
+          // All slides are tiny WebP (<60KB) so eager-load every one to avoid
+          // blank flashes when the slideshow advances.
+          loading="eager"
           decoding="async"
+          fetchPriority={i === 0 ? "high" : "low"}
         />
       ))}
 
