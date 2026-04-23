@@ -9,6 +9,7 @@ import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
+import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 
 export default function VerifyStep1() {
@@ -89,6 +90,7 @@ export default function VerifyStep1() {
                     <li>{t("verify_reason_4")}</li>
                   </ul>
                 </div>
+                <LinkvertiseTimerNotice />
               </CardContent>
               <CardFooter>
                 <Button
