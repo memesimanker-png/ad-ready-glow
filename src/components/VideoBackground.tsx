@@ -1,27 +1,28 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import gallery1 from "@/assets/gallery-1.webp";
 import gallery2 from "@/assets/gallery-2.webp";
 import gallery3 from "@/assets/gallery-3.webp";
 import gallery4 from "@/assets/gallery-4.webp";
 import gallery7 from "@/assets/gallery-7.webp";
+import gallery8 from "@/assets/gallery-8.webp";
 
-const images = [gallery1, gallery2, gallery3, gallery4, gallery7];
+const images = [gallery1, gallery2, gallery3, gallery4, gallery7, gallery8];
 
 interface VideoBackgroundProps {
   className?: string;
   overlay?: boolean;
 }
 
-let cachedIndex = 0;
 const loadedSlides = new Set<number>();
 const preloadCache = new Map<string, Promise<void>>();
-
-const SLIDE_INTERVAL = 5000;
+const SLIDE_INTERVAL = 4500;
+let slideshowStartedAt = Date.now();
 
 function warmImage(src: string, index: number) {
   if (loadedSlides.has(index)) return Promise.resolve();
-  const existing = preloadCache.get(src);
-  if (existing) return existing;
+
+  const cached = preloadCache.get(src);
+  if (cached) return cached;
 
   const promise = new Promise<void>((resolve) => {
     if (typeof Image === "undefined") {
@@ -34,45 +35,56 @@ function warmImage(src: string, index: number) {
     img.decoding = "async";
     img.src = src;
 
-    const finish = () => {
+    const done = () => {
       loadedSlides.add(index);
       resolve();
     };
 
     if (img.complete) {
-      finish();
+      done();
       return;
     }
 
-    img.onload = finish;
-    img.onerror = finish;
+    img.onload = done;
+    img.onerror = done;
   });
 
   preloadCache.set(src, promise);
   return promise;
 }
 
-function getNextLoadedIndex(current: number, loaded: boolean[]) {
-  if (!loaded.some(Boolean)) return current;
-
-  for (let step = 1; step <= images.length; step += 1) {
-    const next = (current + step) % images.length;
-    if (loaded[next]) return next;
-  }
-
-  return current;
+function getTimedIndex() {
+  const elapsed = Date.now() - slideshowStartedAt;
+  return Math.floor(elapsed / SLIDE_INTERVAL) % images.length;
 }
 
 export function VideoBackground({ className = "", overlay = true }: VideoBackgroundProps) {
-  const [current, setCurrent] = useState(() => cachedIndex % images.length);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
   const [loaded, setLoaded] = useState(() => images.map((_, index) => loadedSlides.has(index)));
   const [isPageVisible, setIsPageVisible] = useState(() =>
     typeof document === "undefined" ? true : !document.hidden
   );
+  const [current, setCurrent] = useState(() => getTimedIndex());
 
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const resolveLoadedIndex = useCallback((target: number, flags: boolean[]) => {
+    if (!flags.some(Boolean)) return target;
+    if (flags[target]) return target;
+
+    for (let step = 1; step <= images.length; step += 1) {
+      const next = (target + step) % images.length;
+      if (flags[next]) return next;
+    }
+
+    return target;
+  }, []);
+
+  const visibleIndex = useMemo(
+    () => resolveLoadedIndex(prefersReducedMotion ? 0 : getTimedIndex(), loaded),
+    [loaded, prefersReducedMotion, resolveLoadedIndex]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -111,41 +123,31 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
   }, []);
 
   useEffect(() => {
-    const firstLoadedIndex = loaded.findIndex(Boolean);
-    if (firstLoadedIndex === -1) return;
-
-    if (!loaded[current]) {
-      cachedIndex = firstLoadedIndex;
-      setCurrent(firstLoadedIndex);
-    }
-  }, [current, loaded]);
-
-  const canAdvance = !prefersReducedMotion && isPageVisible && loaded.filter(Boolean).length > 1;
+    setCurrent(visibleIndex);
+  }, [visibleIndex]);
 
   useEffect(() => {
-    if (!canAdvance) return;
+    if (prefersReducedMotion || !isPageVisible) return;
 
-    const id = setInterval(() => {
-      setCurrent((currentIndex) => {
-        const next = getNextLoadedIndex(currentIndex, loaded);
-        cachedIndex = next;
-        return next;
-      });
-    }, SLIDE_INTERVAL);
+    const update = () => {
+      setCurrent(resolveLoadedIndex(getTimedIndex(), loaded));
+    };
 
-    return () => clearInterval(id);
-  }, [canAdvance, loaded]);
+    update();
+    const id = window.setInterval(update, 1000);
+    return () => window.clearInterval(id);
+  }, [isPageVisible, loaded, prefersReducedMotion, resolveLoadedIndex]);
 
   return (
     <div className={`absolute inset-0 overflow-hidden bg-muted ${className}`}>
       {images.map((src, i) => (
         <img
-          key={i}
+          key={src}
           src={src}
           alt=""
           aria-hidden="true"
           onLoad={() => markLoaded(i)}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           style={{
             opacity: i === current && loaded[i] ? 1 : 0,
             filter: "brightness(0.55) saturate(1.15)",
