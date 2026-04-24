@@ -33,7 +33,7 @@ type RobloxAccount = {
 };
 
 const tierNames: Record<string, string> = {
-  "trial-7day": "7-Day Trial",
+  "trial-7day": "3-Day Trial",
   monthly: "Monthly Access",
   lifetime: "Lifetime Access",
 };
