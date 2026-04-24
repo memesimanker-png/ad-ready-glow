@@ -71,7 +71,9 @@ function getVideoId(url: string): string | null {
 export function YouTubeEmbed({ url }: YouTubeEmbedProps) {
   const videoId = getVideoId(url);
   const [active, setActive] = useState(false);
-  const [thumbnailSrc, setThumbnailSrc] = useState("");
+  const [thumbnailSrc, setThumbnailSrc] = useState(() =>
+    videoId ? `https://i.ytimg.com/vi_webp/${videoId}/hqdefault.webp` : ""
+  );
 
   const isReturningVisitor = useMemo(
     () => (videoId ? hasSeenVideo(videoId) : false),
