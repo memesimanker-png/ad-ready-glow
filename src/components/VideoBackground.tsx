@@ -1,85 +1,160 @@
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import gallery1 from "@/assets/gallery-1.webp";
 import gallery2 from "@/assets/gallery-2.webp";
 import gallery3 from "@/assets/gallery-3.webp";
 import gallery4 from "@/assets/gallery-4.webp";
-import gallery5 from "@/assets/gallery-5.webp";
-import gallery6 from "@/assets/gallery-6.webp";
 import gallery7 from "@/assets/gallery-7.webp";
 
-const images = [gallery1, gallery2, gallery3, gallery4, gallery5, gallery6, gallery7];
+const images = [gallery1, gallery2, gallery3, gallery4, gallery7];
 
 interface VideoBackgroundProps {
   className?: string;
   overlay?: boolean;
 }
 
-// Persist slideshow index across route navigations so it doesn't restart from
-// image #1 each time the user comes back to /.
 let cachedIndex = 0;
+const loadedSlides = new Set<number>();
+const preloadCache = new Map<string, Promise<void>>();
 
 const SLIDE_INTERVAL = 5000;
 
+function warmImage(src: string, index: number) {
+  if (loadedSlides.has(index)) return Promise.resolve();
+  const existing = preloadCache.get(src);
+  if (existing) return existing;
+
+  const promise = new Promise<void>((resolve) => {
+    if (typeof Image === "undefined") {
+      loadedSlides.add(index);
+      resolve();
+      return;
+    }
+
+    const img = new Image();
+    img.decoding = "async";
+    img.src = src;
+
+    const finish = () => {
+      loadedSlides.add(index);
+      resolve();
+    };
+
+    if (img.complete) {
+      finish();
+      return;
+    }
+
+    img.onload = finish;
+    img.onerror = finish;
+  });
+
+  preloadCache.set(src, promise);
+  return promise;
+}
+
+function getNextLoadedIndex(current: number, loaded: boolean[]) {
+  if (!loaded.some(Boolean)) return current;
+
+  for (let step = 1; step <= images.length; step += 1) {
+    const next = (current + step) % images.length;
+    if (loaded[next]) return next;
+  }
+
+  return current;
+}
+
 export function VideoBackground({ className = "", overlay = true }: VideoBackgroundProps) {
-  const [current, setCurrent] = useState(cachedIndex);
-  const [paused, setPaused] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [current, setCurrent] = useState(() => cachedIndex % images.length);
+  const [loaded, setLoaded] = useState(() => images.map((_, index) => loadedSlides.has(index)));
+  const [isPageVisible, setIsPageVisible] = useState(() =>
+    typeof document === "undefined" ? true : !document.hidden
+  );
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  // Pause when off-screen
   useEffect(() => {
-    if (!containerRef.current) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setPaused(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    obs.observe(containerRef.current);
-    return () => obs.disconnect();
+    let cancelled = false;
+
+    images.forEach((src, index) => {
+      warmImage(src, index).then(() => {
+        if (cancelled) return;
+        setLoaded((prev) => {
+          if (prev[index]) return prev;
+          const next = [...prev];
+          next[index] = true;
+          return next;
+        });
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Pause when the tab is hidden
   useEffect(() => {
-    const onVis = () => setPaused(document.hidden);
+    const onVis = () => setIsPageVisible(!document.hidden);
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  // Auto-advance slideshow
+  const markLoaded = useCallback((index: number) => {
+    loadedSlides.add(index);
+    setLoaded((prev) => {
+      if (prev[index]) return prev;
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
-    if (prefersReducedMotion || paused) return;
+    const firstLoadedIndex = loaded.findIndex(Boolean);
+    if (firstLoadedIndex === -1) return;
+
+    if (!loaded[current]) {
+      cachedIndex = firstLoadedIndex;
+      setCurrent(firstLoadedIndex);
+    }
+  }, [current, loaded]);
+
+  const canAdvance = !prefersReducedMotion && isPageVisible && loaded.filter(Boolean).length > 1;
+
+  useEffect(() => {
+    if (!canAdvance) return;
+
     const id = setInterval(() => {
-      setCurrent((c) => {
-        const next = (c + 1) % images.length;
+      setCurrent((currentIndex) => {
+        const next = getNextLoadedIndex(currentIndex, loaded);
         cachedIndex = next;
         return next;
       });
     }, SLIDE_INTERVAL);
+
     return () => clearInterval(id);
-  }, [prefersReducedMotion, paused]);
+  }, [canAdvance, loaded]);
 
   return (
-    <div ref={containerRef} className={`absolute inset-0 overflow-hidden ${className}`}>
+    <div className={`absolute inset-0 overflow-hidden bg-muted ${className}`}>
       {images.map((src, i) => (
         <img
           key={i}
           src={src}
           alt=""
           aria-hidden="true"
+          onLoad={() => markLoaded(i)}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
-            opacity: i === current ? 1 : 0,
+            opacity: i === current && loaded[i] ? 1 : 0,
             filter: "brightness(0.55) saturate(1.15)",
             transition: "opacity 1.4s ease-in-out",
             zIndex: 1,
           }}
-          // All slides are tiny WebP (<60KB) so eager-load every one to avoid
-          // blank flashes when the slideshow advances.
           loading="eager"
           decoding="async"
-          fetchPriority={i === 0 ? "high" : "low"}
+          fetchPriority={i <= 1 ? "high" : "low"}
         />
       ))}
 
