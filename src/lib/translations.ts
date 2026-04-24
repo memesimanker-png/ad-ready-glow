@@ -313,7 +313,6 @@ export const EN_TEXTS: Record<string, string> = {
   "Dashboard access": "Dashboard access",
   "Bulk discount applied": "Bulk discount applied",
   "Access Your Accounts": "Access Your Accounts",
-  "Best Value": "Best Value",
   // How it works steps
   "step_1_desc": "Pick the package or product that fits your needs.",
   "step_2_desc": "Pay securely via PayPal with full buyer protection.",
