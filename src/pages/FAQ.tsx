@@ -54,7 +54,7 @@ export default function FAQ() {
             <h1 className="font-heading text-4xl font-bold">Frequently Asked Questions</h1>
             <p className="text-xl text-muted-foreground">Find answers to common questions about COMBO WICK</p>
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              ComboWick is a free Roblox script platform offering 24-hour access keys generated through a 3-step verification process. Premium keys are available for $5 (7-day), $9.99 (monthly), and $49.99 (lifetime). Scripts are updated daily for compatibility with the latest Roblox patches.
+              ComboWick is a free Roblox script platform offering 24-hour access keys generated through a 3-step verification process. Premium keys are available for $5 (3-day), $9.99 (monthly), and $49.99 (lifetime). Scripts are updated daily for compatibility with the latest Roblox patches.
             </p>
           </header>
 

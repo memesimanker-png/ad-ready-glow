@@ -119,7 +119,7 @@ function GenerateKeyTab() {
         <div>
           <label className="text-sm font-medium mb-1 block">Tier *</label>
           <select value={tier} onChange={e => setTier(e.target.value)} className={inputCls}>
-            <option value="trial-7day">7-Day Trial ($5)</option>
+            <option value="trial-7day">3-Day Trial ($5)</option>
             <option value="monthly">Monthly Access ($9.99)</option>
             <option value="lifetime">Lifetime Key ($49.99)</option>
           </select>

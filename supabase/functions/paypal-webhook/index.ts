@@ -100,7 +100,7 @@ serve(async (req) => {
       const amount = parseFloat(capture.amount?.value || "0");
 
       let tier = "trial-7day";
-      let hours = 168;
+      let hours = 72;
       if (amount >= 40) { tier = "lifetime"; hours = 876000; }
       else if (amount >= 8) { tier = "monthly"; hours = 720; }
 

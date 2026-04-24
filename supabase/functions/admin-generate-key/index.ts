@@ -9,14 +9,14 @@ const corsHeaders = {
 const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
 
 function getTierHours(tier: string): number {
-  if (tier === "trial-7day") return 168;
+  if (tier === "trial-7day") return 72;
   if (tier === "monthly") return 720;
   return 876000;
 }
 
 function calculateExpiry(tier: string): string {
   const now = new Date();
-  if (tier === "trial-7day") return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  if (tier === "trial-7day") return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
   if (tier === "monthly") return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
   return new Date(now.getTime() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString();
 }

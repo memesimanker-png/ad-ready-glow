@@ -19,7 +19,8 @@ const tiers = [
     price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    featureKeys: ["7 Days Full Access", "Instant Activation", "Great for Trying Out"],
+    featureKeys: ["3 Days Full Access", "$1.67 per day", "Fast trial access"],
+    subtitleKey: "Short entry price before monthly",
     buttonTextKey: "Purchase Now",
     buttonStyle: "bg-primary hover:bg-primary/90",
     isSubscription: false,
@@ -32,7 +33,8 @@ const tiers = [
     discount: "50% OFF",
     color: "text-green-400",
     borderColor: "border-green-500/30",
-    featureKeys: ["30 Days Access", "Priority support", "Premium Support"],
+    featureKeys: ["30 Days Access", "$0.33 per day", "Priority support"],
+    subtitleKey: "Best for regular buyers",
     buttonTextKey: "Purchase Now",
     buttonStyle: "bg-green-600 hover:bg-green-700",
     popular: true,
@@ -146,6 +148,11 @@ export default function PremiumKeys() {
               >
                 <Card className={`p-6 h-full flex flex-col card-neon ${tier.borderColor}`}>
                   <div className="text-center mb-6">
+                    {tier.popular && (
+                      <div className="inline-flex items-center rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-green-300 mb-4">
+                        {t("Best Value")}
+                      </div>
+                    )}
                     <h3 className={`font-heading text-sm font-bold uppercase tracking-wider mb-4 ${tier.color}`}>
                       {t(tier.nameKey)}
                     </h3>
@@ -159,6 +166,7 @@ export default function PremiumKeys() {
                         )}
                         <div className="text-4xl font-bold mb-1">${tier.price}</div>
                         <p className="text-sm text-muted-foreground">{t("Premium Key")}</p>
+                        {tier.subtitleKey && <p className="text-xs text-muted-foreground mt-2">{t(tier.subtitleKey)}</p>}
                       </>
                     ) : (
                       <div className="py-4" />
