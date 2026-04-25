@@ -5,7 +5,7 @@ const BASE_URL = "https://shop-ready.lovable.app";
 const STATIC_PAGES = [
   { loc: "/", changefreq: "weekly", priority: "1.0" },
   { loc: "/about", changefreq: "monthly", priority: "0.8" },
-  { loc: "/roblox-accounts", changefreq: "weekly", priority: "0.9" },
+  
   { loc: "/premium-keys", changefreq: "weekly", priority: "0.9" },
   { loc: "/scripts", changefreq: "daily", priority: "0.9" },
   { loc: "/executors", changefreq: "weekly", priority: "0.8" },
