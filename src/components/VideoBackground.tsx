@@ -6,7 +6,8 @@ import gallery4 from "@/assets/gallery-4.webp";
 import gallery7 from "@/assets/gallery-7.webp";
 import gallery8 from "@/assets/gallery-8.webp";
 
-const images = [gallery1, gallery2, gallery3, gallery4, gallery7, gallery8];
+// gallery-8 is shown first, then the rest rotate in
+const images = [gallery8, gallery1, gallery2, gallery3, gallery4, gallery7];
 
 interface VideoBackgroundProps {
   className?: string;
