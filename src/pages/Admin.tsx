@@ -458,3 +458,132 @@ function UsersTab() {
     </div>
   );
 }
+
+/* ─── Accounts Tab (read-only inventory) ─── */
+function AccountsTab() {
+  const { toast } = useToast();
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "available" | "claimed">("all");
+  const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("roblox_accounts")
+        .select("id, username, password, package_size, claimed, claimed_at, claimed_by, created_at")
+        .order("created_at", { ascending: false });
+      if (error) {
+        toast({ title: "Failed to load accounts", description: error.message, variant: "destructive" });
+      } else {
+        setAccounts(data || []);
+      }
+      setLoading(false);
+    })();
+  }, [toast]);
+
+  const filtered = accounts.filter(a =>
+    filter === "all" ? true : filter === "available" ? !a.claimed : a.claimed
+  );
+
+  const totalAvailable = accounts.filter(a => !a.claimed).length;
+  const totalClaimed = accounts.filter(a => a.claimed).length;
+
+  const toggleReveal = (id: string) => {
+    setRevealedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const copy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: `${label} copied` });
+  };
+
+  const exportTxt = () => {
+    const lines = filtered.map(a => `${a.username}:${a.password}  (size:${a.package_size}, ${a.claimed ? "CLAIMED" : "AVAILABLE"})`);
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `roblox-accounts-${Date.now()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="p-4"><p className="text-xs text-muted-foreground">Total</p><p className="text-2xl font-bold">{accounts.length}</p></Card>
+        <Card className="p-4 border-success/30"><p className="text-xs text-muted-foreground">Available</p><p className="text-2xl font-bold text-success">{totalAvailable}</p></Card>
+        <Card className="p-4 border-muted"><p className="text-xs text-muted-foreground">Claimed</p><p className="text-2xl font-bold text-muted-foreground">{totalClaimed}</p></Card>
+      </div>
+
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex gap-2">
+          {(["all", "available", "claimed"] as const).map(f => (
+            <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="capitalize">{f}</Button>
+          ))}
+        </div>
+        <Button variant="outline" size="sm" onClick={exportTxt} disabled={!filtered.length}>
+          <Copy className="h-4 w-4 mr-2" /> Export {filtered.length} as .txt
+        </Button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card className="p-12 text-center border-dashed">
+          <UserCheck className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No accounts in this view.</p>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map(a => {
+            const revealed = revealedIds.has(a.id);
+            return (
+              <Card key={a.id} className="p-4">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono text-sm font-semibold">{a.username}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${a.claimed ? "bg-muted text-muted-foreground" : "bg-success/15 text-success"}`}>
+                        {a.claimed ? "CLAIMED" : "AVAILABLE"}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary">size {a.package_size}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted-foreground select-all">
+                        {revealed ? a.password : "•".repeat(Math.min(a.password.length, 12))}
+                      </span>
+                      <button onClick={() => toggleReveal(a.id)} className="text-muted-foreground hover:text-foreground">
+                        {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                    {a.claimed && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Claimed {new Date(a.claimed_at).toLocaleString()} by {a.claimed_by?.slice(0, 8)}…
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.username, "Username")}><Copy className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.password, "Password")}><Key className="h-3.5 w-3.5" /></Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      <p className="text-xs text-muted-foreground text-center pt-4">
+        Read-only view — accounts page is removed from the public site. Manage inventory via Discord / direct database access.
+      </p>
+    </div>
+  );
+}
