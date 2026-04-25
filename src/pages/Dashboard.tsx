@@ -395,8 +395,10 @@ Message: ${supportForm.message || "(none)"}
               <Card className="p-12 text-center border-dashed">
                 <User2 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
                 <p className="text-lg font-semibold mb-2">No Roblox Accounts Yet</p>
-                <p className="text-muted-foreground mb-6">Purchase an account package to get started</p>
-                <Button onClick={() => navigate("/accounts")}>Browse Account Packages</Button>
+                <p className="text-muted-foreground mb-6">Account packages are now handled manually — contact us on Discord for availability and custom orders.</p>
+                <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
+                  <Button>Contact on Discord</Button>
+                </a>
               </Card>
             ) : (
               <div className="space-y-4">

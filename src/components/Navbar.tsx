@@ -12,7 +12,6 @@ const navLinks = [
   { to: "/keys", label: "Keys" },
   { to: "/executors", label: "Executors" },
   { to: "/premium-keys", label: "Premium" },
-  { to: "/roblox-accounts", label: "Accounts" },
   { to: "/guides", label: "Guides" },
   { to: "/blog", label: "Blog" },
   { to: "/faq", label: "FAQ" },

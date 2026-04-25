@@ -22,7 +22,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
-const RobloxAccounts = lazy(() => import("./pages/RobloxAccounts"));
+
 const PremiumKeys = lazy(() => import("./pages/PremiumKeys"));
 const Oils = lazy(() => import("./pages/Oils"));
 const Login = lazy(() => import("./pages/Login"));
@@ -86,7 +86,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/about" element={<About />} />
-                  <Route path="/roblox-accounts" element={<RobloxAccounts />} />
+                  
                   <Route path="/premium-keys" element={<PremiumKeys />} />
                   <Route path="/oils" element={<Oils />} />
                   <Route path="/blog" element={<Blog />} />

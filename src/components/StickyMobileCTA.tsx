@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingBag, Key, Sparkles } from "lucide-react";
+import { Crown, Key, Sparkles } from "lucide-react";
 
 /**
  * Sticky mobile bottom-bar CTA. Mobile-only (md:hidden), hidden on
@@ -44,10 +44,10 @@ export function StickyMobileCTA() {
           <Key className="h-3.5 w-3.5" /> Keys
         </Link>
         <Link
-          to="/roblox-accounts"
+          to="/premium-keys"
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground border border-border text-xs font-semibold active:scale-95 transition"
         >
-          <ShoppingBag className="h-3.5 w-3.5" /> Accounts
+          <Crown className="h-3.5 w-3.5" /> Premium
         </Link>
       </div>
     </div>
