@@ -1,10 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, Book, Shield, Lightbulb } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Tutorials() {
   return (
     <Layout>
+      <SEOHead
+        title="Lua Scripting Tutorials for Roblox — Combo_WICK Learn Hub"
+        description="Free Lua programming tutorials by Combo_WICK. Learn Roblox scripting from variables and tables to metatables, OOP patterns, and the globals every Roblox script author needs."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Tutorials", url: "/tutorials" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <article className="space-y-8">

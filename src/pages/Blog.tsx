@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, BookOpen } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const blogPosts = [
   {

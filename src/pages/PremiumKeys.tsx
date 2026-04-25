@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
+import { SEOHead } from "@/components/SEOHead";
 
 const tiers = [
   {

@@ -4,12 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Key, Clock, Shield, Zap, Crown, CheckCircle, Play } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Keys() {
   const { t } = useTranslation();
 
   return (
     <Layout>
+      <SEOHead
+        title="Free Roblox Script Key — Combo_WICK Free 11-Hour HWID Key"
+        description="Get your free Combo_WICK key in 2 minutes. The 11-hour HWID-locked key unlocks every free script in the hub. Step-by-step instructions and supported executors."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Free Key", url: "/keys" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
