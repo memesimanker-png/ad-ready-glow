@@ -18,8 +18,8 @@ export default function Index() {
   return (
     <Layout>
       <SEOHead
-        title="Combo_WICK Official — Free Roblox Scripts, Premium Keys & Executors 2026"
-        description="ComboWick is the #1 trusted source for free Roblox scripts, premium keys, executors, and gaming resources. Instant automated delivery, secure PayPal payments, and 24/7 Discord support."
+        title="Combo_WICK Official — Free Roblox Scripts, Premium Keys & Lua Tutorials"
+        description="Combo_WICK (ComboWick / combo_wick) — the official hub for free Roblox Lua scripts, HWID premium keys, executor reviews, anti-cheat guides, and Lua tutorials. Instant PayPal delivery, 24/7 Discord support."
       />
       {/* Hero */}
       <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-end overflow-hidden">

@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, BookOpen } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const blogPosts = [
   {
@@ -129,6 +130,11 @@ const blogPosts = [
 export default function Blog() {
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Blog — Roblox Scripts, Lua Tutorials & Security Guides"
+        description="The Combo_WICK blog: Roblox security guides, Lua scripting walkthroughs, executor reviews, anti-cheat explainers, and update notes. Original content written by the COMBO_WICK team."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Blog", url: "/blog" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

@@ -1,10 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, Server, Code } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function AntiCheatGuide() {
   return (
     <Layout>
+      <SEOHead
+        title="Roblox Anti-Cheat Explained — Combo_WICK Safety Guide"
+        description="How Roblox anti-cheat detects unusual activity, the difference between client and server checks, and concrete steps to protect your account when running scripts."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Anti-Cheat Guide", url: "/anti-cheat-guide" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <article className="space-y-8">

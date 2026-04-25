@@ -1,10 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Shield } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Privacy() {
   return (
     <Layout>
+      <SEOHead
+        title="Privacy Policy — Combo_WICK"
+        description="The Combo_WICK privacy policy. What data we collect, how we use it, third-party processors (PayPal, Supabase, Google), and your GDPR rights."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Privacy", url: "/privacy" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">

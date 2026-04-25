@@ -30,7 +30,6 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
                 { to: "/keys", label: t("Keys") },
                 { to: "/executors", label: t("Executors") },
                 { to: "/premium-keys", label: t("Premium") },
-                { to: "/roblox-accounts", label: t("Accounts") },
               ],
             },
             {

@@ -2,10 +2,16 @@ import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Terms() {
   return (
     <Layout>
+      <SEOHead
+        title="Terms of Service — Combo_WICK"
+        description="Combo_WICK terms of service. User obligations, permitted use of scripts and premium keys, account termination conditions, and dispute resolution."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Terms", url: "/terms" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">

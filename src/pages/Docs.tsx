@@ -1,10 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Key, Clock, RefreshCw, Shield, Code } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Docs() {
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Documentation — HWID Key System & API Reference"
+        description="Technical documentation for the Combo_WICK premium key system: HWID binding, key generation, expiry handling, dashboard activation flow, and partner script-author APIs."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Docs", url: "/docs" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <article className="space-y-8">
