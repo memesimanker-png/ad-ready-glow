@@ -1,10 +1,16 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, BookOpen, Shield, Scale } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function FairUse() {
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Fair Use Policy — Responsible Roblox Scripting"
+        description="The Combo_WICK fair-use policy. What scripts and tools we curate, what we deliberately don't list, and the community standards we ask every user to follow."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Fair Use", url: "/fair-use" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">

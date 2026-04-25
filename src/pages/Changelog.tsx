@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Plus, Zap, Shield, Bug } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const changelog = [
   {
@@ -85,6 +86,11 @@ const badgeMap: Record<string, string> = {
 export default function Changelog() {
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Changelog — Script Updates, Key System & Site Releases"
+        description="Public changelog for Combo_WICK. New script support, executor compatibility updates, premium key system improvements, and site release notes."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Changelog", url: "/changelog" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
           <header className="text-center space-y-4">

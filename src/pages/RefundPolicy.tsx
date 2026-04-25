@@ -3,10 +3,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function RefundPolicy() {
   return (
     <Layout>
+      <SEOHead
+        title="Refund Policy — Combo_WICK Premium Keys"
+        description="Combo_WICK refund policy. Why digital premium keys are non-refundable, the narrow exception for provably defective keys, and how to request a replacement."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Refund Policy", url: "/refund-policy" }]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
