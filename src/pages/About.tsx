@@ -1,18 +1,27 @@
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
-import { Shield, Zap, Award, Heart, Target, Globe, Clock, Users } from "lucide-react";
+import { Shield, Zap, Award, Heart, Target, Globe, Clock, Users, Code, Key } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function About() {
   return (
     <Layout>
+      <SEOHead
+        title="About Combo_WICK — The Story Behind ComboWick Roblox Scripts & Keys"
+        description="Learn how Combo_WICK (ComboWick) became a trusted Roblox community hub for free Lua scripts, premium HWID keys, executor reviews, and Lua programming tutorials."
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "About", url: "/about" },
+        ]}
+      />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="font-heading text-4xl sm:text-5xl font-bold mb-4">
-              About <span className="text-gradient-primary">ComboWick</span>
+              About <span className="text-gradient-primary">Combo_WICK</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A marketplace for premium Roblox accounts and game keys, built by gamers who understand what you need.
+              The community-run hub for Roblox Lua scripts, premium HWID keys, executor reviews, and Lua programming tutorials — built by gamers, for gamers.
             </p>
           </div>
 
@@ -22,10 +31,10 @@ export default function About() {
               <div>
                 <h2 className="font-heading text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  At ComboWick, we're dedicated to providing gamers with instant access to premium Roblox accounts and game keys through a secure, transparent platform. We believe every gamer deserves a hassle-free experience when purchasing digital assets, which is why we've built our service around three core principles: <strong>security, speed, and customer satisfaction</strong>.
+                  Combo_WICK exists to make the Roblox scripting community more accessible. Quality script hubs are scattered, paywalled behind sketchy links, or wrapped in malware. We curate, test, and document scripts in one place — with a transparent free tier and a fair premium tier for the people who want to support the work.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  ComboWick started as a small project to help Roblox developers who needed test accounts for their games. We saw a gap in the market — most sellers were unreliable, slow, or unsafe. So we built something better: a platform with verified accounts, instant automated delivery, and proper PayPal buyer protection on every transaction.
+                  We started as a YouTube channel (<a href="https://www.youtube.com/@COMBO_WICK" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@COMBO_WICK</a>) covering Roblox script reviews and grew into a full hub: scripts, premium HWID keys, executor breakdowns, anti-cheat explainers, and beginner-to-advanced Lua tutorials.
                 </p>
               </div>
             </div>
@@ -34,22 +43,24 @@ export default function About() {
           <Card className="p-8 bg-glass mb-8">
             <h2 className="font-heading text-2xl font-bold mb-4">Who We Are</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              ComboWick is run by a small team of Roblox enthusiasts and web developers. We're active members of the Roblox community ourselves — we play the games, follow the updates, and understand the ecosystem. This firsthand experience shapes how we source, verify, and deliver accounts.
+              The Combo_WICK team is a small group of long-time Roblox players, Lua developers, and content creators. We actively play the games we cover, follow Roblox updates, and personally test the scripts and executors we recommend before they go on the site.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Our blog content is written by our team members who have genuine experience with Roblox development, trading, and the broader gaming ecosystem. We focus on creating guides and resources that actually help players, not just filler content.
+              Every guide, tutorial, and script writeup is written by a team member with hands-on experience — not auto-generated filler. When we recommend an executor, it's because we've used it. When we publish a Lua tutorial, it's the same explanation we'd give a friend learning the language.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              We're based online with team members across different time zones, which is why we can offer round-the-clock support through our Discord server. Whether it's 2 AM or 2 PM, someone from our team is available to help.
+              The team is distributed across multiple time zones, which is why our Discord support is genuinely 24/7. No tickets, no business hours — just real people answering in chat.
             </p>
           </Card>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {[
-              { icon: Shield, title: "Security First", desc: "All transactions are protected by PayPal's buyer protection program. We never store payment information and use industry-standard encryption for all data transfers. Your account credentials are delivered through our secure dashboard, accessible only with your login." },
-              { icon: Zap, title: "Instant Delivery", desc: "Your purchases are delivered immediately after payment confirmation. Our automated system processes orders within seconds, not minutes. No waiting, no delays — just instant access to your digital products." },
-              { icon: Award, title: "Quality Guarantee", desc: "Every Roblox account and game key is verified before listing. Our quality assurance process checks each account for validity, proper email verification, and working credentials. We maintain high standards so you receive exactly what you paid for." },
-              { icon: Heart, title: "Customer Support", desc: "Our support team is available 24/7 on Discord. Whether you need help with your first purchase or have a question about an order, we respond quickly and resolve issues efficiently. Customer satisfaction drives everything we do." },
+              { icon: Code, title: "Curated Script Hub", desc: "Every script in the hub is hand-picked, tested in real game sessions, and tagged by category (auto-farm, ESP, utility, hub). We pull thumbnails directly from Roblox so you always know what game you're looking at." },
+              { icon: Key, title: "HWID-Locked Premium Keys", desc: "Premium keys are bound to your hardware ID at first activation. They can't be shared, leaked, or stolen — only the device that activated the key can use it. Keys are generated and delivered the moment PayPal confirms payment." },
+              { icon: Shield, title: "Security First", desc: "Payments run through PayPal's buyer-protection infrastructure. We never store card data. Sessions are SSL-encrypted, role-based access (admin/moderator/user) is enforced server-side, and all credentials live behind your account login." },
+              { icon: Zap, title: "Instant Delivery", desc: "Premium keys are generated by our edge functions in under 2 seconds after PayPal posts a successful capture. No tickets, no manual review, no waiting on a human." },
+              { icon: Award, title: "Quality Control", desc: "Scripts are re-tested whenever a game updates, and broken scripts are flagged or removed. Executor recommendations are kept current — we update reviews when UNC scores or features change." },
+              { icon: Heart, title: "Discord-First Support", desc: "Our Discord (50k+ members) is where the community lives. Real-time help with key activation, executor setup, script issues — usually answered in minutes, not hours." },
             ].map(({ icon: Icon, title, desc }) => (
               <Card key={title} className="p-6 bg-glass">
                 <div className="flex items-start gap-4">
@@ -66,18 +77,18 @@ export default function About() {
           </div>
 
           <Card className="p-8 bg-glass mb-8">
-            <h2 className="font-heading text-2xl font-bold mb-6">Why Choose ComboWick?</h2>
+            <h2 className="font-heading text-2xl font-bold mb-6">Why People Choose Combo_WICK</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                In a marketplace filled with unreliable sellers and scam websites, we aim to stand out through transparency and reliability. Here's what sets us apart:
+                The Roblox script-hub space is full of bait sites: malware-laced loaders, pay-walled pirated scripts, and key systems that never deliver. Here's how Combo_WICK is different:
               </p>
               <ul className="space-y-3">
                 {[
-                  { bold: "Transparent Pricing", text: "No hidden fees or surprise charges. The price displayed is exactly what you pay. Our bulk discounts are clearly shown so you can make informed decisions." },
-                  { bold: "Verified Products", text: "Every account is tested and verified before listing. We don't sell in bulk without checking — each credential is confirmed working." },
-                  { bold: "Secure Platform", text: "Built with modern web technologies and enterprise-grade security. Your data is protected with SSL encryption and secure authentication." },
-                  { bold: "Mobile Optimized", text: "Shop seamlessly from any device. Our fully responsive design ensures a smooth experience whether you're on desktop, tablet, or phone." },
-                  { bold: "Active Discord Community", text: "Join our Discord server to get support, share feedback, and connect with other customers. We're transparent and accessible." },
+                  { bold: "Transparent Pricing", text: "$5 / 3-day trial, $9.99 / month (~$0.33/day, our best value), $49.99 / lifetime. The price you see is the price you pay — no hidden renewals, no upsells at checkout." },
+                  { bold: "Real Free Tier", text: "Most scripts on the hub are free with a short 11-hour HWID key earned through a quick verification step. You don't have to pay to use Combo_WICK." },
+                  { bold: "Original Written Content", text: "Tutorials, anti-cheat guides, executor reviews, and Lua walkthroughs are written from scratch by our team — never scraped, never AI-spam." },
+                  { bold: "Multi-Language", text: "The site auto-translates into 10 languages (English, Spanish, French, German, Portuguese, Russian, Chinese, Japanese, Korean, Arabic) including full RTL support for Arabic readers." },
+                  { bold: "Active Roadmap", text: "Public changelog, weekly script updates, and a Discord channel dedicated to user requests for new game support." },
                 ].map((item) => (
                   <li key={item.bold} className="flex items-start gap-2">
                     <span className="text-primary mt-1">•</span>
@@ -89,25 +100,24 @@ export default function About() {
           </Card>
 
           <Card className="p-8 bg-glass mb-8">
-            <h2 className="font-heading text-2xl font-bold mb-4">Our Commitment to Safety</h2>
+            <h2 className="font-heading text-2xl font-bold mb-4">Fair Use &amp; Responsibility</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Account security is paramount in the digital marketplace. We implement multiple layers of protection to ensure every transaction is safe and every customer is protected:
+              Combo_WICK publishes scripts and tools intended for educational use, personal-account testing, and Roblox development research. We strongly encourage users to read our <a href="/fair-use" className="text-primary hover:underline">Fair Use Policy</a> and respect the Terms of Service of every game and platform involved.
             </p>
             <ul className="space-y-2 text-muted-foreground">
-              <li>• All accounts are verified authentic before listing on our platform</li>
-              <li>• Secure payment processing exclusively through PayPal's trusted infrastructure</li>
-              <li>• Encrypted data transmission with HTTPS on every page</li>
-              <li>• Regular security audits and platform updates</li>
-              <li>• Full compliance with data protection regulations including GDPR</li>
-              <li>• Automated fraud detection to protect both buyers and sellers</li>
+              <li>• Use scripts on alt accounts and private servers — not on competitive accounts you can't afford to lose.</li>
+              <li>• Read our <a href="/anti-cheat-guide" className="text-primary hover:underline">Anti-Cheat Guide</a> before running anything in a game with active anti-cheat.</li>
+              <li>• Credentials and keys are encrypted in transit (HTTPS everywhere) and HWID-bound where applicable.</li>
+              <li>• Full GDPR compliance — see our <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a> for what we collect and why.</li>
+              <li>• Independent security review of edge functions and RLS policies before each release.</li>
             </ul>
           </Card>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { icon: Users, label: "Discord Members", value: "50k+" },
-              { icon: Globe, label: "Worldwide", value: "Global" },
-              { icon: Clock, label: "Delivery", value: "Instant" },
+              { icon: Globe, label: "Languages", value: "10" },
+              { icon: Clock, label: "Key Delivery", value: "Instant" },
               { icon: Award, label: "Support", value: "24/7" },
             ].map(({ icon: Icon, label, value }) => (
               <Card key={label} className="p-4 bg-glass text-center">
