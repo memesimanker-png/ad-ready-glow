@@ -116,6 +116,11 @@ export default function PremiumKeys() {
 
   return (
     <Layout>
+      <SEOHead
+        title="Combo_WICK Premium Keys — 3-Day Trial $5, Monthly $9.99, Lifetime $49.99"
+        description="Buy a Combo_WICK premium HWID key. 3-day trial $5, monthly $9.99 (best value at $0.33/day), lifetime $49.99. Instant PayPal delivery, HWID-locked, full premium script access."
+        breadcrumbs={[{ name: "Home", url: "/" }, { name: "Premium Keys", url: "/premium-keys" }]}
+      />
       {/* Hero */}
       <section className="relative py-16 sm:py-20 overflow-hidden">
         <VideoBackground overlay />
