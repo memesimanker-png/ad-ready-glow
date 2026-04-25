@@ -68,7 +68,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
   const [isPageVisible, setIsPageVisible] = useState(() =>
     typeof document === "undefined" ? true : !document.hidden
   );
-  const [current, setCurrent] = useState(() => getTimedIndex());
+  const [current, setCurrent] = useState(0);
 
   const resolveLoadedIndex = useCallback((target: number, flags: boolean[]) => {
     if (!flags.some(Boolean)) return target;
@@ -81,11 +81,6 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
 
     return target;
   }, []);
-
-  const visibleIndex = useMemo(
-    () => resolveLoadedIndex(prefersReducedMotion ? 0 : getTimedIndex(), loaded),
-    [loaded, prefersReducedMotion, resolveLoadedIndex]
-  );
 
   useEffect(() => {
     let cancelled = false;
@@ -123,19 +118,26 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
     });
   }, []);
 
+  // Drive the slideshow off a real timer that ticks every SLIDE_INTERVAL.
+  // Previously we relied on a useMemo over Date.now() which never recomputed
+  // unless `loaded` changed -- on desktop where all images load instantly,
+  // that meant the slideshow froze on the first frame.
   useEffect(() => {
-    setCurrent(visibleIndex);
-  }, [visibleIndex]);
+    if (prefersReducedMotion) {
+      setCurrent((prev) => resolveLoadedIndex(0, loaded) || prev);
+      return;
+    }
 
-  useEffect(() => {
-    if (prefersReducedMotion || !isPageVisible) return;
+    let index = 0;
+    setCurrent(resolveLoadedIndex(index, loaded));
 
-    const update = () => {
-      setCurrent(resolveLoadedIndex(getTimedIndex(), loaded));
-    };
+    if (!isPageVisible) return;
 
-    update();
-    const id = window.setInterval(update, 1000);
+    const id = window.setInterval(() => {
+      index = (index + 1) % images.length;
+      setCurrent(resolveLoadedIndex(index, loaded));
+    }, SLIDE_INTERVAL);
+
     return () => window.clearInterval(id);
   }, [isPageVisible, loaded, prefersReducedMotion, resolveLoadedIndex]);
 
