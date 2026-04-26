@@ -145,6 +145,7 @@ export const EN_TEXTS: Record<string, string> = {
   "Premium Features": "Premium Features",
   "prem_hero_desc": "Skip all verification steps and get instant access to premium keys with extended validity, priority support, and exclusive features.",
   "7-Day Trial": "3-Day Trial",
+  "3-Day Trial": "3-Day Trial",
   "Monthly Access": "Monthly Access",
   "Lifetime Key": "Lifetime Key",
   "Custom Script Request": "Custom Script Request",

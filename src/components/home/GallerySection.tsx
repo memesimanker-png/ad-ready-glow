@@ -1,18 +1,56 @@
+import { useEffect, useMemo, useState } from "react";
 import gallery1 from "@/assets/gallery-1.webp";
 import gallery2 from "@/assets/gallery-2.webp";
 import gallery3 from "@/assets/gallery-3.webp";
 import gallery4 from "@/assets/gallery-4.webp";
+import gallery5 from "@/assets/gallery-5.webp";
+import gallery6 from "@/assets/gallery-6.webp";
 import gallery7 from "@/assets/gallery-7.webp";
+import gallery8 from "@/assets/gallery-8.webp";
 
-const images = [
+const allImages = [
   { src: gallery1, alt: "Combo_WICK character with swords" },
   { src: gallery2, alt: "Combo_WICK in a car" },
   { src: gallery3, alt: "Combo_WICK mirror selfie" },
   { src: gallery4, alt: "Combo_WICK with cows" },
+  { src: gallery5, alt: "Combo_WICK action shot" },
+  { src: gallery6, alt: "Combo_WICK signature pose" },
   { src: gallery7, alt: "Combo_WICK drip" },
+  { src: gallery8, alt: "Combo_WICK featured shot" },
 ];
 
+const STORAGE_KEY = "cw-gallery-rotation-index";
+const VISIBLE_COUNT = 6;
+
+function isDesktop() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(min-width: 768px)").matches;
+}
+
 export function GallerySection() {
+  const [startIndex, setStartIndex] = useState(0);
+
+  useEffect(() => {
+    // On desktop, rotate which image leads the gallery on every revisit.
+    if (!isDesktop()) {
+      setStartIndex(0);
+      return;
+    }
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const last = raw ? Number.parseInt(raw, 10) : -1;
+    const next = Number.isFinite(last) ? (last + 1) % allImages.length : 0;
+    setStartIndex(next);
+    localStorage.setItem(STORAGE_KEY, String(next));
+  }, []);
+
+  const images = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < VISIBLE_COUNT; i++) {
+      out.push(allImages[(startIndex + i) % allImages.length]);
+    }
+    return out;
+  }, [startIndex]);
+
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
