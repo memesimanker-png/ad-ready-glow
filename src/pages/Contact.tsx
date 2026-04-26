@@ -1,15 +1,51 @@
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, MessageSquare, Clock, MapPin, Youtube } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { MessageSquare, Clock, Youtube, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
+  const { toast } = useToast();
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
+      toast({ title: "Missing fields", description: "Please fill out every field.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    const { data: userData } = await supabase.auth.getUser();
+    const { error } = await supabase.from("contact_messages").insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      subject: form.subject.trim(),
+      message: form.message.trim(),
+      user_id: userData?.user?.id ?? null,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast({ title: "Couldn't send", description: error.message, variant: "destructive" });
+      return;
+    }
+    setSent(true);
+    setForm({ name: "", email: "", subject: "", message: "" });
+    toast({ title: "Message sent!", description: "We'll reply on Discord or via email shortly." });
+  };
+
   return (
     <Layout>
       <SEOHead
-        title="Contact Combo_WICK — Discord, YouTube & Email Support | ComboWick"
-        description="Get in touch with the Combo_WICK team. Real-time Discord support, YouTube channel @COMBO_WICK, and email contact for premium key activation, scripts, and Lua tutorial questions."
+        title="Contact Combo_WICK — Discord Support, YouTube & Direct Message Form | ComboWick"
+        description="Reach the Combo_WICK team. Real-time Discord support, YouTube channel @COMBO_WICK, or send a direct message via our contact form for premium key activation, scripts, and Lua tutorial questions."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Contact", url: "/contact" },
@@ -26,31 +62,74 @@ export default function Contact() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
-              { icon: MessageSquare, title: "Discord Community (Fastest)", desc: "Our 50k+ Discord server is the fastest way to get help. Real-time answers from the team and the community — typically replied to within minutes, not hours.", contact: "Join the Combo_WICK Discord", href: "https://discord.com/invite/ufrz9Zaqs8" },
-              { icon: Youtube, title: "YouTube — @COMBO_WICK", desc: "The official Combo_WICK YouTube channel. Script reviews, tutorials, executor showcases, and weekly updates. Comment on a video for slower public Q&A.", contact: "youtube.com/@COMBO_WICK", href: "https://www.youtube.com/@COMBO_WICK" },
-              { icon: Mail, title: "Email Support", desc: "For formal requests, business inquiries, refund disputes covered by our policy, or anything you'd rather not handle in chat. Replied to within 24 hours on weekdays.", contact: "support@combowick.com", href: "mailto:support@combowick.com" },
-              { icon: Clock, title: "Response Times", desc: "Discord: usually under 30 minutes during peak hours, under a few hours overnight. Email: within 24 hours on business days. Premium key activation issues are always prioritized.", contact: null, href: null },
+              { icon: MessageSquare, title: "Discord (Fastest)", desc: "Our 50k+ Discord server replies within minutes during peak hours.", contact: "Join the Discord", href: "https://discord.com/invite/ufrz9Zaqs8" },
+              { icon: Youtube, title: "YouTube — @COMBO_WICK", desc: "Script reviews, tutorials, executor showcases, and weekly updates.", contact: "youtube.com/@COMBO_WICK", href: "https://www.youtube.com/@COMBO_WICK" },
+              { icon: Clock, title: "Response Times", desc: "Discord under 30 min during peak hours. Form messages within 24h on weekdays. Premium key activation is always prioritized.", contact: null, href: null },
             ].map(({ icon: Icon, title, desc, contact, href }) => (
               <Card key={title} className="p-6 bg-glass">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 flex-shrink-0">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading text-lg font-semibold mb-2">{title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{desc}</p>
-                    {contact && href && (
-                      <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="text-primary hover:underline text-sm font-medium">
-                        {contact}
-                      </a>
-                    )}
-                  </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
+                  <Icon className="h-6 w-6 text-primary" />
                 </div>
+                <h3 className="font-heading text-lg font-semibold mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{desc}</p>
+                {contact && href && (
+                  <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="text-primary hover:underline text-sm font-medium">
+                    {contact}
+                  </a>
+                )}
               </Card>
             ))}
           </div>
+
+          {/* Direct message form — saves to admin dashboard */}
+          <Card className="p-6 sm:p-8 bg-glass-strong mb-12">
+            <h2 className="font-heading text-2xl font-bold mb-2">Send Us a Direct Message</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Prefer not to use Discord? Drop a message here — it lands directly in our admin inbox and we'll get back to you.
+            </p>
+            {sent ? (
+              <div className="flex items-start gap-3 p-4 rounded-lg border border-success/30 bg-success/10">
+                <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-foreground">Message received</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Thanks! We've logged your message. Expect a reply within 24h on weekdays — or hop into Discord for instant help.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-3" onClick={() => setSent(false)}>
+                    Send another
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Your Name</Label>
+                    <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Doe" maxLength={80} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" maxLength={120} required />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="subject">Subject</Label>
+                  <Input id="subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="e.g. Premium key not activating" maxLength={120} required />
+                </div>
+                <div>
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea id="message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell us what's going on…" rows={6} maxLength={4000} required />
+                  <p className="text-xs text-muted-foreground mt-1">{form.message.length}/4000</p>
+                </div>
+                <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
+                  {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                  Send Message
+                </Button>
+              </form>
+            )}
+          </Card>
 
           <Card className="p-8 bg-glass mb-8">
             <h2 className="font-heading text-2xl font-bold mb-6">Frequently Asked Support Questions</h2>
