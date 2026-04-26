@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -62,6 +62,7 @@ export default function Admin() {
             <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>
             <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>
             <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>
+            <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>
             <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>
           </TabsList>
 
@@ -69,6 +70,7 @@ export default function Admin() {
           <TabsContent value="orders"><OrdersTab /></TabsContent>
           <TabsContent value="generate"><GenerateKeyTab /></TabsContent>
           <TabsContent value="accounts"><AccountsTab /></TabsContent>
+          <TabsContent value="messages"><MessagesTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
         </Tabs>
       </main>
@@ -584,6 +586,125 @@ function AccountsTab() {
       <p className="text-xs text-muted-foreground text-center pt-4">
         Read-only view — accounts page is removed from the public site. Manage inventory via Discord / direct database access.
       </p>
+    </div>
+  );
+}
+
+/* ─── Messages Tab (Contact form inbox) ─── */
+function MessagesTab() {
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "new" | "read" | "archived">("all");
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("contact_messages")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    setLoading(false);
+    if (error) {
+      toast({ title: "Failed to load", description: error.message, variant: "destructive" });
+      return;
+    }
+    setMessages(data ?? []);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const setStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("contact_messages").update({ status }).eq("id", id);
+    if (error) {
+      toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this message permanently?")) return;
+    const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setMessages(prev => prev.filter(m => m.id !== id));
+    toast({ title: "Deleted" });
+  };
+
+  const filtered = filter === "all" ? messages : messages.filter(m => m.status === filter);
+  const counts = {
+    all: messages.length,
+    new: messages.filter(m => m.status === "new").length,
+    read: messages.filter(m => m.status === "read").length,
+    archived: messages.filter(m => m.status === "archived").length,
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h2 className="text-lg font-semibold">Contact Form Inbox</h2>
+        <div className="flex gap-2 text-xs">
+          {(["all", "new", "read", "archived"] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-md transition-colors ${filter === f ? "bg-primary text-primary-foreground" : "bg-secondary/60 text-muted-foreground hover:text-foreground"}`}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)} ({counts[f]})
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card className="p-8 text-center text-sm text-muted-foreground">No messages in this view.</Card>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(m => (
+            <Card key={m.id} className={`p-4 ${m.status === "new" ? "border-primary/40" : ""}`}>
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <h3 className="font-semibold">{m.subject}</h3>
+                    {m.status === "new" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary uppercase tracking-wider">New</span>}
+                    {m.status === "archived" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">Archived</span>}
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    From <strong className="text-foreground">{m.name}</strong> &lt;{m.email}&gt; •{" "}
+                    {new Date(m.created_at).toLocaleString()}
+                  </p>
+                  <p className="text-sm whitespace-pre-wrap break-words text-foreground/90">{m.message}</p>
+                </div>
+                <div className="flex flex-col gap-1.5 flex-shrink-0">
+                  <Button size="sm" variant="outline" onClick={() => window.open(`mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.subject)}`, "_blank")}>
+                    <Mail className="h-3.5 w-3.5 mr-1" /> Reply
+                  </Button>
+                  {m.status !== "read" && (
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")}>
+                      <MailOpen className="h-3.5 w-3.5 mr-1" /> Mark read
+                    </Button>
+                  )}
+                  {m.status !== "archived" && (
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")}>
+                      <MailX className="h-3.5 w-3.5 mr-1" /> Archive
+                    </Button>
+                  )}
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)}>
+                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
