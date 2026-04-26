@@ -16,7 +16,7 @@ import { SEOHead } from "@/components/SEOHead";
 const tiers = [
   {
     id: "trial-7day",
-    nameKey: "7-Day Trial",
+    nameKey: "3-Day Trial",
     price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
