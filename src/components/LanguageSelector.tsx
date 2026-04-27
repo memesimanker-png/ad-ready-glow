@@ -33,16 +33,7 @@ export function LanguageSelector({ dropUp = false, inline = false }: LanguageSel
   return (
     <div className="relative" ref={ref} data-no-translate>
       <div className="relative rounded-lg lang-glow-wrap">
-        <svg className="lang-glow-svg" preserveAspectRatio="none" aria-hidden>
-          <defs>
-            <linearGradient id="langGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(280, 95%, 70%)" stopOpacity="0" />
-              <stop offset="50%" stopColor="hsl(250, 100%, 85%)" stopOpacity="1" />
-              <stop offset="100%" stopColor="hsl(280, 95%, 70%)" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <rect x="1" y="1" width="100%" height="100%" rx="7" ry="7" style={{ width: "calc(100% - 2px)", height: "calc(100% - 2px)" }} />
-        </svg>
+        <span aria-hidden className="lang-glow-ring" />
         <button
           onClick={() => setOpen(!open)}
           className="relative z-[2] flex items-center gap-2 px-3 py-2 rounded-[7px] text-sm font-medium text-muted-foreground hover:text-foreground bg-transparent transition-all"
