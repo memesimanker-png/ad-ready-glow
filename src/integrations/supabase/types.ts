@@ -16,37 +16,46 @@ export type Database = {
     Tables: {
       contact_messages: {
         Row: {
+          admin_reply: string | null
           created_at: string
           email: string
           id: string
           message: string
           name: string
+          replied_at: string | null
+          replied_by: string | null
           status: string
           subject: string
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
+          admin_reply?: string | null
           created_at?: string
           email: string
           id?: string
           message: string
           name: string
+          replied_at?: string | null
+          replied_by?: string | null
           status?: string
           subject: string
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
+          admin_reply?: string | null
           created_at?: string
           email?: string
           id?: string
           message?: string
           name?: string
+          replied_at?: string | null
+          replied_by?: string | null
           status?: string
           subject?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -301,6 +310,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_contact_rate_limit: { Args: { _user_id: string }; Returns: boolean }
       claim_accounts_for_purchase: {
         Args: {
           _package_size: number
