@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,16 @@ type RobloxAccount = {
   password: string;
   package_size: number;
   claimed_at: string;
+};
+
+type ContactMessage = {
+  id: string;
+  subject: string;
+  message: string;
+  status: string;
+  admin_reply: string | null;
+  replied_at: string | null;
+  created_at: string;
 };
 
 const tierNames: Record<string, string> = {
@@ -72,7 +82,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
   const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
-  const [tab, setTab] = useState<"keys" | "accounts">("keys");
+  const [tab, setTab] = useState<"keys" | "accounts" | "messages">("keys");
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
@@ -97,9 +108,10 @@ export default function Dashboard() {
             .eq("user_id", data.user.id)
             .order("created_at", { ascending: false });
 
-      const [keysRes, accountsRes] = await Promise.all([
+      const [keysRes, accountsRes, messagesRes] = await Promise.all([
         keysQuery,
         supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
+        supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
       ]);
 
       // Dedupe by id in case a row matches both filters
@@ -109,6 +121,7 @@ export default function Dashboard() {
 
       setKeys(uniqKeys);
       setAccounts((accountsRes.data as RobloxAccount[]) || []);
+      setMessages((messagesRes.data as ContactMessage[]) || []);
       setLoading(false);
     });
   }, []);
@@ -325,7 +338,7 @@ Message: ${supportForm.message || "(none)"}
           )}
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-border">
+          <div className="flex gap-2 mb-6 border-b border-border flex-wrap">
             <button
               onClick={() => setTab("keys")}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "keys" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
@@ -337,6 +350,15 @@ Message: ${supportForm.message || "(none)"}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "accounts" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
               <User2 className="h-4 w-4" /> Roblox Accounts ({accounts.length})
+            </button>
+            <button
+              onClick={() => setTab("messages")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "messages" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              <MessageSquare className="h-4 w-4" /> Messages ({messages.length})
+              {messages.some(m => m.admin_reply && m.status === "new") && (
+                <span className="ml-1 inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
+              )}
             </button>
           </div>
 
@@ -442,6 +464,45 @@ Message: ${supportForm.message || "(none)"}
                     );
                   })}
                 </div>
+              </div>
+            )
+          )}
+
+          {tab === "messages" && (
+            messages.length === 0 ? (
+              <Card className="p-12 text-center border-dashed">
+                <MessageSquare className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg font-semibold mb-2">No Messages Yet</p>
+                <p className="text-muted-foreground mb-6">Send us a message from the contact page — replies will appear here.</p>
+                <Button onClick={() => navigate("/contact")}>Go to Contact</Button>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((m) => (
+                  <Card key={m.id} className={`p-5 ${m.admin_reply ? "border-success/30" : "border-border"}`}>
+                    <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
+                      <h3 className="font-semibold">{m.subject}</h3>
+                      {m.admin_reply ? (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-success/20 text-success uppercase tracking-wider">Replied</span>
+                      ) : (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">Awaiting reply</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">Sent {new Date(m.created_at).toLocaleString()}</p>
+                    <div className="rounded-lg bg-background/50 border border-border/50 p-3 mb-3">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Your message</p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{m.message}</p>
+                    </div>
+                    {m.admin_reply && (
+                      <div className="rounded-lg bg-success/5 border border-success/30 p-3">
+                        <p className="text-[10px] uppercase tracking-wider text-success mb-1">
+                          Combo_WICK team • {m.replied_at ? new Date(m.replied_at).toLocaleString() : ""}
+                        </p>
+                        <p className="text-sm whitespace-pre-wrap break-words">{m.admin_reply}</p>
+                      </div>
+                    )}
+                  </Card>
+                ))}
               </div>
             )
           )}

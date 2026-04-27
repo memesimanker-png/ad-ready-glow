@@ -4,48 +4,71 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MessageSquare, Clock, Youtube, Send, Loader2, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Clock, Youtube, Send, Loader2, CheckCircle2, LogIn, ShieldAlert } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link, useNavigate } from "react-router-dom";
+
+type AuthState = { loading: boolean; user: { id: string; email?: string | null } | null };
 
 export default function Contact() {
   const { toast } = useToast();
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const navigate = useNavigate();
+  const [auth, setAuth] = useState<AuthState>({ loading: true, user: null });
+  const [form, setForm] = useState({ subject: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
+  useEffect(() => {
+    let mounted = true;
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!mounted) return;
+      setAuth({ loading: false, user: session?.user ? { id: session.user.id, email: session.user.email } : null });
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setAuth({ loading: false, user: data.session?.user ? { id: data.session.user.id, email: data.session.user.email } : null });
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
-      toast({ title: "Missing fields", description: "Please fill out every field.", variant: "destructive" });
+    if (!auth.user) return;
+    if (!form.subject.trim() || !form.message.trim()) {
+      toast({ title: "Missing fields", description: "Please fill out subject and message.", variant: "destructive" });
       return;
     }
     setSubmitting(true);
-    const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.from("contact_messages").insert({
-      name: form.name.trim(),
-      email: form.email.trim(),
+      name: auth.user.email?.split("@")[0] ?? "User",
+      email: auth.user.email ?? "",
       subject: form.subject.trim(),
       message: form.message.trim(),
-      user_id: userData?.user?.id ?? null,
+      user_id: auth.user.id,
     });
     setSubmitting(false);
     if (error) {
+      // Rate-limit policy violation surfaces as a generic RLS error
+      if (error.message.includes("row-level security") || error.code === "42501") {
+        toast({ title: "Slow down", description: "You can send up to 3 messages per hour. Try again later or hop into Discord for instant help.", variant: "destructive" });
+        return;
+      }
       toast({ title: "Couldn't send", description: error.message, variant: "destructive" });
       return;
     }
     setSent(true);
-    setForm({ name: "", email: "", subject: "", message: "" });
-    toast({ title: "Message sent!", description: "We'll reply on Discord or via email shortly." });
+    setForm({ subject: "", message: "" });
+    toast({ title: "Message sent!", description: "Track replies in your dashboard." });
   };
 
   return (
     <Layout>
       <SEOHead
         title="Contact Combo_WICK — Discord Support, YouTube & Direct Message Form | ComboWick"
-        description="Reach the Combo_WICK team. Real-time Discord support, YouTube channel @COMBO_WICK, or send a direct message via our contact form for premium key activation, scripts, and Lua tutorial questions."
+        description="Reach the Combo_WICK team. Real-time Discord support, YouTube channel @COMBO_WICK, or send a tracked message via your account dashboard for premium key activation, scripts, and Lua tutorial questions."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Contact", url: "/contact" },
@@ -66,7 +89,7 @@ export default function Contact() {
             {[
               { icon: MessageSquare, title: "Discord (Fastest)", desc: "Our 50k+ Discord server replies within minutes during peak hours.", contact: "Join the Discord", href: "https://discord.com/invite/ufrz9Zaqs8" },
               { icon: Youtube, title: "YouTube — @COMBO_WICK", desc: "Script reviews, tutorials, executor showcases, and weekly updates.", contact: "youtube.com/@COMBO_WICK", href: "https://www.youtube.com/@COMBO_WICK" },
-              { icon: Clock, title: "Response Times", desc: "Discord under 30 min during peak hours. Form messages within 24h on weekdays. Premium key activation is always prioritized.", contact: null, href: null },
+              { icon: Clock, title: "Response Times", desc: "Discord under 30 min during peak hours. Tracked messages within 24h on weekdays. Premium key activation is always prioritized.", contact: null, href: null },
             ].map(({ icon: Icon, title, desc, contact, href }) => (
               <Card key={title} className="p-6 bg-glass">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
@@ -83,19 +106,39 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* Direct message form — saves to admin dashboard */}
+          {/* Direct message form — requires login, replies appear in the user's dashboard */}
           <Card className="p-6 sm:p-8 bg-glass-strong mb-12">
-            <h2 className="font-heading text-2xl font-bold mb-2">Send Us a Direct Message</h2>
+            <h2 className="font-heading text-2xl font-bold mb-2">Send Us a Tracked Message</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Prefer not to use Discord? Drop a message here — it lands directly in our admin inbox and we'll get back to you.
+              Sign in to send a message — replies from our team show up in your dashboard so you never miss one. (Limit: 3 messages per hour.)
             </p>
-            {sent ? (
+
+            {auth.loading ? (
+              <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+            ) : !auth.user ? (
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 text-center">
+                <ShieldAlert className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-heading text-lg font-semibold mb-1">Sign in to send a message</h3>
+                <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
+                  Tying messages to your account lets us reply privately and track the conversation in your dashboard. It's free and takes 30 seconds.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={() => navigate("/login?redirect=/contact")}>
+                    <LogIn className="h-4 w-4 mr-2" /> Log in
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/signup?redirect=/contact")}>Create account</Button>
+                  <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost">Or use Discord →</Button>
+                  </a>
+                </div>
+              </div>
+            ) : sent ? (
               <div className="flex items-start gap-3 p-4 rounded-lg border border-success/30 bg-success/10">
                 <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-foreground">Message received</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Thanks! We've logged your message. Expect a reply within 24h on weekdays — or hop into Discord for instant help.
+                    Thanks! Replies will appear in your <Link to="/dashboard" className="text-primary underline">dashboard</Link>. Expect a response within 24h on weekdays.
                   </p>
                   <Button variant="outline" size="sm" className="mt-3" onClick={() => setSent(false)}>
                     Send another
@@ -104,15 +147,8 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Your Name</Label>
-                    <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Doe" maxLength={80} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" maxLength={120} required />
-                  </div>
+                <div className="text-xs text-muted-foreground">
+                  Sending as <strong className="text-foreground">{auth.user.email}</strong>
                 </div>
                 <div>
                   <Label htmlFor="subject">Subject</Label>
@@ -141,7 +177,7 @@ export default function Contact() {
                 { q: "Can I get a refund?", a: "Premium keys are digital products with instant delivery, so all sales are final. The exception is a key that is provably defective on our side — in that case we replace it. Read the full policy on our Refund Policy page before purchasing." },
                 { q: "A script stopped working after a Roblox update.", a: "Roblox updates frequently break scripts. Report the broken script in #script-issues on Discord — most fixes go out within 24–72 hours. Many script authors also release patches that we mirror to the hub automatically." },
                 { q: "Which executor should I use with Combo_WICK scripts?", a: "Check the Executors page for our up-to-date recommendations. Compatibility depends on your platform (Windows, macOS, mobile) and how recent your Roblox client is. The page lists UNC scores and recent test dates for each executor." },
-                { q: "Do I need to make an account to use the site?", a: "Browsing scripts and reading guides is fully open. You only need an account to save purchase history, manage HWID-bound keys, and use the dashboard. Account creation is free and takes 30 seconds." },
+                { q: "Do I need to make an account to use the site?", a: "Browsing scripts and reading guides is fully open. You only need an account to save purchase history, manage HWID-bound keys, send tracked support messages, and use the dashboard. Account creation is free and takes 30 seconds." },
               ].map(({ q, a }) => (
                 <div key={q}>
                   <h3 className="font-heading text-base font-semibold mb-2">{q}</h3>
