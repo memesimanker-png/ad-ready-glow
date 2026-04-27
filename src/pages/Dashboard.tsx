@@ -108,9 +108,10 @@ export default function Dashboard() {
             .eq("user_id", data.user.id)
             .order("created_at", { ascending: false });
 
-      const [keysRes, accountsRes] = await Promise.all([
+      const [keysRes, accountsRes, messagesRes] = await Promise.all([
         keysQuery,
         supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
+        supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
       ]);
 
       // Dedupe by id in case a row matches both filters
@@ -120,6 +121,7 @@ export default function Dashboard() {
 
       setKeys(uniqKeys);
       setAccounts((accountsRes.data as RobloxAccount[]) || []);
+      setMessages((messagesRes.data as ContactMessage[]) || []);
       setLoading(false);
     });
   }, []);
@@ -336,7 +338,7 @@ Message: ${supportForm.message || "(none)"}
           )}
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-border">
+          <div className="flex gap-2 mb-6 border-b border-border flex-wrap">
             <button
               onClick={() => setTab("keys")}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "keys" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
@@ -348,6 +350,15 @@ Message: ${supportForm.message || "(none)"}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "accounts" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
               <User2 className="h-4 w-4" /> Roblox Accounts ({accounts.length})
+            </button>
+            <button
+              onClick={() => setTab("messages")}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "messages" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              <MessageSquare className="h-4 w-4" /> Messages ({messages.length})
+              {messages.some(m => m.admin_reply && m.status === "new") && (
+                <span className="ml-1 inline-block h-2 w-2 rounded-full bg-primary animate-pulse" />
+              )}
             </button>
           </div>
 
