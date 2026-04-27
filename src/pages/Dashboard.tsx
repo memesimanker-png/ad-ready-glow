@@ -467,6 +467,45 @@ Message: ${supportForm.message || "(none)"}
               </div>
             )
           )}
+
+          {tab === "messages" && (
+            messages.length === 0 ? (
+              <Card className="p-12 text-center border-dashed">
+                <MessageSquare className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg font-semibold mb-2">No Messages Yet</p>
+                <p className="text-muted-foreground mb-6">Send us a message from the contact page — replies will appear here.</p>
+                <Button onClick={() => navigate("/contact")}>Go to Contact</Button>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((m) => (
+                  <Card key={m.id} className={`p-5 ${m.admin_reply ? "border-success/30" : "border-border"}`}>
+                    <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
+                      <h3 className="font-semibold">{m.subject}</h3>
+                      {m.admin_reply ? (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-success/20 text-success uppercase tracking-wider">Replied</span>
+                      ) : (
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">Awaiting reply</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">Sent {new Date(m.created_at).toLocaleString()}</p>
+                    <div className="rounded-lg bg-background/50 border border-border/50 p-3 mb-3">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Your message</p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{m.message}</p>
+                    </div>
+                    {m.admin_reply && (
+                      <div className="rounded-lg bg-success/5 border border-success/30 p-3">
+                        <p className="text-[10px] uppercase tracking-wider text-success mb-1">
+                          Combo_WICK team • {m.replied_at ? new Date(m.replied_at).toLocaleString() : ""}
+                        </p>
+                        <p className="text-sm whitespace-pre-wrap break-words">{m.admin_reply}</p>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            )
+          )}
         </div>
       </section>
     </Layout>
