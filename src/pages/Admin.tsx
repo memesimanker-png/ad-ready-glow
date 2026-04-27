@@ -596,6 +596,8 @@ function MessagesTab() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "new" | "read" | "archived">("all");
+  const [replyDraft, setReplyDraft] = useState<Record<string, string>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -621,6 +623,30 @@ function MessagesTab() {
       return;
     }
     setMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
+  };
+
+  const sendReply = async (id: string) => {
+    const text = (replyDraft[id] ?? "").trim();
+    if (!text) {
+      toast({ title: "Empty reply", description: "Type a reply first.", variant: "destructive" });
+      return;
+    }
+    setSavingId(id);
+    const { data: userData } = await supabase.auth.getUser();
+    const { error } = await supabase.from("contact_messages").update({
+      admin_reply: text,
+      replied_at: new Date().toISOString(),
+      replied_by: userData?.user?.id ?? null,
+      status: "read",
+    }).eq("id", id);
+    setSavingId(null);
+    if (error) {
+      toast({ title: "Reply failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, admin_reply: text, replied_at: new Date().toISOString(), status: "read" } : m));
+    setReplyDraft(prev => { const { [id]: _, ...rest } = prev; return rest; });
+    toast({ title: "Reply saved", description: "User will see it in their dashboard." });
   };
 
   const remove = async (id: string) => {
@@ -669,11 +695,12 @@ function MessagesTab() {
         <div className="space-y-3">
           {filtered.map(m => (
             <Card key={m.id} className={`p-4 ${m.status === "new" ? "border-primary/40" : ""}`}>
-              <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <h3 className="font-semibold">{m.subject}</h3>
                     {m.status === "new" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary uppercase tracking-wider">New</span>}
+                    {m.admin_reply && <span className="text-[10px] px-1.5 py-0.5 rounded bg-success/20 text-success uppercase tracking-wider">Replied</span>}
                     {m.status === "archived" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">Archived</span>}
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">
@@ -683,17 +710,14 @@ function MessagesTab() {
                   <p className="text-sm whitespace-pre-wrap break-words text-foreground/90">{m.message}</p>
                 </div>
                 <div className="flex flex-col gap-1.5 flex-shrink-0">
-                  <Button size="sm" variant="outline" onClick={() => window.open(`mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.subject)}`, "_blank")}>
-                    <Mail className="h-3.5 w-3.5 mr-1" /> Reply
-                  </Button>
-                  {m.status !== "read" && (
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")}>
-                      <MailOpen className="h-3.5 w-3.5 mr-1" /> Mark read
-                    </Button>
-                  )}
                   {m.status !== "archived" && (
                     <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")}>
                       <MailX className="h-3.5 w-3.5 mr-1" /> Archive
+                    </Button>
+                  )}
+                  {m.status === "new" && (
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")}>
+                      <MailOpen className="h-3.5 w-3.5 mr-1" /> Mark read
                     </Button>
                   )}
                   <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)}>
@@ -701,6 +725,35 @@ function MessagesTab() {
                   </Button>
                 </div>
               </div>
+
+              {/* Reply thread */}
+              {m.admin_reply ? (
+                <div className="mt-3 rounded-lg border border-success/30 bg-success/5 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-success mb-1">
+                    Your reply • {m.replied_at ? new Date(m.replied_at).toLocaleString() : ""}
+                  </p>
+                  <p className="text-sm whitespace-pre-wrap break-words text-foreground/90">{m.admin_reply}</p>
+                </div>
+              ) : (
+                <div className="mt-3 space-y-2">
+                  <textarea
+                    className="w-full min-h-[80px] text-sm rounded-md border border-border bg-background p-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    placeholder="Write a reply — the user will see it in their dashboard…"
+                    value={replyDraft[m.id] ?? ""}
+                    onChange={(e) => setReplyDraft(prev => ({ ...prev, [m.id]: e.target.value }))}
+                    maxLength={4000}
+                  />
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={savingId === m.id} onClick={() => sendReply(m.id)}>
+                      {savingId === m.id ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Mail className="h-3.5 w-3.5 mr-1" />}
+                      Send reply
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => window.open(`mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.subject)}`, "_blank")}>
+                      Or open email client
+                    </Button>
+                  </div>
+                </div>
+              )}
             </Card>
           ))}
         </div>
