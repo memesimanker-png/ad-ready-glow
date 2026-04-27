@@ -41,7 +41,7 @@ export function LanguageSelector({ dropUp = false, inline = false }: LanguageSel
               <stop offset="100%" stopColor="hsl(280, 95%, 70%)" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx="7" ry="7" />
+          <rect x="1" y="1" width="100%" height="100%" rx="7" ry="7" style={{ width: "calc(100% - 2px)", height: "calc(100% - 2px)" }} />
         </svg>
         <button
           onClick={() => setOpen(!open)}
