@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,16 @@ type RobloxAccount = {
   password: string;
   package_size: number;
   claimed_at: string;
+};
+
+type ContactMessage = {
+  id: string;
+  subject: string;
+  message: string;
+  status: string;
+  admin_reply: string | null;
+  replied_at: string | null;
+  created_at: string;
 };
 
 const tierNames: Record<string, string> = {
@@ -72,7 +82,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
   const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
-  const [tab, setTab] = useState<"keys" | "accounts">("keys");
+  const [tab, setTab] = useState<"keys" | "accounts" | "messages">("keys");
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
