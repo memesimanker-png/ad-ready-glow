@@ -3,8 +3,6 @@ import gallery1 from "@/assets/gallery-1.webp";
 import gallery2 from "@/assets/gallery-2.webp";
 import gallery3 from "@/assets/gallery-3.webp";
 import gallery4 from "@/assets/gallery-4.webp";
-import gallery5 from "@/assets/gallery-5.webp";
-import gallery6 from "@/assets/gallery-6.webp";
 import gallery7 from "@/assets/gallery-7.webp";
 import gallery8 from "@/assets/gallery-8.webp";
 
@@ -13,8 +11,6 @@ const allImages = [
   { src: gallery2, alt: "Combo_WICK in a car" },
   { src: gallery3, alt: "Combo_WICK mirror selfie" },
   { src: gallery4, alt: "Combo_WICK with cows" },
-  { src: gallery5, alt: "Combo_WICK action shot" },
-  { src: gallery6, alt: "Combo_WICK signature pose" },
   { src: gallery7, alt: "Combo_WICK drip" },
   { src: gallery8, alt: "Combo_WICK featured shot" },
 ];
