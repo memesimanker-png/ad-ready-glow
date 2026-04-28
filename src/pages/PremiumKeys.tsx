@@ -16,11 +16,11 @@ import { SEOHead } from "@/components/SEOHead";
 const tiers = [
   {
     id: "trial-7day",
-    nameKey: "3-Day Trial",
+    nameKey: "7-Day Trial",
     price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    featureKeys: ["3 Days Full Access", "$1.67 per day", "Fast trial access"],
+    featureKeys: ["7 Days Full Access", "$0.71 per day", "Fast trial access"],
     subtitleKey: "Short entry price before monthly",
     buttonTextKey: "Purchase Now",
     buttonStyle: "bg-primary hover:bg-primary/90",
