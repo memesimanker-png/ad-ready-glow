@@ -111,12 +111,14 @@ export default function VerifyStep2() {
                     </p>
                   </div>
                 )}
-                {!isGoogleUser && todaySchedule.skipStep2 && (
+                {!isGoogleUser && (
                   <div className="rounded-lg border border-primary/40 bg-primary/10 p-3 space-y-3">
                     <div className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                       <p className="text-sm text-primary font-medium">
-                        {t("Sign in with Google to skip this step on reward days!")}
+                        {todaySchedule.skipStep2
+                          ? t("Sign in with Google to skip this step on reward days!")
+                          : t("Sign in with Google to unlock skip on reward days (Wed, Fri, Sat & Sun)")}
                       </p>
                     </div>
                     <Button
