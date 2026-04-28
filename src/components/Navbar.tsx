@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { LanguageSelector } from "./LanguageSelector";
+import { NotificationBell } from "./NotificationBell";
 import { useTranslation } from "@/lib/translation-context";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -62,6 +63,7 @@ export function Navbar() {
 
           <div className="hidden xl:flex items-center gap-3">
             <LanguageSelector />
+            <NotificationBell />
             <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" className="border-primary/20 text-primary hover:bg-primary/10 text-xs uppercase tracking-wider">
                 {t("Discord")}
