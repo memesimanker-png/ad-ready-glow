@@ -13,6 +13,7 @@ import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 export default function VerifyStep2() {
   const navigate = useNavigate();
