@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { FloatingYouTubePlayer } from "@/components/FloatingYouTubePlayer";
 import { getTodaySchedule } from "@/lib/day-schedule";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const adProviders = [
   { id: "linkvertise", name: "Free Key", description: "" },
@@ -24,6 +26,7 @@ export default function VerifyProviderSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
   const todaySchedule = getTodaySchedule();
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
@@ -72,6 +75,13 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("step2_completed");
     localStorage.removeItem("step3_completed");
     localStorage.removeItem("verification_step");
+
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.app_metadata?.provider === "google") setIsGoogleUser(true);
+      } catch { /* noop */ }
+    })();
   }, []);
 
   useEffect(() => {
