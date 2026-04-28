@@ -8,6 +8,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TranslationProvider } from "@/lib/translation-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
+import { BackToTop } from "@/components/BackToTop";
+import { RouteProgress } from "@/components/RouteProgress";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
@@ -82,6 +84,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <RouteProgress />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -125,6 +128,7 @@ const App = () => (
                 </Routes>
               </Suspense>
               <StickyMobileCTA />
+              <BackToTop />
             </BrowserRouter>
           </MotionConfig>
         </TooltipProvider>
