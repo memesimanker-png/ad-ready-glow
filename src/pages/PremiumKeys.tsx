@@ -16,11 +16,11 @@ import { SEOHead } from "@/components/SEOHead";
 const tiers = [
   {
     id: "trial-7day",
-    nameKey: "3-Day Trial",
+    nameKey: "7-Day Trial",
     price: 5,
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    featureKeys: ["3 Days Full Access", "$1.67 per day", "Fast trial access"],
+    featureKeys: ["7 Days Full Access", "$0.71 per day", "Fast trial access"],
     subtitleKey: "Short entry price before monthly",
     buttonTextKey: "Purchase Now",
     buttonStyle: "bg-primary hover:bg-primary/90",
@@ -117,8 +117,8 @@ export default function PremiumKeys() {
   return (
     <Layout>
       <SEOHead
-        title="Combo_WICK Premium Keys — 3-Day Trial $5, Monthly $9.99, Lifetime $49.99"
-        description="Buy a Combo_WICK premium HWID key. 3-day trial $5, monthly $9.99 (best value at $0.33/day), lifetime $49.99. Instant PayPal delivery, HWID-locked, full premium script access."
+        title="Combo_WICK Premium Keys — 7-Day Trial $5, Monthly $9.99, Lifetime $49.99"
+        description="Buy a Combo_WICK premium HWID key. 7-day trial $5, monthly $9.99 (best value at $0.33/day), lifetime $49.99. Instant PayPal delivery, HWID-locked, full premium script access."
         breadcrumbs={[{ name: "Home", url: "/" }, { name: "Premium Keys", url: "/premium-keys" }]}
       />
       {/* Hero */}

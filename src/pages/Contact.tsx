@@ -148,7 +148,7 @@ export default function Contact() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="text-xs text-muted-foreground">
-                  Sending as <strong className="text-foreground">{auth.user.email}</strong>
+                  Sending from your account — your email stays private.
                 </div>
                 <div>
                   <Label htmlFor="subject">Subject</Label>
