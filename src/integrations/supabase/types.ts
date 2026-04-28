@@ -59,6 +59,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       premium_key_purchases: {
         Row: {
           amount: number
@@ -310,6 +343,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      broadcast_notification: {
+        Args: { _body: string; _link: string; _title: string; _type?: string }
+        Returns: number
+      }
       check_contact_rate_limit: { Args: { _user_id: string }; Returns: boolean }
       claim_accounts_for_purchase: {
         Args: {

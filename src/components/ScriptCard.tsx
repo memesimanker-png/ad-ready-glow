@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, ShieldCheck, DollarSign, Calendar } from "lucide-react";
+import { TrendingUp, ShieldCheck, DollarSign, Calendar, Play } from "lucide-react";
 import { type Script } from "@/lib/scripts-data";
 import { GameThumbnail } from "@/components/GameThumbnail";
 
@@ -8,6 +8,12 @@ function formatDate(iso: string): string {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function buildPlayUrl(script: Script): string {
+  // Prefer Roblox search by game name — works without a place ID and lands the user
+  // on the official Roblox game page they can press Play on.
+  return `https://www.roblox.com/search/games?keyword=${encodeURIComponent(script.game)}`;
 }
 
 export function ScriptCard({ script }: { script: Script }) {
@@ -59,6 +65,19 @@ export function ScriptCard({ script }: { script: Script }) {
         ))}
       </div>
 
+      <div className="px-4 pb-3">
+        <a
+          href={buildPlayUrl(script)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white text-sm font-semibold px-3 py-2 transition-all shadow-sm shadow-green-500/20"
+          aria-label={`Play ${script.game} on Roblox`}
+        >
+          <Play className="h-3.5 w-3.5 fill-current" />
+          Play Game
+        </a>
+      </div>
+
       <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
         <span className="text-xs px-2 py-0.5 rounded-full bg-secondary">{script.category}</span>
         <time dateTime={dateIso} className="flex items-center gap-1">
@@ -69,4 +88,3 @@ export function ScriptCard({ script }: { script: Script }) {
     </article>
   );
 }
-

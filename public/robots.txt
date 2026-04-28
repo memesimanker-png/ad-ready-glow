@@ -59,5 +59,7 @@ Disallow: /blocked
 Disallow: /ad-return
 Disallow: /verify/
 
-Sitemap: https://shop-ready.lovable.app/sitemap.xml
+# Dynamic sitemap (always up-to-date — includes all scripts and blog posts)
 Sitemap: https://iphiksvnuzpteoryrdxf.supabase.co/functions/v1/dynamic-sitemap
+# Static fallback sitemap
+Sitemap: https://shop-ready.lovable.app/sitemap.xml
