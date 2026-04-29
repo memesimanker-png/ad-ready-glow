@@ -161,6 +161,7 @@ function ScriptsTab() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [notifyingId, setNotifyingId] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const { toast } = useToast();
@@ -212,6 +213,11 @@ function ScriptsTab() {
     }
     setSaving(true);
     try {
+      // Auto-build a Roblox URL when admin pastes just a place ID (digits only)
+      const rawGameUrl = form.gameUrl.trim();
+      const builtGameUrl = /^\d+$/.test(rawGameUrl)
+        ? `https://www.roblox.com/games/${rawGameUrl}`
+        : (rawGameUrl || null);
       const payload = {
         title: form.title, slug: form.slug, description: form.description,
         long_description: form.longDescription, game: form.game, category: form.category,
@@ -220,7 +226,7 @@ function ScriptsTab() {
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
         youtube_url: form.youtube_url || null,
         is_paid: form.is_paid,
-        game_url: form.gameUrl || null,
+        game_url: builtGameUrl,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -295,7 +301,7 @@ function ScriptsTab() {
             <div><label className="text-sm font-medium mb-1 block">Slug *</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={inputCls} /></div>
             <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} placeholder="e.g. Prison Life" /></div>
             <div><label className="text-sm font-medium mb-1 block">Game Universe ID</label><input value={form.gameUniverseId} onChange={e => set("gameUniverseId", e.target.value)} className={inputCls} placeholder="Roblox Universe ID for thumbnail" /></div>
-            <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">🎮 Roblox Game URL (for Play Game button)</label><input value={form.gameUrl} onChange={e => set("gameUrl", e.target.value)} className={inputCls} placeholder="https://www.roblox.com/games/123456789/Game-Name" /></div>
+            <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">🎮 Roblox Place ID or full URL <span className="text-muted-foreground font-normal">(auto-builds Play Game link)</span></label><input value={form.gameUrl} onChange={e => set("gameUrl", e.target.value)} className={inputCls} placeholder="e.g. 208050  →  becomes https://www.roblox.com/games/208050" /></div>
             <div><label className="text-sm font-medium mb-1 block">Category *</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
@@ -354,22 +360,29 @@ function ScriptsTab() {
                 size="sm"
                 variant="outline"
                 title="Notify all subscribers about this script"
+                disabled={notifyingId === s.id}
                 onClick={async () => {
+                  if (notifyingId) return;
                   if (!confirm(`Send an in-app notification to all signed-up users about "${s.title}"?`)) return;
-                  const { data, error } = await supabase.rpc("broadcast_notification", {
-                    _title: `New script: ${s.title}`,
-                    _body: s.description?.slice(0, 140) || `Check out the new ${s.game} script.`,
-                    _link: `/scripts/${s.slug}`,
-                    _type: "script",
-                  });
-                  if (error) {
-                    toast({ variant: "destructive", title: "Failed", description: error.message });
-                  } else {
-                    toast({ title: "Notified!", description: `Sent to ${data} users.` });
+                  setNotifyingId(s.id);
+                  try {
+                    const { data, error } = await supabase.rpc("broadcast_notification", {
+                      _title: `New script: ${s.title}`,
+                      _body: s.description?.slice(0, 140) || `Check out the new ${s.game} script.`,
+                      _link: `/scripts/${s.slug}`,
+                      _type: "script",
+                    });
+                    if (error) {
+                      toast({ variant: "destructive", title: "Failed", description: error.message });
+                    } else {
+                      toast({ title: "Notified!", description: `Sent to ${data} users.` });
+                    }
+                  } finally {
+                    setNotifyingId(null);
                   }
                 }}
               >
-                <Bell className="h-3 w-3" />
+                {notifyingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
               </Button>
               <Button size="sm" variant="outline" onClick={() => editScript(s)}><Edit className="h-3 w-3" /></Button>
               <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)}><Trash2 className="h-3 w-3" /></Button>

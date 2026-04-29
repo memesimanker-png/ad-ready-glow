@@ -1,10 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { LanguageSelector } from "./LanguageSelector";
 import { NotificationBell } from "./NotificationBell";
 import { useTranslation } from "@/lib/translation-context";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -22,6 +26,23 @@ export function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const displayName: string =
+    (user?.user_metadata as any)?.full_name ||
+    (user?.user_metadata as any)?.name ||
+    user?.email ||
+    "Account";
+  const avatarUrl: string | undefined =
+    (user?.user_metadata as any)?.avatar_url ||
+    (user?.user_metadata as any)?.picture;
+  const initials = (displayName || "U")
+    .split(/\s+/).map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-primary/10 bg-background/70 backdrop-blur-2xl">
@@ -69,11 +90,43 @@ export function Navbar() {
                 {t("Discord")}
               </Button>
             </a>
-            <Link to="/login">
-              <Button size="sm" className="neon-glow text-xs uppercase tracking-wider font-semibold">
-                {t("Sign In")}
-              </Button>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="Account menu"
+                    className="flex items-center gap-2 rounded-full border border-primary/20 bg-secondary/40 hover:bg-secondary/70 transition-colors px-1 pr-3 py-1"
+                  >
+                    <Avatar className="h-7 w-7 ring-2 ring-primary/30">
+                      <AvatarImage src={avatarUrl} alt={displayName} />
+                      <AvatarFallback className="text-[10px] bg-primary/20 text-primary">{initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium uppercase tracking-wider max-w-[110px] truncate">
+                      {displayName.split("@")[0]}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="truncate">{displayName}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="h-4 w-4 mr-2" /> {t("Dashboard")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" /> {t("Sign Out")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button size="sm" className="neon-glow text-xs uppercase tracking-wider font-semibold">
+                  {t("Sign In")}
+                </Button>
+              </Link>
+            )}
           </div>
 
           <button className="xl:hidden p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -113,9 +166,22 @@ export function Navbar() {
                 <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="sm" className="w-full border-primary/20">{t("Discord")}</Button>
                 </a>
-                <Link to="/login" onClick={() => setMobileOpen(false)}>
-                  <Button size="sm" className="w-full neon-glow">{t("Sign In")}</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                      <Button size="sm" className="w-full neon-glow gap-2">
+                        <LayoutDashboard className="h-4 w-4" /> {t("Dashboard")}
+                      </Button>
+                    </Link>
+                    <Button size="sm" variant="outline" className="w-full gap-2" onClick={() => { setMobileOpen(false); handleSignOut(); }}>
+                      <LogOut className="h-4 w-4" /> {t("Sign Out")}
+                    </Button>
+                  </>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>
+                    <Button size="sm" className="w-full neon-glow">{t("Sign In")}</Button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

@@ -293,7 +293,7 @@ export default function AccessKey() {
                     </pre>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Paste this entire block into your executor. The loader auto-injects your key.
+                    Paste this entire block into your executor and run it. When prompted, paste the key shown above.
                   </p>
                   {keyExpiresAt && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

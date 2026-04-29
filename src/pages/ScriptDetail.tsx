@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp, DollarSign, Play } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, DollarSign, Play, Share2, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
@@ -19,6 +20,25 @@ export default function ScriptDetail() {
     script?.game || "",
     script?.category || ""
   );
+  const { toast } = useToast();
+  const [shared, setShared] = useState(false);
+
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const title = script?.title || "Roblox Script";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "Link copied", description: "Share link copied to clipboard." });
+      }
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      /* user cancelled */
+    }
+  };
 
   // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
@@ -240,6 +260,16 @@ export default function ScriptDetail() {
                   <Play className="h-4 w-4 fill-current" /> Play Game on Roblox
                 </a>
               )}
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-primary/30 bg-secondary/40 hover:bg-secondary/70 text-foreground font-medium transition-colors"
+                aria-label="Share this script"
+              >
+                {shared ? <Check className="h-4 w-4 text-green-400" /> : <Share2 className="h-4 w-4" />}
+                {shared ? "Copied!" : "Share Script"}
+              </button>
 
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">
