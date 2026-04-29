@@ -261,6 +261,16 @@ export default function ScriptDetail() {
                 </a>
               )}
 
+              <button
+                type="button"
+                onClick={handleShare}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-primary/30 bg-secondary/40 hover:bg-secondary/70 text-foreground font-medium transition-colors"
+                aria-label="Share this script"
+              >
+                {shared ? <Check className="h-4 w-4 text-green-400" /> : <Share2 className="h-4 w-4" />}
+                {shared ? "Copied!" : "Share Script"}
+              </button>
+
               {related.length > 0 && (
                 <div className="rounded-lg border border-border bg-card p-5">
                   <h3 className="font-semibold mb-4 text-primary">Related Scripts</h3>
