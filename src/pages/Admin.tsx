@@ -212,6 +212,11 @@ function ScriptsTab() {
     }
     setSaving(true);
     try {
+      // Auto-build a Roblox URL when admin pastes just a place ID (digits only)
+      const rawGameUrl = form.gameUrl.trim();
+      const builtGameUrl = /^\d+$/.test(rawGameUrl)
+        ? `https://www.roblox.com/games/${rawGameUrl}`
+        : (rawGameUrl || null);
       const payload = {
         title: form.title, slug: form.slug, description: form.description,
         long_description: form.longDescription, game: form.game, category: form.category,
@@ -220,7 +225,7 @@ function ScriptsTab() {
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
         youtube_url: form.youtube_url || null,
         is_paid: form.is_paid,
-        game_url: form.gameUrl || null,
+        game_url: builtGameUrl,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
