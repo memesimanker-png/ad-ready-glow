@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Search, SlidersHorizontal, Crown, ArrowRight } from "lucide-react";
 import { CATEGORIES } from "@/lib/scripts-data";
@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
 import { GameThumbnail } from "@/components/GameThumbnail";
+import { Skeleton } from "@/components/ui/skeleton";
 import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
