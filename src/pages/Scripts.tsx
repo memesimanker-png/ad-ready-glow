@@ -157,12 +157,16 @@ export default function Scripts() {
             <div className="relative mb-6">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <input
+                ref={searchRef}
                 type="search"
                 value={query}
                 onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Search scripts, games, or tags..."
-                className="w-full rounded-lg border border-border bg-card pl-10 pr-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="Search scripts, games, or tags... (press / )"
+                className="w-full rounded-lg border border-border bg-card pl-10 pr-12 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
+              <kbd className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center h-6 px-1.5 rounded border border-border bg-secondary/60 text-[10px] text-muted-foreground font-mono pointer-events-none">
+                /
+              </kbd>
             </div>
 
             <p className="text-sm text-muted-foreground mb-4">
@@ -171,13 +175,28 @@ export default function Scripts() {
               {category !== "All" && <span> in {category}</span>}
             </p>
 
-            {results.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="rounded-lg border border-border bg-card p-4 space-y-3">
+                    <Skeleton className="h-32 w-full rounded-md" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                    <div className="flex gap-2">
+                      <Skeleton className="h-5 w-12 rounded-full" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                    <Skeleton className="h-9 w-full rounded-md" />
+                  </div>
+                ))}
+              </div>
+            ) : results.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {results.map((script) => (
                   <ScriptCard key={script.id} script={script} />
                 ))}
               </div>
-            ) : !isLoading ? (
+            ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-muted-foreground text-lg font-medium">No scripts found</p>
                 <p className="text-muted-foreground text-sm mt-2">Try a different search term or category.</p>
@@ -192,7 +211,7 @@ export default function Scripts() {
                   Clear filters
                 </button>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       </main>
