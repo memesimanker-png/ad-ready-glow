@@ -18,7 +18,7 @@ const emptyScript = {
   game: "", category: "Utility", tags: [] as string[],
   code: DEFAULT_SCRIPT_CODE, faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
-  youtube_url: "" as string, is_paid: false,
+  youtube_url: "" as string, is_paid: false, gameUrl: "" as string,
 };
 
 export default function Admin() {
@@ -220,6 +220,7 @@ function ScriptsTab() {
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
         youtube_url: form.youtube_url || null,
         is_paid: form.is_paid,
+        game_url: form.gameUrl || null,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -254,6 +255,7 @@ function ScriptsTab() {
       gameUniverseId: s.game_universe_id ? String(s.game_universe_id) : "",
       youtube_url: s.youtube_url || "",
       is_paid: !!s.is_paid,
+      gameUrl: s.game_url || "",
     });
     setEditingId(s.id);
     setShowForm(true);
@@ -293,6 +295,7 @@ function ScriptsTab() {
             <div><label className="text-sm font-medium mb-1 block">Slug *</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={inputCls} /></div>
             <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} placeholder="e.g. Prison Life" /></div>
             <div><label className="text-sm font-medium mb-1 block">Game Universe ID</label><input value={form.gameUniverseId} onChange={e => set("gameUniverseId", e.target.value)} className={inputCls} placeholder="Roblox Universe ID for thumbnail" /></div>
+            <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">🎮 Roblox Game URL (for Play Game button)</label><input value={form.gameUrl} onChange={e => set("gameUrl", e.target.value)} className={inputCls} placeholder="https://www.roblox.com/games/123456789/Game-Name" /></div>
             <div><label className="text-sm font-medium mb-1 block">Category *</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}

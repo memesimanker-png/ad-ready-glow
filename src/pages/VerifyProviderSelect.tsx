@@ -207,107 +207,123 @@ export default function VerifyProviderSelect() {
       </header>
 
       <main className="flex-1 container flex flex-col items-center justify-center py-12">
-        <div className="max-w-2xl w-full mx-auto space-y-6">
-          <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold">Verification Provider</h1>
-            <p className="text-muted-foreground">Select which provider you want to use for verification.</p>
+        <div className="max-w-2xl w-full mx-auto">
+          <div className="space-y-2 text-center mb-6">
+            <h1 className="text-3xl font-bold">Verification</h1>
+            <p className="text-muted-foreground">Complete the steps below to unlock your free key.</p>
           </div>
 
-          {!isGoogleUser && (
-            <Card className="border-primary/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Sign in with Google (optional)
-                </CardTitle>
-                <CardDescription>
-                  {todaySchedule.skipStep2
-                    ? `${todaySchedule.label} — sign in to skip Step 2 today!`
-                    : "Sign in to skip Step 2 on reward days (Wed, Fri, Sat & Sun)."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full bg-white text-black hover:bg-white/90 hover:text-black gap-2"
-                  onClick={async () => {
-                    const result = await lovable.auth.signInWithOAuth("google", {
-                      redirect_uri: `${window.location.origin}/verify/provider-select`,
-                    });
-                    if (result.error) {
-                      toast({ variant: "destructive", title: "Error", description: result.error.message ?? "Google sign-in failed" });
-                    }
-                  }}
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
-                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
-                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-                    <path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
-                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.3 5.3C41.6 35.5 44 30.1 44 24c0-1.2-.1-2.3-.4-3.5z"/>
-                  </svg>
-                  Sign in with Google
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-          {isGoogleUser && (
-            <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 text-sm text-green-300 text-center">
-              ✓ Signed in with Google — eligible for skip on reward days.
-            </div>
-          )}
-
-          {showSubscriptionGate && !subscriptionGateCompleted && (
-            <Card className="border-yellow-500/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-yellow-400" />
-                  Subscribe & Join to Continue
-                </CardTitle>
-                <CardDescription>Complete these steps to proceed</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <Button onClick={handleYoutubeClick} disabled={youtubeCompleted || youtubeTimer > 0} className="w-full bg-red-600 hover:bg-red-700">
-                    <Youtube className="mr-2 h-4 w-4" />
-                    {youtubeCompleted ? "✓ YouTube Subscribed" : youtubeTimer > 0 ? `Waiting ${youtubeTimer}s...` : "Subscribe to YouTube"}
-                  </Button>
-                  {youtubeTimer > 0 && <Progress value={youtubeProgress} className="h-1" />}
-
-                  <Button onClick={handleDiscordClick} disabled={discordCompleted || discordTimer > 0} className="w-full bg-indigo-600 hover:bg-indigo-700">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    {discordCompleted ? "✓ Discord Joined" : discordTimer > 0 ? `Waiting ${discordTimer}s...` : "Join Discord"}
-                  </Button>
-                  {discordTimer > 0 && <Progress value={discordProgress} className="h-1" />}
+          <Card className="border-primary/30">
+            <CardContent className="p-6 space-y-6 divide-y divide-border/40">
+              {/* Step 1: Google sign-in (optional) */}
+              <section className="pt-0 space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">1</span>
+                  <div className="flex-1">
+                    <h2 className="font-semibold flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      Sign in with Google
+                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-normal">Optional</span>
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {todaySchedule.skipStep2
+                        ? `${todaySchedule.label} — sign in to skip Step 2 today!`
+                        : "Sign in to skip Step 2 on reward days (Wed, Fri, Sat & Sun)."}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">This will appear again in 1 week</p>
-              </CardContent>
-            </Card>
-          )}
+                {isGoogleUser ? (
+                  <div className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300 text-center">
+                    ✓ Signed in — eligible for skip on reward days.
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full bg-white text-black hover:bg-white/90 hover:text-black gap-2"
+                    onClick={async () => {
+                      const result = await lovable.auth.signInWithOAuth("google", {
+                        redirect_uri: `${window.location.origin}/verify/provider-select`,
+                      });
+                      if (result.error) {
+                        toast({ variant: "destructive", title: "Error", description: result.error.message ?? "Google sign-in failed" });
+                      }
+                    }}
+                  >
+                    <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
+                      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
+                      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+                      <path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
+                      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.3 5.3C41.6 35.5 44 30.1 44 24c0-1.2-.1-2.3-.4-3.5z"/>
+                    </svg>
+                    Sign in with Google
+                  </Button>
+                )}
+              </section>
 
-          {showDirectLinkGate && !directLinkGateCompleted && (
-            <Card className="border-primary/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MousePointerClick className="h-5 w-5 text-primary" />
-                  One More Step!
-                </CardTitle>
-                <CardDescription>Click the button below 2 times to continue</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
-                  <MousePointerClick className="mr-2 h-4 w-4" />
-                  {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2 clicks completed</p>
-                <p className="text-xs text-muted-foreground text-center">This gate reappears every 5 minutes for security purposes</p>
-              </CardContent>
-            </Card>
-          )}
+              {/* Step 2: Subscribe & Join (weekly gate) */}
+              {showSubscriptionGate && !subscriptionGateCompleted && (
+                <section className="pt-6 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-bold">2</span>
+                    <div className="flex-1">
+                      <h2 className="font-semibold">Subscribe & Join</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Support us — this only appears once per week.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Button onClick={handleYoutubeClick} disabled={youtubeCompleted || youtubeTimer > 0} className="w-full bg-red-600 hover:bg-red-700">
+                      <Youtube className="mr-2 h-4 w-4" />
+                      {youtubeCompleted ? "✓ YouTube Subscribed" : youtubeTimer > 0 ? `Waiting ${youtubeTimer}s...` : "Subscribe to YouTube"}
+                    </Button>
+                    {youtubeTimer > 0 && <Progress value={youtubeProgress} className="h-1" />}
+                    <Button onClick={handleDiscordClick} disabled={discordCompleted || discordTimer > 0} className="w-full bg-indigo-600 hover:bg-indigo-700">
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      {discordCompleted ? "✓ Discord Joined" : discordTimer > 0 ? `Waiting ${discordTimer}s...` : "Join Discord"}
+                    </Button>
+                    {discordTimer > 0 && <Progress value={discordProgress} className="h-1" />}
+                  </div>
+                </section>
+              )}
 
-          {(!showSubscriptionGate || subscriptionGateCompleted) && (!showDirectLinkGate || directLinkGateCompleted) && (
-            <AdProviderSelector providers={adProviders} onSelect={handleProviderSelect} />
-          )}
+              {/* Step 3: Quick click gate */}
+              {showDirectLinkGate && !directLinkGateCompleted && (
+                <section className="pt-6 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">
+                      {showSubscriptionGate && !subscriptionGateCompleted ? 3 : 2}
+                    </span>
+                    <div className="flex-1">
+                      <h2 className="font-semibold flex items-center gap-2">
+                        <MousePointerClick className="h-4 w-4 text-primary" />
+                        Quick Click Gate
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Click the button below 2 times to continue. Reappears every 5 minutes.</p>
+                    </div>
+                  </div>
+                  <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
+                    <MousePointerClick className="mr-2 h-4 w-4" />
+                    {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2</p>
+                </section>
+              )}
+
+              {/* Final: Continue to provider */}
+              {(!showSubscriptionGate || subscriptionGateCompleted) && (!showDirectLinkGate || directLinkGateCompleted) && (
+                <section className="pt-6">
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-300 text-xs font-bold">✓</span>
+                    <div className="flex-1">
+                      <h2 className="font-semibold">All set — choose a provider</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Pick how you'd like to verify and continue.</p>
+                    </div>
+                  </div>
+                  <AdProviderSelector providers={adProviders} onSelect={handleProviderSelect} />
+                </section>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

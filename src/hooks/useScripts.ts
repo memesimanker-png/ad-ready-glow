@@ -21,6 +21,7 @@ function mapRow(row: any): Script {
     game_universe_id: row.game_universe_id || null,
     is_paid: row.is_paid || false,
     youtube_url: row.youtube_url || null,
+    game_url: row.game_url || null,
   };
 }
 
@@ -57,7 +58,7 @@ export function useScriptBySlug(slug: string | undefined) {
 
 // Lightweight projection for list/card views — skips the heavy `code`,
 // `long_description`, and `faqs` columns. Cuts row payload by ~80% on /scripts.
-const LIST_COLS = "id,slug,title,description,game,category,tags,created_at,updated_at,trending,verified,game_universe_id,is_paid,youtube_url";
+const LIST_COLS = "id,slug,title,description,game,category,tags,created_at,updated_at,trending,verified,game_universe_id,is_paid,youtube_url,game_url";
 
 export function useSearchScripts(query: string, category: string) {
   return useQuery({

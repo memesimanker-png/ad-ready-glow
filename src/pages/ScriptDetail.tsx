@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp, DollarSign } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, DollarSign, Play } from "lucide-react";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
@@ -227,6 +227,18 @@ export default function ScriptDetail() {
                 </Link>
               ) : (
                 <CopyButton text={script.code} className="w-full justify-center" />
+              )}
+
+              {script.game_url && (
+                <a
+                  href={script.game_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold transition-all shadow-sm shadow-green-500/20"
+                  aria-label={`Play ${script.game} on Roblox`}
+                >
+                  <Play className="h-4 w-4 fill-current" /> Play Game on Roblox
+                </a>
               )}
 
               {related.length > 0 && (

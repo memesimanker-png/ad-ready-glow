@@ -245,6 +245,7 @@ export type Database = {
           faqs: Json | null
           game: string
           game_universe_id: number | null
+          game_url: string | null
           id: string
           is_paid: boolean | null
           long_description: string | null
@@ -264,6 +265,7 @@ export type Database = {
           faqs?: Json | null
           game: string
           game_universe_id?: number | null
+          game_url?: string | null
           id?: string
           is_paid?: boolean | null
           long_description?: string | null
@@ -283,6 +285,7 @@ export type Database = {
           faqs?: Json | null
           game?: string
           game_universe_id?: number | null
+          game_url?: string | null
           id?: string
           is_paid?: boolean | null
           long_description?: string | null

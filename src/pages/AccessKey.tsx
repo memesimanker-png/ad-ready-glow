@@ -276,13 +276,25 @@ export default function AccessKey() {
                 <div className="space-y-3">
                   <div className="rounded-lg bg-black/50 p-4 border border-green-500/30">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-green-400 font-medium">Your HWID Key:</span>
-                      <Button size="sm" variant="ghost" onClick={() => copyToClipboard(generatedKey)} className="h-7 text-green-400 hover:text-green-300">
+                      <span className="text-sm text-green-400 font-medium">Your Script + HWID Key:</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(`loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();\n\n-- Key: ${generatedKey}`)}
+                        className="h-7 text-green-400 hover:text-green-300"
+                      >
                         <Copy className="h-3 w-3 mr-1" /> Copy
                       </Button>
                     </div>
-                    <code className="text-lg font-mono text-green-500 break-all select-all">{generatedKey}</code>
+                    <pre className="text-xs font-mono text-green-400 break-all whitespace-pre-wrap select-all leading-relaxed">
+{`loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();
+
+-- Key: ${generatedKey}`}
+                    </pre>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Paste this entire block into your executor. The loader auto-injects your key.
+                  </p>
                   {keyExpiresAt && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
