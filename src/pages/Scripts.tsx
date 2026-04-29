@@ -26,6 +26,21 @@ export default function Scripts() {
     loadMonetagPopunder();
   }, []);
 
+  // Press "/" to focus the search box (skip when typing in another input)
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+      searchRef.current?.select();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const { data: results = [], isLoading } = useSearchScripts(query, category);
   // Always-fetched (cached 15min, near zero cost) — used to surface a featured/sponsored
   // paid script even when the user is searching/filtering. Today the only paid script
