@@ -20,6 +20,25 @@ export default function ScriptDetail() {
     script?.game || "",
     script?.category || ""
   );
+  const { toast } = useToast();
+  const [shared, setShared] = useState(false);
+
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const title = script?.title || "Roblox Script";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "Link copied", description: "Share link copied to clipboard." });
+      }
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      /* user cancelled */
+    }
+  };
 
   // Fire popunder at most once every 5 minutes (shared across pages)
   useEffect(() => {
