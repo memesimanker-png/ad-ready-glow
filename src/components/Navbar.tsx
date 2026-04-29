@@ -26,6 +26,23 @@ export function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const displayName: string =
+    (user?.user_metadata as any)?.full_name ||
+    (user?.user_metadata as any)?.name ||
+    user?.email ||
+    "Account";
+  const avatarUrl: string | undefined =
+    (user?.user_metadata as any)?.avatar_url ||
+    (user?.user_metadata as any)?.picture;
+  const initials = (displayName || "U")
+    .split(/\s+/).map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-primary/10 bg-background/70 backdrop-blur-2xl">
