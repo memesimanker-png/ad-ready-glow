@@ -300,7 +300,7 @@ function ScriptsTab() {
             <div><label className="text-sm font-medium mb-1 block">Slug *</label><input value={form.slug} onChange={e => set("slug", e.target.value)} className={inputCls} /></div>
             <div><label className="text-sm font-medium mb-1 block">Game *</label><input value={form.game} onChange={e => set("game", e.target.value)} className={inputCls} placeholder="e.g. Prison Life" /></div>
             <div><label className="text-sm font-medium mb-1 block">Game Universe ID</label><input value={form.gameUniverseId} onChange={e => set("gameUniverseId", e.target.value)} className={inputCls} placeholder="Roblox Universe ID for thumbnail" /></div>
-            <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">🎮 Roblox Game URL (for Play Game button)</label><input value={form.gameUrl} onChange={e => set("gameUrl", e.target.value)} className={inputCls} placeholder="https://www.roblox.com/games/123456789/Game-Name" /></div>
+            <div className="md:col-span-2"><label className="text-sm font-medium mb-1 block">🎮 Roblox Place ID or full URL <span className="text-muted-foreground font-normal">(auto-builds Play Game link)</span></label><input value={form.gameUrl} onChange={e => set("gameUrl", e.target.value)} className={inputCls} placeholder="e.g. 208050  →  becomes https://www.roblox.com/games/208050" /></div>
             <div><label className="text-sm font-medium mb-1 block">Category *</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className={inputCls}>
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
