@@ -360,22 +360,29 @@ function ScriptsTab() {
                 size="sm"
                 variant="outline"
                 title="Notify all subscribers about this script"
+                disabled={notifyingId === s.id}
                 onClick={async () => {
+                  if (notifyingId) return;
                   if (!confirm(`Send an in-app notification to all signed-up users about "${s.title}"?`)) return;
-                  const { data, error } = await supabase.rpc("broadcast_notification", {
-                    _title: `New script: ${s.title}`,
-                    _body: s.description?.slice(0, 140) || `Check out the new ${s.game} script.`,
-                    _link: `/scripts/${s.slug}`,
-                    _type: "script",
-                  });
-                  if (error) {
-                    toast({ variant: "destructive", title: "Failed", description: error.message });
-                  } else {
-                    toast({ title: "Notified!", description: `Sent to ${data} users.` });
+                  setNotifyingId(s.id);
+                  try {
+                    const { data, error } = await supabase.rpc("broadcast_notification", {
+                      _title: `New script: ${s.title}`,
+                      _body: s.description?.slice(0, 140) || `Check out the new ${s.game} script.`,
+                      _link: `/scripts/${s.slug}`,
+                      _type: "script",
+                    });
+                    if (error) {
+                      toast({ variant: "destructive", title: "Failed", description: error.message });
+                    } else {
+                      toast({ title: "Notified!", description: `Sent to ${data} users.` });
+                    }
+                  } finally {
+                    setNotifyingId(null);
                   }
                 }}
               >
-                <Bell className="h-3 w-3" />
+                {notifyingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
               </Button>
               <Button size="sm" variant="outline" onClick={() => editScript(s)}><Edit className="h-3 w-3" /></Button>
               <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)}><Trash2 className="h-3 w-3" /></Button>
