@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShieldCheck, ChevronRight, TrendingUp, DollarSign, Play } from "lucide-react";
+import { ShieldCheck, ChevronRight, TrendingUp, DollarSign, Play, Share2, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useScriptBySlug, useRelatedScripts } from "@/hooks/useScripts";
 import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
