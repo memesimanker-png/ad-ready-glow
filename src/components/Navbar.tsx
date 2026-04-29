@@ -166,9 +166,22 @@ export function Navbar() {
                 <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" size="sm" className="w-full border-primary/20">{t("Discord")}</Button>
                 </a>
-                <Link to="/login" onClick={() => setMobileOpen(false)}>
-                  <Button size="sm" className="w-full neon-glow">{t("Sign In")}</Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                      <Button size="sm" className="w-full neon-glow gap-2">
+                        <LayoutDashboard className="h-4 w-4" /> {t("Dashboard")}
+                      </Button>
+                    </Link>
+                    <Button size="sm" variant="outline" className="w-full gap-2" onClick={() => { setMobileOpen(false); handleSignOut(); }}>
+                      <LogOut className="h-4 w-4" /> {t("Sign Out")}
+                    </Button>
+                  </>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>
+                    <Button size="sm" className="w-full neon-glow">{t("Sign In")}</Button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
