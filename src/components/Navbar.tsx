@@ -90,11 +90,43 @@ export function Navbar() {
                 {t("Discord")}
               </Button>
             </a>
-            <Link to="/login">
-              <Button size="sm" className="neon-glow text-xs uppercase tracking-wider font-semibold">
-                {t("Sign In")}
-              </Button>
-            </Link>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="Account menu"
+                    className="flex items-center gap-2 rounded-full border border-primary/20 bg-secondary/40 hover:bg-secondary/70 transition-colors px-1 pr-3 py-1"
+                  >
+                    <Avatar className="h-7 w-7 ring-2 ring-primary/30">
+                      <AvatarImage src={avatarUrl} alt={displayName} />
+                      <AvatarFallback className="text-[10px] bg-primary/20 text-primary">{initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium uppercase tracking-wider max-w-[110px] truncate">
+                      {displayName.split("@")[0]}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="truncate">{displayName}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="h-4 w-4 mr-2" /> {t("Dashboard")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" /> {t("Sign Out")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button size="sm" className="neon-glow text-xs uppercase tracking-wider font-semibold">
+                  {t("Sign In")}
+                </Button>
+              </Link>
+            )}
           </div>
 
           <button className="xl:hidden p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
