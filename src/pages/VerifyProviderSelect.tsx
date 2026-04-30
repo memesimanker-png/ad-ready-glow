@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
