@@ -18,8 +18,16 @@ const TranslationContext = createContext<TranslationContextType>({
 });
 
 // Load cache from localStorage on init
+const TRANSLATION_CACHE_VERSION = "v2"; // bump to invalidate bad cached entries (e.g. translated lookup-keys)
 const translationCache: Record<string, Record<string, string>> = (() => {
   try {
+    const ver = localStorage.getItem("combowick-translations-ver");
+    if (ver !== TRANSLATION_CACHE_VERSION) {
+      localStorage.removeItem("combowick-translations");
+      localStorage.removeItem("combowick-auto-translations");
+      localStorage.setItem("combowick-translations-ver", TRANSLATION_CACHE_VERSION);
+      return {};
+    }
     const saved = localStorage.getItem("combowick-translations");
     return saved ? JSON.parse(saved) : {};
   } catch { return {}; }
@@ -111,18 +119,21 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
 
   const t = useCallback((text: string) => {
     const lang = langRef.current;
-    if (lang === "en") return EN_TEXTS[text] || text;
+    // Resolve EN value: if `text` is a key in EN_TEXTS use the value, otherwise treat `text` itself as the source.
+    const enValue = EN_TEXTS[text] ?? text;
+    if (lang === "en") return enValue;
 
-    const cached = translationCache[lang]?.[text];
+    // Look up cache by the English source text (not the lookup key)
+    const cached = translationCache[lang]?.[enValue];
     if (cached) return cached;
 
-    // Queue for batch fetch
-    pendingTexts.add(text);
+    // Queue the English source text for batch fetch
+    pendingTexts.add(enValue);
     if (flushTimer) clearTimeout(flushTimer);
     flushTimer = setTimeout(flushPending, 50);
 
     // Return English as fallback while loading
-    return EN_TEXTS[text] || text;
+    return enValue;
   }, [flushPending]);
 
   return (
