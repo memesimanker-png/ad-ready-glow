@@ -55,7 +55,7 @@ export default function ScriptDetail() {
         description: script.longDescription || script.description,
         programmingLanguage: "Lua",
         runtimePlatform: "Roblox",
-        codeRepository: "https://shop-ready.lovable.app/scripts/" + script.slug,
+        codeRepository: "https://combowick.com/scripts/" + script.slug,
         author: { "@type": "Organization", name: "ComboWick" },
         dateCreated: script.createdAt,
         dateModified: script.updatedAt,

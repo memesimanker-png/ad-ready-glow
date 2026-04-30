@@ -82,8 +82,8 @@ export default function Scripts() {
           "@type": "CollectionPage",
           name: "Free Roblox Scripts",
           description: "Browse verified Roblox Lua scripts. Auto-farm, ESP, aimbot, and utility scripts updated daily.",
-          url: "https://shop-ready.lovable.app/scripts",
-          isPartOf: { "@type": "WebSite", name: "ComboWick", url: "https://shop-ready.lovable.app" },
+          url: "https://combowick.com/scripts",
+          isPartOf: { "@type": "WebSite", name: "ComboWick", url: "https://combowick.com" },
         }}
       />
       <DirectLinkOverlay />
