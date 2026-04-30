@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles } from "lucide-react";
+import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { FloatingYouTubePlayer } from "@/components/FloatingYouTubePlayer";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { getTodaySchedule } from "@/lib/day-schedule";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
