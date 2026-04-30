@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const BASE_URL = "https://shop-ready.lovable.app";
+const BASE_URL = "https://combowick.com";
 
 const STATIC_PAGES = [
   { loc: "/", changefreq: "weekly", priority: "1.0" },
