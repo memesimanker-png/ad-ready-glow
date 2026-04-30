@@ -98,3 +98,21 @@ export function useRelatedScripts(scriptId: string, game: string, category: stri
     enabled: !!scriptId,
   });
 }
+
+export function useFeaturedScripts(limit = 6) {
+  return useQuery({
+    queryKey: ["scripts", "featured", limit],
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scripts")
+        .select(LIST_COLS)
+        .order("trending", { ascending: false })
+        .order("updated_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return (data || []).map(mapRow);
+    },
+  });
+}
