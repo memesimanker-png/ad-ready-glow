@@ -218,8 +218,8 @@ export default function VerifyProviderSelect() {
               key: string;
               title: string;
               done: boolean;
-              icon: JSX.Element;
-              render: () => JSX.Element;
+              icon: React.ReactNode;
+              render: () => React.ReactNode;
             };
 
             const steps: Step[] = [];
