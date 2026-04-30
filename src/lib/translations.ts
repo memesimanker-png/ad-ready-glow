@@ -207,7 +207,7 @@ export const EN_TEXTS: Record<string, string> = {
   "prem_cta_desc": "Join thousands of users who've upgraded to premium for the best experience. No verification, no waiting — just instant access.",
   "Join Discord": "Join Discord",
   // Verification pages
-  "SecureVerify": "ComboWick Verify™",
+  "ComboWick Verify": "ComboWick Verify™",
   "Verification Step 1": "Verification Step 1",
   "Verification Step 2": "Verification Step 2",
   "Verification Step 3": "Verification Step 3",
