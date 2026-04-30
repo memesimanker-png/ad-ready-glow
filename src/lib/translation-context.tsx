@@ -18,8 +18,16 @@ const TranslationContext = createContext<TranslationContextType>({
 });
 
 // Load cache from localStorage on init
+const TRANSLATION_CACHE_VERSION = "v2"; // bump to invalidate bad cached entries (e.g. translated lookup-keys)
 const translationCache: Record<string, Record<string, string>> = (() => {
   try {
+    const ver = localStorage.getItem("combowick-translations-ver");
+    if (ver !== TRANSLATION_CACHE_VERSION) {
+      localStorage.removeItem("combowick-translations");
+      localStorage.removeItem("combowick-auto-translations");
+      localStorage.setItem("combowick-translations-ver", TRANSLATION_CACHE_VERSION);
+      return {};
+    }
     const saved = localStorage.getItem("combowick-translations");
     return saved ? JSON.parse(saved) : {};
   } catch { return {}; }
