@@ -201,77 +201,72 @@ export default function VerifyProviderSelect() {
       )}
 
       <header className="container py-6">
-        <div className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">ComboWick Verify</h1>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">ComboWick Verify</h1>
+          </div>
+          <LanguageSelector />
         </div>
       </header>
 
-      <main className="flex-1 container flex flex-col items-center justify-center py-12">
-        <div className="max-w-2xl w-full mx-auto">
-          <div className="space-y-2 text-center mb-6">
-            <h1 className="text-3xl font-bold">Verification</h1>
-            <p className="text-muted-foreground">Complete the steps below to unlock your free key.</p>
-          </div>
+      <main className="flex-1 container flex flex-col items-center justify-center py-8">
+        <div className="max-w-xl w-full mx-auto">
+          {/* Build the active step list dynamically so the UI is never confusing */}
+          {(() => {
+            type Step = {
+              key: string;
+              title: string;
+              done: boolean;
+              icon: JSX.Element;
+              render: () => JSX.Element;
+            };
 
-          <Card className="border-primary/30">
-            <CardContent className="p-6 space-y-6 divide-y divide-border/40">
-              {/* Step 1: Google sign-in — only shown on reward days */}
-              {todaySchedule.skipStep2 && (
-                <section className="pt-0 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">1</span>
-                    <div className="flex-1">
-                      <h2 className="font-semibold flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-primary" />
-                        Sign in with Google
-                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-normal">Skip Step 2 today</span>
-                      </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {todaySchedule.label} — sign in to skip Step 2 today!
-                      </p>
-                    </div>
-                  </div>
-                  {isGoogleUser ? (
-                    <div className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300 text-center">
-                      ✓ Signed in — Step 2 will be skipped.
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full bg-white text-black hover:bg-white/90 hover:text-black gap-2"
-                      onClick={async () => {
-                        const result = await lovable.auth.signInWithOAuth("google", {
-                          redirect_uri: `${window.location.origin}/verify/provider-select`,
-                        });
-                        if (result.error) {
-                          toast({ variant: "destructive", title: "Error", description: result.error.message ?? "Google sign-in failed" });
-                        }
-                      }}
-                    >
-                      <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
-                        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
-                        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-                        <path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
-                        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.3 5.3C41.6 35.5 44 30.1 44 24c0-1.2-.1-2.3-.4-3.5z"/>
-                      </svg>
-                      Sign in with Google
-                    </Button>
-                  )}
-                </section>
-              )}
+            const steps: Step[] = [];
 
-              {/* Step 2: Subscribe & Join (weekly gate) */}
-              {showSubscriptionGate && !subscriptionGateCompleted && (
-                <section className="pt-6 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-bold">2</span>
-                    <div className="flex-1">
-                      <h2 className="font-semibold">Subscribe & Join</h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">Support us — this only appears once per week.</p>
-                    </div>
+            if (todaySchedule.skipStep2) {
+              steps.push({
+                key: "google",
+                title: "Sign in with Google (skips Step 2)",
+                done: isGoogleUser,
+                icon: <Sparkles className="h-4 w-4" />,
+                render: () => isGoogleUser ? (
+                  <div className="rounded-md border border-green-500/40 bg-green-500/10 px-3 py-2 text-xs text-green-300 text-center">
+                    ✓ Signed in — Step 2 skipped today.
                   </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full bg-white text-black hover:bg-white/90 hover:text-black gap-2"
+                    onClick={async () => {
+                      const result = await lovable.auth.signInWithOAuth("google", {
+                        redirect_uri: `${window.location.origin}/verify/provider-select`,
+                      });
+                      if (result.error) {
+                        toast({ variant: "destructive", title: "Error", description: result.error.message ?? "Google sign-in failed" });
+                      }
+                    }}
+                  >
+                    <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
+                      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
+                      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34.2 5.6 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+                      <path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.3l-6.3-5.3C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
+                      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.3 5.3C41.6 35.5 44 30.1 44 24c0-1.2-.1-2.3-.4-3.5z"/>
+                    </svg>
+                    Sign in with Google
+                  </Button>
+                ),
+              });
+            }
+
+            if (showSubscriptionGate) {
+              steps.push({
+                key: "subscribe",
+                title: "Subscribe & Join (once per week)",
+                done: subscriptionGateCompleted,
+                icon: <Youtube className="h-4 w-4" />,
+                render: () => (
                   <div className="space-y-2">
                     <Button onClick={handleYoutubeClick} disabled={youtubeCompleted || youtubeTimer > 0} className="w-full bg-red-600 hover:bg-red-700">
                       <Youtube className="mr-2 h-4 w-4" />
@@ -284,47 +279,97 @@ export default function VerifyProviderSelect() {
                     </Button>
                     {discordTimer > 0 && <Progress value={discordProgress} className="h-1" />}
                   </div>
-                </section>
-              )}
+                ),
+              });
+            }
 
-              {/* Step 3: Quick click gate */}
-              {showDirectLinkGate && !directLinkGateCompleted && (
-                <section className="pt-6 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">
-                      {showSubscriptionGate && !subscriptionGateCompleted ? 3 : 2}
-                    </span>
-                    <div className="flex-1">
-                      <h2 className="font-semibold flex items-center gap-2">
-                        <MousePointerClick className="h-4 w-4 text-primary" />
-                        Quick Click Gate
-                      </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">Click the button below 2 times to continue. Reappears every 5 minutes.</p>
+            if (showDirectLinkGate) {
+              steps.push({
+                key: "click",
+                title: "Quick Click Gate",
+                done: directLinkGateCompleted,
+                icon: <MousePointerClick className="h-4 w-4" />,
+                render: () => (
+                  <div className="space-y-2">
+                    <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
+                      <MousePointerClick className="mr-2 h-4 w-4" />
+                      {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
+                    </Button>
+                    <Progress value={(directLinkClicks / 2) * 100} className="h-1" />
+                  </div>
+                ),
+              });
+            }
+
+            steps.push({
+              key: "provider",
+              title: "Get Your Free Key",
+              done: false,
+              icon: <CheckCircle2 className="h-4 w-4" />,
+              render: () => <AdProviderSelector providers={adProviders} onSelect={handleProviderSelect} />,
+            });
+
+            // Find the first incomplete step — that's the active one.
+            const activeIdx = steps.findIndex((s) => !s.done);
+            const completedCount = steps.slice(0, -1).filter((s) => s.done).length;
+            const totalGates = steps.length - 1; // exclude final provider step
+            const overallPercent = totalGates === 0 ? 100 : Math.round((completedCount / totalGates) * 100);
+
+            return (
+              <Card className="border-primary/30 overflow-hidden">
+                <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 via-transparent to-primary/5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-2xl">Verification</CardTitle>
+                      <CardDescription>Finish the steps below to unlock your free key.</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">Progress</p>
+                      <p className="text-lg font-bold text-primary">{overallPercent}%</p>
                     </div>
                   </div>
-                  <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
-                    <MousePointerClick className="mr-2 h-4 w-4" />
-                    {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2</p>
-                </section>
-              )}
+                  <Progress value={overallPercent} className="h-1.5 mt-3" />
+                </CardHeader>
 
-              {/* Final: Continue to provider */}
-              {(!showSubscriptionGate || subscriptionGateCompleted) && (!showDirectLinkGate || directLinkGateCompleted) && (
-                <section className="pt-6">
-                  <div className="flex items-start gap-3 mb-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-300 text-xs font-bold">✓</span>
-                    <div className="flex-1">
-                      <h2 className="font-semibold">All set — choose a provider</h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">Pick how you'd like to verify and continue.</p>
-                    </div>
-                  </div>
-                  <AdProviderSelector providers={adProviders} onSelect={handleProviderSelect} />
-                </section>
-              )}
-            </CardContent>
-          </Card>
+                <CardContent className="p-0">
+                  <ol className="divide-y divide-border/40">
+                    {steps.map((step, idx) => {
+                      const isActive = idx === activeIdx;
+                      const isLocked = activeIdx !== -1 && idx > activeIdx;
+                      const isDone = step.done;
+                      return (
+                        <li
+                          key={step.key}
+                          className={`p-5 transition-colors ${
+                            isActive ? "bg-primary/5" : isDone ? "opacity-60" : isLocked ? "opacity-40" : ""
+                          }`}
+                        >
+                          <div className="flex items-start gap-3 mb-3">
+                            <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                              isDone
+                                ? "bg-green-500/20 text-green-300"
+                                : isActive
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-secondary text-muted-foreground"
+                            }`}>
+                              {isDone ? <CheckCircle2 className="h-4 w-4" /> : isLocked ? <Lock className="h-3.5 w-3.5" /> : idx + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm flex items-center gap-2">
+                                <span className="text-primary">{step.icon}</span>
+                                {step.title}
+                              </h3>
+                            </div>
+                          </div>
+                          {isActive && <div className="pl-11">{step.render()}</div>}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
       </main>
     </div>
