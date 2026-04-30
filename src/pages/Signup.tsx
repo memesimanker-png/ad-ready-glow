@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus } from "lucide-react";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -40,6 +41,11 @@ export default function Signup() {
               <CardTitle className="font-heading text-2xl">Create Account</CardTitle>
             </CardHeader>
             <CardContent>
+              <GoogleSignInButton label="Sign up with Google" redirectPath="/dashboard" />
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/60" /></div>
+                <div className="relative flex justify-center text-[11px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">or with email</span></div>
+              </div>
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email</Label>

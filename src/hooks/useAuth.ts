@@ -48,3 +48,25 @@ export function useIsAdmin() {
 
   return { isAdmin, loading, user };
 }
+
+export function useIsSuperAdmin() {
+  const { user, loading: authLoading } = useAuth();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setIsSuperAdmin(false);
+      setLoading(false);
+      return;
+    }
+    supabase.rpc("has_role" as any, { _user_id: user.id, _role: "super_admin" })
+      .then(({ data }) => {
+        setIsSuperAdmin(!!data);
+        setLoading(false);
+      });
+  }, [user, authLoading]);
+
+  return { isSuperAdmin, loading, user };
+}
