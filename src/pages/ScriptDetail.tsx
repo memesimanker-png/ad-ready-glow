@@ -249,17 +249,20 @@ export default function ScriptDetail() {
                 <CopyButton text={script.code} className="w-full justify-center" />
               )}
 
-              {script.game_url && (
-                <a
-                  href={script.game_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold transition-all shadow-sm shadow-green-500/20"
-                  aria-label={`Play ${script.game} on Roblox`}
-                >
-                  <Play className="h-4 w-4 fill-current" /> Play Game on Roblox
-                </a>
-              )}
+              <a
+                href={
+                  script.game_url ||
+                  ((script as any).game_universe_id
+                    ? `https://www.roblox.com/games/${(script as any).game_universe_id}`
+                    : `https://www.roblox.com/discover?Keyword=${encodeURIComponent(script.game)}`)
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold transition-all shadow-sm shadow-green-500/20"
+                aria-label={`Play ${script.game} on Roblox`}
+              >
+                <Play className="h-4 w-4 fill-current" /> Play Game on Roblox
+              </a>
 
               <button
                 type="button"
