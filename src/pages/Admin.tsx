@@ -808,3 +808,134 @@ function MessagesTab() {
     </div>
   );
 }
+
+/* ─── Admins Tab (super_admin only) ─── */
+function AdminsTab() {
+  const { toast } = useToast();
+  const [rows, setRows] = useState<Array<{ user_id: string; role: string; email?: string }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<"admin" | "moderator">("admin");
+  const [adding, setAdding] = useState(false);
+
+  const inputCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("user_id, role")
+      .in("role", ["admin", "moderator", "super_admin"]);
+    if (error) {
+      toast({ variant: "destructive", title: "Failed to load", description: error.message });
+      setLoading(false);
+      return;
+    }
+    // Resolve emails (super_admin only via RPC)
+    const enriched = await Promise.all((data || []).map(async (r: any) => {
+      const { data: emailData } = await supabase.rpc("get_user_email" as any, { _user_id: r.user_id });
+      return { ...r, email: (emailData as any) || r.user_id.slice(0, 8) + "…" };
+    }));
+    setRows(enriched);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const grant = async () => {
+    if (!email.trim()) {
+      toast({ variant: "destructive", title: "Email required" });
+      return;
+    }
+    setAdding(true);
+    const { error } = await supabase.rpc("grant_role_by_email" as any, { _email: email.trim(), _role: role });
+    setAdding(false);
+    if (error) {
+      toast({ variant: "destructive", title: "Failed", description: error.message });
+      return;
+    }
+    toast({ title: "Role granted", description: `${email} is now a ${role}.` });
+    setEmail("");
+    load();
+  };
+
+  const revoke = async (user_id: string, r: string) => {
+    if (r === "super_admin") {
+      toast({ variant: "destructive", title: "Forbidden", description: "Cannot revoke super_admin from the dashboard." });
+      return;
+    }
+    if (!confirm(`Revoke ${r} role for this user?`)) return;
+    const { error } = await supabase.rpc("revoke_user_role" as any, { _user_id: user_id, _role: r });
+    if (error) {
+      toast({ variant: "destructive", title: "Failed", description: error.message });
+      return;
+    }
+    toast({ title: "Role revoked" });
+    load();
+  };
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <Card className="p-5 border-primary/20 bg-primary/5">
+        <h2 className="font-semibold mb-1 flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-primary" /> Add an admin or moderator</h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          Admins added here can manage scripts, accounts, messages, and users — but <strong>cannot view orders / purchases</strong>. Only the super-admin (you) sees those.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px_auto] gap-3">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="user@example.com"
+            className={inputCls}
+          />
+          <select value={role} onChange={e => setRole(e.target.value as any)} className={inputCls}>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+          </select>
+          <Button onClick={grant} disabled={adding}>
+            {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            Grant
+          </Button>
+        </div>
+        <p className="text-[11px] text-muted-foreground mt-2">
+          Tip: the user must have already signed up at least once.
+        </p>
+      </Card>
+
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Current staff ({rows.length})</h2>
+        {loading ? (
+          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+        ) : rows.length === 0 ? (
+          <Card className="p-8 text-center text-sm text-muted-foreground">No admins or moderators yet.</Card>
+        ) : (
+          <div className="space-y-2">
+            {rows.map((r, i) => (
+              <Card key={`${r.user_id}-${r.role}-${i}`} className="p-4 flex items-center justify-between gap-3 flex-wrap">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm truncate">{r.email}</span>
+                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                      r.role === "super_admin" ? "bg-primary/15 text-primary border-primary/30"
+                      : r.role === "admin" ? "bg-yellow-500/15 text-yellow-300 border-yellow-500/30"
+                      : "bg-blue-500/15 text-blue-300 border-blue-500/30"
+                    }`}>
+                      {r.role.replace("_", " ")}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{r.user_id.slice(0, 8)}…</p>
+                </div>
+                {r.role !== "super_admin" && (
+                  <Button size="sm" variant="destructive" onClick={() => revoke(r.user_id, r.role)}>
+                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
+                  </Button>
+                )}
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
