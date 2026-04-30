@@ -26,17 +26,56 @@ export default function ScriptDetail() {
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const title = script?.title || "Roblox Script";
-    try {
-      if (navigator.share) {
-        await navigator.share({ title, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast({ title: "Link copied", description: "Share link copied to clipboard." });
+    const text = `${title} — ${url}`;
+
+    // Robust clipboard helper with execCommand fallback (works on http, old Safari, etc.)
+    const copyText = async (value: string): Promise<boolean> => {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+          return true;
+        }
+      } catch { /* fall through */ }
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = value;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "-1000px";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      } catch {
+        return false;
       }
+    };
+
+    // Prefer native share on touch devices (mobile/tablet) where it's reliable.
+    const isTouch = typeof window !== "undefined" && (("ontouchstart" in window) || (navigator as any).maxTouchPoints > 0);
+    if (isTouch && typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title, text: title, url });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        return;
+      } catch (err: any) {
+        // AbortError = user cancelled; don't fall back in that case
+        if (err?.name === "AbortError") return;
+        // Otherwise fall through to clipboard
+      }
+    }
+
+    const ok = await copyText(url);
+    if (ok) {
       setShared(true);
+      toast({ title: "Link copied!", description: "Share link copied to clipboard." });
       setTimeout(() => setShared(false), 2000);
-    } catch {
-      /* user cancelled */
+    } else {
+      // Last resort: prompt user to copy manually
+      window.prompt("Copy this link:", url);
     }
   };
 
