@@ -174,21 +174,21 @@ export default function AccessKey() {
     return `${hours}h ${minutes}m`;
   };
 
-  // Direct link gate
-  if (showDirectLinkGate && !directLinkCompleted) {
-    return (
-      <div className="min-h-screen bg-black/70 flex items-center justify-center p-4">
-        <div className="space-y-4 w-full max-w-md">
-          <Card className="border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MousePointerClick className="h-5 w-5 text-primary" />
-                One More Step!
-              </CardTitle>
-              <CardDescription>Click the button below 2 times to access the key generator</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
+  return (
+    <div className="min-h-screen bg-black/70 flex flex-col">
+      <header className="container py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">COMBO WICK</h1>
+          </div>
+          <LanguageSelector />
+        </div>
+      </header>
+
+      <main className="flex-1 container flex flex-col items-center justify-center py-12">
+        <div className="max-w-md w-full mx-auto space-y-6">
+          <div className="text-center space-y-2">
             <Key className="h-12 w-12 text-primary mx-auto" />
             <h1 className="text-3xl font-bold">Access Key Generator</h1>
             <p className="text-muted-foreground">Generate your HWID access key below.</p>
