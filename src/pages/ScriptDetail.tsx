@@ -188,7 +188,11 @@ export default function ScriptDetail() {
                   </h1>
                 </div>
               </div>
-              <p className="mt-3 text-muted-foreground leading-relaxed">{script.longDescription || script.description}</p>
+              <div className="mt-3 text-muted-foreground leading-relaxed space-y-3 max-w-prose">
+                {(script.longDescription || script.description).split(/\n\n+/).map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
                 <span>Added {script.createdAt}</span>
                 <span>Updated {script.updatedAt}</span>
