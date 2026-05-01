@@ -9,9 +9,7 @@ import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { getTodaySchedule } from "@/lib/day-schedule";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
-import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
-import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
@@ -76,9 +74,7 @@ export default function VerifyStep2() {
 
   return (
     <>
-      <SkipAdsBanner />
-      <SkipAdsFloatButton />
-      <div className="min-h-screen bg-black/70 flex flex-col pt-12">
+      <div className="min-h-screen bg-black/70 flex flex-col">
         <header className="container py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

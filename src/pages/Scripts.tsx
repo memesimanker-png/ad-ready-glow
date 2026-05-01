@@ -5,11 +5,9 @@ import { CATEGORIES } from "@/lib/scripts-data";
 import { useSearchScripts } from "@/hooks/useScripts";
 import { ScriptCard } from "@/components/ScriptCard";
 import { Layout } from "@/components/Layout";
-import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { SEOHead } from "@/components/SEOHead";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
-import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,11 +18,6 @@ export default function Scripts() {
     setQuery(searchParams.get("q") ?? "");
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
-
-  // Fire popunder at most once every 5 minutes (shared across pages)
-  useEffect(() => {
-    loadMonetagPopunder();
-  }, []);
 
   // Press "/" to focus the search box (skip when typing in another input)
   const searchRef = useRef<HTMLInputElement | null>(null);
@@ -86,7 +79,6 @@ export default function Scripts() {
           isPartOf: { "@type": "WebSite", name: "ComboWick", url: "https://combowick.com" },
         }}
       />
-      <DirectLinkOverlay />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-heading" style={{ textWrap: "balance" as any }}>
