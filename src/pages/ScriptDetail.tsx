@@ -10,6 +10,7 @@ import { GameThumbnail } from "@/components/GameThumbnail";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -187,7 +188,11 @@ export default function ScriptDetail() {
                   </h1>
                 </div>
               </div>
-              <p className="mt-3 text-muted-foreground leading-relaxed">{script.longDescription || script.description}</p>
+              <div className="mt-3 text-muted-foreground leading-relaxed space-y-3 max-w-prose">
+                {(script.longDescription || script.description).split(/\n\n+/).map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
                 <span>Added {script.createdAt}</span>
                 <span>Updated {script.updatedAt}</span>
@@ -230,6 +235,11 @@ export default function ScriptDetail() {
                   </pre>
                 </div>
               </section>
+            )}
+
+            {/* In-article AdSense — only on free script pages with code shown above (not paid gates) */}
+            {!script.is_paid && (
+              <AdSlot slot="4444444444" format="fluid" layout="in-article" responsive={false} minHeight={200} />
             )}
 
             <section className="mb-8">
