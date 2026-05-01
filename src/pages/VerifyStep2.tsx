@@ -12,6 +12,7 @@ import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function VerifyStep2() {
   const navigate = useNavigate();
@@ -164,6 +165,7 @@ export default function VerifyStep2() {
                 </Button>
               </CardFooter>
             </Card>
+            <AdSlot slot="0000000000" format="auto" minHeight={250} />
           </div>
         </main>
       </div>

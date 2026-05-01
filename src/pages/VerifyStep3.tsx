@@ -9,6 +9,7 @@ import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function VerifyStep3() {
   const navigate = useNavigate();
@@ -91,6 +92,7 @@ export default function VerifyStep3() {
                 </Button>
               </CardFooter>
             </Card>
+            <AdSlot slot="0000000000" format="auto" minHeight={250} />
           </div>
         </main>
       </div>
