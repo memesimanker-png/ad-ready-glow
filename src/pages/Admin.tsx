@@ -28,7 +28,7 @@ export default function Admin() {
   const { toast } = useToast();
   const can = (t: AdminTab) => isSuperAdmin || allowedTabs.includes(t);
 
-  if (loading) {
+  if (loading || tabsLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -37,6 +37,8 @@ export default function Admin() {
       </Layout>
     );
   }
+
+  const defaultTab = (allowedTabs[0] as string) || "scripts";
 
   if (!user) return <Navigate to="/login" replace />;
   if (!isAdmin) {
