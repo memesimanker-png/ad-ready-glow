@@ -93,13 +93,6 @@ export default function VerifyProviderSelect() {
     }
   }, [youtubeCompleted, discordCompleted, showSubscriptionGate, toast]);
 
-  useEffect(() => {
-    if (directLinkClicks >= 2 && showDirectLinkGate) {
-      localStorage.setItem("direct_link_completed", new Date().toISOString());
-      setShowDirectLinkGate(false);
-      toast({ title: "Access Granted!", description: "You can now select a verification provider." });
-    }
-  }, [directLinkClicks, showDirectLinkGate, toast]);
 
   const handleYoutubeClick = () => {
     window.open(YOUTUBE_URL, "_blank");
@@ -113,18 +106,6 @@ export default function VerifyProviderSelect() {
     toast({ title: "Opening Discord", description: `Please join and wait ${WAIT_TIME_SECONDS} seconds...` });
   };
 
-  const handleDirectLinkClick = () => {
-    const newClickCount = directLinkClicks + 1;
-    setDirectLinkClicks(newClickCount);
-    localStorage.setItem("direct_link_clicks", newClickCount.toString());
-    window.open(DIRECT_LINK_URL, "_blank");
-
-    if (newClickCount >= 2) {
-      toast({ title: "Completed!", description: "You've clicked the button 2 times. Thank you!" });
-    } else {
-      toast({ title: "Link Opened", description: `Click ${2 - newClickCount} more time${2 - newClickCount > 1 ? "s" : ""} after returning.` });
-    }
-  };
 
   const handleProviderSelect = (providerId: string) => {
     localStorage.setItem("selected_ad_provider", providerId);
@@ -142,7 +123,7 @@ export default function VerifyProviderSelect() {
   if (!mounted) return null;
 
   const subscriptionGateCompleted = youtubeCompleted && discordCompleted;
-  const directLinkGateCompleted = directLinkClicks >= 2;
+  
   const youtubeProgress = youtubeTimer > 0 ? ((WAIT_TIME_SECONDS - youtubeTimer) / WAIT_TIME_SECONDS) * 100 : youtubeCompleted ? 100 : 0;
   const discordProgress = discordTimer > 0 ? ((WAIT_TIME_SECONDS - discordTimer) / WAIT_TIME_SECONDS) * 100 : discordCompleted ? 100 : 0;
 
