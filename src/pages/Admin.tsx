@@ -338,7 +338,7 @@ function ScriptsTab() {
             <label className="text-sm font-medium mb-1 block">Tags</label>
             <div className="flex gap-2 mb-2">
               <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())} className={`${inputCls} flex-1`} placeholder="Add tag..." />
-              <Button onClick={addTag} size="sm" variant="outline"><Plus className="h-3 w-3" /></Button>
+              <Button onClick={addTag} size="sm" variant="outline" title="Add tag"><Plus className="h-3 w-3" /></Button>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {form.tags.map(t => (
@@ -398,8 +398,8 @@ function ScriptsTab() {
               >
                 {notifyingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => editScript(s)}><Edit className="h-3 w-3" /></Button>
-              <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)}><Trash2 className="h-3 w-3" /></Button>
+              <Button size="sm" variant="outline" onClick={() => editScript(s)} title="Edit script"><Edit className="h-3 w-3" /></Button>
+              <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)} title="Delete script permanently"><Trash2 className="h-3 w-3" /></Button>
             </div>
           </Card>
         ))}
@@ -469,7 +469,7 @@ function KeyDisplay({ value }: { value: string }) {
   return (
     <div className="flex items-center gap-1">
       <code className="text-xs font-mono bg-secondary px-2 py-1 rounded">{show ? value : "••••••••"}</code>
-      <button onClick={() => setShow(!show)} className="text-muted-foreground hover:text-foreground">
+      <button onClick={() => setShow(!show)} className="text-muted-foreground hover:text-foreground" title={show ? "Hide value" : "Reveal value"}>
         {show ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
       </button>
     </div>
@@ -613,7 +613,7 @@ function AccountsTab() {
                       <span className="font-mono text-xs text-muted-foreground select-all">
                         {revealed ? a.password : "•".repeat(Math.min(a.password.length, 12))}
                       </span>
-                      <button onClick={() => toggleReveal(a.id)} className="text-muted-foreground hover:text-foreground">
+                      <button onClick={() => toggleReveal(a.id)} className="text-muted-foreground hover:text-foreground" title={revealed ? "Hide password" : "Show password"}>
                         {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                       </button>
                     </div>
@@ -624,8 +624,8 @@ function AccountsTab() {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => copy(a.username, "Username")}><Copy className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => copy(a.password, "Password")}><Key className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.username, "Username")} title="Copy username"><Copy className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.password, "Password")} title="Copy password"><Key className="h-3.5 w-3.5" /></Button>
                   </div>
                 </div>
               </Card>
@@ -994,12 +994,12 @@ function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; ema
         </div>
         <div className="flex items-center gap-2">
           {!isSuper && (
-            <Button size="sm" variant="outline" onClick={() => { setExpanded(e => !e); loadTabs(); }}>
+            <Button size="sm" variant="outline" onClick={() => { setExpanded(e => !e); loadTabs(); }} title="Configure which admin sections this user can access">
               <ShieldCheck className="h-3.5 w-3.5 mr-1" /> {expanded ? "Hide" : "Permissions"}
             </Button>
           )}
           {!isSuper && (
-            <Button size="sm" variant="destructive" onClick={onRevoke}>
+            <Button size="sm" variant="destructive" onClick={onRevoke} title="Remove this user's admin access entirely">
               <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
             </Button>
           )}
