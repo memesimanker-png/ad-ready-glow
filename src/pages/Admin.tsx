@@ -68,24 +68,24 @@ export default function Admin() {
           </div>
         </div>
 
-        <Tabs defaultValue="scripts" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
-            <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>
-            {isSuperAdmin && <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
-            {isSuperAdmin && <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
-            <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>
-            <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>
-            <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>
-            {isSuperAdmin && <TabsTrigger value="admins" className="gap-2"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
+            {can("orders") && <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
+            {can("generate") && <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
+            {can("accounts") && <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>}
+            {can("messages") && <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
+            {can("users") && <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>}
+            {can("admins") && <TabsTrigger value="admins" className="gap-2"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="scripts"><ScriptsTab /></TabsContent>
-          {isSuperAdmin && <TabsContent value="orders"><OrdersTab /></TabsContent>}
-          {isSuperAdmin && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
-          <TabsContent value="accounts"><AccountsTab /></TabsContent>
-          <TabsContent value="messages"><MessagesTab /></TabsContent>
-          <TabsContent value="users"><UsersTab /></TabsContent>
-          {isSuperAdmin && <TabsContent value="admins"><AdminsTab /></TabsContent>}
+          {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
+          {can("orders") && <TabsContent value="orders"><OrdersTab /></TabsContent>}
+          {can("generate") && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
+          {can("accounts") && <TabsContent value="accounts"><AccountsTab /></TabsContent>}
+          {can("messages") && <TabsContent value="messages"><MessagesTab /></TabsContent>}
+          {can("users") && <TabsContent value="users"><UsersTab /></TabsContent>}
+          {can("admins") && <TabsContent value="admins"><AdminsTab /></TabsContent>}
         </Tabs>
       </main>
     </Layout>
