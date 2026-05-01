@@ -1040,8 +1040,4 @@ function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; ema
     </Card>
   );
 }
-        )}
-      </div>
-    </div>
-  );
-}
+
