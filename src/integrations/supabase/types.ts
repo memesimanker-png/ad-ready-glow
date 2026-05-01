@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_permissions: {
+        Row: {
+          tabs: string[]
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          tabs?: string[]
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          tabs?: string[]
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           admin_reply: string | null
@@ -496,6 +517,7 @@ export type Database = {
         Returns: number
       }
       get_account_stock: { Args: { _package_size: number }; Returns: number }
+      get_admin_tabs: { Args: { _user_id: string }; Returns: string[] }
       get_user_email: { Args: { _user_id: string }; Returns: string }
       grant_role_by_email: {
         Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
@@ -530,6 +552,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: undefined
+      }
+      set_admin_tabs: {
+        Args: { _tabs: string[]; _user_id: string }
         Returns: undefined
       }
     }
