@@ -246,23 +246,7 @@ export default function VerifyProviderSelect() {
               });
             }
 
-            if (showDirectLinkGate) {
-              steps.push({
-                key: "click",
-                title: "Quick Click Gate",
-                done: directLinkGateCompleted,
-                icon: <MousePointerClick className="h-4 w-4" />,
-                render: () => (
-                  <div className="space-y-2">
-                    <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
-                      <MousePointerClick className="mr-2 h-4 w-4" />
-                      {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
-                    </Button>
-                    <Progress value={(directLinkClicks / 2) * 100} className="h-1" />
-                  </div>
-                ),
-              });
-            }
+
 
             steps.push({
               key: "provider",
