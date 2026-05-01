@@ -4,7 +4,7 @@
     { "source": "/robots.txt", "destination": "/robots.txt" },
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/manifest.webmanifest", "destination": "/manifest.webmanifest" },
-    { "source": "/sw_2.js", "destination": "/sw_2.js" },
+    
     { "source": "/google249552f9b2711a57.html", "destination": "/google249552f9b2711a57.html" },
     { "source": "/((?!assets/|images/|videos/|.*\\.(?:xml|txt|json|js|css|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|otf|mp4|webmanifest|html)).*)", "destination": "/index.html" }
   ],
