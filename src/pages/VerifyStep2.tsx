@@ -113,7 +113,7 @@ export default function VerifyStep2() {
                     <div className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                       <p className="text-sm text-primary font-medium">
-                        {t("Sign in with Google to skip this step on reward days!")}
+                        {t("Sign into Puter to skip this step reward thru Google!")}
                       </p>
                     </div>
                     <Button
