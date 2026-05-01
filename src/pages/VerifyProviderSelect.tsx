@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,7 @@ const adProviders = [
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
-const DIRECT_LINK_COOLDOWN_MINUTES = 5;
 const WAIT_TIME_SECONDS = 3;
 
 export default function VerifyProviderSelect() {
@@ -32,13 +30,11 @@ export default function VerifyProviderSelect() {
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
-  const [showDirectLinkGate, setShowDirectLinkGate] = useState(false);
 
   const [youtubeCompleted, setYoutubeCompleted] = useState(false);
   const [discordCompleted, setDiscordCompleted] = useState(false);
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
-  const [directLinkClicks, setDirectLinkClicks] = useState(0);
 
 
   useEffect(() => {
@@ -55,22 +51,8 @@ export default function VerifyProviderSelect() {
       setShowSubscriptionGate(true);
     }
 
-    const directLinkCompletedAt = localStorage.getItem("direct_link_completed");
-    if (directLinkCompletedAt) {
-      const minutesSince = (Date.now() - new Date(directLinkCompletedAt).getTime()) / (1000 * 60);
-      if (minutesSince >= DIRECT_LINK_COOLDOWN_MINUTES) {
-        setShowDirectLinkGate(true);
-        localStorage.removeItem("direct_link_clicks");
-        setDirectLinkClicks(0);
-      } else {
-        setShowDirectLinkGate(false);
-      }
-    } else {
-      setShowDirectLinkGate(true);
-    }
-
-    const savedClicks = localStorage.getItem("direct_link_clicks");
-    if (savedClicks) setDirectLinkClicks(parseInt(savedClicks, 10));
+    localStorage.removeItem("direct_link_completed");
+    localStorage.removeItem("direct_link_clicks");
 
     localStorage.removeItem("step1_completed");
     localStorage.removeItem("step2_completed");
