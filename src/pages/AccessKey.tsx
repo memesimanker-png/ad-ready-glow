@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Copy, User, Clock, Shield, Key, MousePointerClick, Loader2 } from "lucide-react";
+import { Copy, User, Clock, Shield, Key, Loader2 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 interface StoredKeyData {
   key: string;
@@ -15,8 +14,6 @@ interface StoredKeyData {
   username?: string;
   generated_at: number;
 }
-
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 
 export default function AccessKey() {
   const navigate = useNavigate();
@@ -26,15 +23,7 @@ export default function AccessKey() {
   const [keyExpiresAt, setKeyExpiresAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
-  const [directLinkClicks, setDirectLinkClicks] = useState(0);
-  const [directLinkCompleted, setDirectLinkCompleted] = useState(false);
-  const [showDirectLinkGate, setShowDirectLinkGate] = useState(true);
   const [error, setError] = useState("");
-
-  // Fire popunder at most once every 5 minutes (shared across pages)
-  useEffect(() => {
-    loadMonetagPopunder();
-  }, []);
 
   // Verify steps are completed & load stored key
   useEffect(() => {
