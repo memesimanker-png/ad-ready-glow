@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Calendar, ArrowRight, BookOpen } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
+import { AdSlot } from "@/components/AdSlot";
 
 const blogPosts = [
   {
@@ -149,6 +150,8 @@ export default function Blog() {
               Expert articles to help you get the most out of Roblox — from account security and trading strategies to game development tutorials and earning guides.
             </p>
           </div>
+
+          <AdSlot slot="5555555555" format="auto" responsive minHeight={250} className="mb-8" />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogPosts.map((post) => (

@@ -9,6 +9,7 @@ import { BlogPreviewSection } from "@/components/home/BlogPreviewSection";
 import { GallerySection } from "@/components/home/GallerySection";
 import { FeaturedScriptsSection } from "@/components/home/FeaturedScriptsSection";
 import { VideoBackground } from "@/components/VideoBackground";
+import { AdSlot } from "@/components/AdSlot";
 import { useTranslation } from "@/lib/translation-context";
 import { motion } from "framer-motion";
 import { SEOHead } from "@/components/SEOHead";
@@ -88,9 +89,20 @@ export default function Index() {
       </section>
 
       <FeaturedScriptsSection />
+
+      {/* In-content AdSense unit — between content sections, not in nav/sidebar/footer */}
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <AdSlot slot="1111111111" format="auto" responsive minHeight={280} />
+      </div>
+
       <FeaturesSection />
       <GallerySection />
       <HowItWorksSection />
+
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <AdSlot slot="2222222222" format="auto" responsive minHeight={280} />
+      </div>
+
       <BlogPreviewSection />
       <FAQSection />
 

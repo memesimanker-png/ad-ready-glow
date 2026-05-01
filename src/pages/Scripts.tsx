@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -183,11 +184,23 @@ export default function Scripts() {
                 ))}
               </div>
             ) : results.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {results.map((script) => (
-                  <ScriptCard key={script.id} script={script} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {results.slice(0, 6).map((script) => (
+                    <ScriptCard key={script.id} script={script} />
+                  ))}
+                </div>
+                {results.length > 6 && (
+                  <AdSlot slot="3333333333" format="auto" responsive minHeight={250} />
+                )}
+                {results.length > 6 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {results.slice(6).map((script) => (
+                      <ScriptCard key={script.id} script={script} />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-muted-foreground text-lg font-medium">No scripts found</p>

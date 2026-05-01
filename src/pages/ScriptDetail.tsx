@@ -10,6 +10,7 @@ import { GameThumbnail } from "@/components/GameThumbnail";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -230,6 +231,11 @@ export default function ScriptDetail() {
                   </pre>
                 </div>
               </section>
+            )}
+
+            {/* In-article AdSense — only on free script pages with code shown above (not paid gates) */}
+            {!script.is_paid && (
+              <AdSlot slot="4444444444" format="fluid" layout="in-article" responsive={false} minHeight={200} />
             )}
 
             <section className="mb-8">
