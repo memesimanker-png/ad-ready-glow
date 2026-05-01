@@ -53,6 +53,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ClaimAccess = lazy(() => import("./pages/ClaimAccess"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
 // Tuned defaults to massively cut Lovable Cloud DB load on a 5K-visits/day site.
 const queryClient = new QueryClient({
@@ -124,6 +125,7 @@ const App = () => (
                   <Route path="/register" element={<Register />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/claim-access" element={<ClaimAccess />} />
+                  <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
