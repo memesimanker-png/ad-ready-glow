@@ -932,9 +932,12 @@ function AdminsTab() {
 /* ─── Single admin row with inline permissions editor ─── */
 const MANAGEABLE_TABS: Array<{ key: AdminTab; label: string }> = [
   { key: "scripts", label: "Scripts" },
+  { key: "orders", label: "Orders" },
+  { key: "generate", label: "Generate Key" },
   { key: "accounts", label: "Accounts" },
   { key: "messages", label: "Messages" },
   { key: "users", label: "Users" },
+  { key: "admins", label: "Admins" },
 ];
 
 function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; email?: string }; onRevoke: () => void }) {
