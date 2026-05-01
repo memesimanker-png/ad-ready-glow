@@ -70,13 +70,13 @@ export default function Admin() {
 
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
-            {can("scripts") && <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
-            {can("orders") && <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
-            {can("generate") && <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
-            {can("accounts") && <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>}
-            {can("messages") && <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
-            {can("users") && <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>}
-            {can("admins") && <TabsTrigger value="admins" className="gap-2"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="scripts" className="gap-2" title="Manage all scripts (create, edit, delete, send notifications)"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
+            {can("orders") && <TabsTrigger value="orders" className="gap-2" title="View premium key purchase orders and payments"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
+            {can("generate") && <TabsTrigger value="generate" className="gap-2" title="Manually generate a premium key for a customer"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
+            {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage Roblox accounts inventory available for claim"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>}
+            {can("messages") && <TabsTrigger value="messages" className="gap-2" title="Read and reply to contact form messages"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
+            {can("users") && <TabsTrigger value="users" className="gap-2" title="View and manage registered user accounts"><Users className="h-4 w-4" /> Users</TabsTrigger>}
+            {can("admins") && <TabsTrigger value="admins" className="gap-2" title="Grant or revoke admin/moderator access"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
           </TabsList>
 
           {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
@@ -146,7 +146,7 @@ function GenerateKeyTab() {
           <label className="text-sm font-medium mb-1 block">Customer Email (optional)</label>
           <input value={email} onChange={e => setEmail(e.target.value)} className={inputCls} placeholder="customer@example.com" />
         </div>
-        <Button onClick={handleGenerate} disabled={generating} className="w-full">
+        <Button onClick={handleGenerate} disabled={generating} className="w-full" title="Create a new premium key with the chosen tier and email it to the customer if provided">
           {generating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
           Generate Key
         </Button>
@@ -155,7 +155,7 @@ function GenerateKeyTab() {
           <div className="mt-4 p-4 rounded-lg border border-green-500/30 bg-green-500/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-green-400">Generated Key:</span>
-              <Button size="sm" variant="ghost" onClick={copyKey} className="text-green-400 hover:text-green-300">
+              <Button size="sm" variant="ghost" onClick={copyKey} className="text-green-400 hover:text-green-300" title="Copy the generated key to clipboard">
                 <Copy className="h-3 w-3 mr-1" /> Copy
               </Button>
             </div>
@@ -294,7 +294,7 @@ function ScriptsTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{scripts.length} Scripts</h2>
-        <Button onClick={() => { setForm({ ...emptyScript }); setEditingId(null); setShowForm(!showForm); }}>
+        <Button onClick={() => { setForm({ ...emptyScript }); setEditingId(null); setShowForm(!showForm); }} title={showForm ? "Close the script editor form" : "Open form to add a brand new script"}>
           <Plus className="h-4 w-4 mr-2" /> {showForm ? "Close Form" : "Add Script"}
         </Button>
       </div>
@@ -306,7 +306,7 @@ function ScriptsTab() {
             <label className="text-sm font-medium mb-1 block">Script Code *</label>
             <textarea value={form.code} onChange={e => set("code", e.target.value)} rows={5} className={`${inputCls} font-mono text-xs`} placeholder="Paste Lua code..." />
           </div>
-          <Button onClick={aiAutofill} disabled={aiLoading} variant="outline" className="w-full">
+          <Button onClick={aiAutofill} disabled={aiLoading} variant="outline" className="w-full" title="Use AI to auto-generate title, description, tags, and FAQs from the pasted code">
             {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
             AI Auto-Fill
           </Button>
@@ -338,7 +338,7 @@ function ScriptsTab() {
             <label className="text-sm font-medium mb-1 block">Tags</label>
             <div className="flex gap-2 mb-2">
               <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())} className={`${inputCls} flex-1`} placeholder="Add tag..." />
-              <Button onClick={addTag} size="sm" variant="outline"><Plus className="h-3 w-3" /></Button>
+              <Button onClick={addTag} size="sm" variant="outline" title="Add tag"><Plus className="h-3 w-3" /></Button>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {form.tags.map(t => (
@@ -351,7 +351,7 @@ function ScriptsTab() {
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.verified} onChange={e => set("verified", e.target.checked)} className="rounded" /> Verified</label>
             <label className="flex items-center gap-2 text-sm font-semibold text-yellow-400"><input type="checkbox" checked={form.is_paid} onChange={e => set("is_paid", e.target.checked)} className="rounded" /> 💰 Paid Script</label>
           </div>
-          <Button onClick={save} disabled={saving} className="w-full">
+          <Button onClick={save} disabled={saving} className="w-full" title={editingId ? "Save changes to this script" : "Publish this script to the public hub"}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             {editingId ? "Update Script" : "Save Script"}
           </Button>
@@ -398,8 +398,8 @@ function ScriptsTab() {
               >
                 {notifyingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => editScript(s)}><Edit className="h-3 w-3" /></Button>
-              <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)}><Trash2 className="h-3 w-3" /></Button>
+              <Button size="sm" variant="outline" onClick={() => editScript(s)} title="Edit script"><Edit className="h-3 w-3" /></Button>
+              <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)} title="Delete script permanently"><Trash2 className="h-3 w-3" /></Button>
             </div>
           </Card>
         ))}
@@ -469,7 +469,7 @@ function KeyDisplay({ value }: { value: string }) {
   return (
     <div className="flex items-center gap-1">
       <code className="text-xs font-mono bg-secondary px-2 py-1 rounded">{show ? value : "••••••••"}</code>
-      <button onClick={() => setShow(!show)} className="text-muted-foreground hover:text-foreground">
+      <button onClick={() => setShow(!show)} className="text-muted-foreground hover:text-foreground" title={show ? "Hide value" : "Reveal value"}>
         {show ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
       </button>
     </div>
@@ -584,7 +584,7 @@ function AccountsTab() {
             <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="capitalize">{f}</Button>
           ))}
         </div>
-        <Button variant="outline" size="sm" onClick={exportTxt} disabled={!filtered.length}>
+        <Button variant="outline" size="sm" onClick={exportTxt} disabled={!filtered.length} title="Export all visible accounts as a .txt file (user:pass per line)">
           <Copy className="h-4 w-4 mr-2" /> Export {filtered.length} as .txt
         </Button>
       </div>
@@ -613,7 +613,7 @@ function AccountsTab() {
                       <span className="font-mono text-xs text-muted-foreground select-all">
                         {revealed ? a.password : "•".repeat(Math.min(a.password.length, 12))}
                       </span>
-                      <button onClick={() => toggleReveal(a.id)} className="text-muted-foreground hover:text-foreground">
+                      <button onClick={() => toggleReveal(a.id)} className="text-muted-foreground hover:text-foreground" title={revealed ? "Hide password" : "Show password"}>
                         {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                       </button>
                     </div>
@@ -624,8 +624,8 @@ function AccountsTab() {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => copy(a.username, "Username")}><Copy className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => copy(a.password, "Password")}><Key className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.username, "Username")} title="Copy username"><Copy className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => copy(a.password, "Password")} title="Copy password"><Key className="h-3.5 w-3.5" /></Button>
                   </div>
                 </div>
               </Card>
@@ -762,16 +762,16 @@ function MessagesTab() {
                 </div>
                 <div className="flex flex-col gap-1.5 flex-shrink-0">
                   {m.status !== "archived" && (
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")}>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")} title="Move this message to the archive (hidden from active list)">
                       <MailX className="h-3.5 w-3.5 mr-1" /> Archive
                     </Button>
                   )}
                   {m.status === "new" && (
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")}>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")} title="Mark this message as read">
                       <MailOpen className="h-3.5 w-3.5 mr-1" /> Mark read
                     </Button>
                   )}
-                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)}>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)} title="Permanently delete this message">
                     <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                   </Button>
                 </div>
@@ -795,11 +795,11 @@ function MessagesTab() {
                     maxLength={4000}
                   />
                   <div className="flex gap-2">
-                    <Button size="sm" disabled={savingId === m.id} onClick={() => sendReply(m.id)}>
+                    <Button size="sm" disabled={savingId === m.id} onClick={() => sendReply(m.id)} title="Send your reply — the user will see it in their dashboard and receive an email">
                       {savingId === m.id ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Mail className="h-3.5 w-3.5 mr-1" />}
                       Send reply
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => window.open(`mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.subject)}`, "_blank")}>
+                    <Button size="sm" variant="outline" onClick={() => window.open(`mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.subject)}`, "_blank")} title="Open your local email client to reply manually">
                       Or open email client
                     </Button>
                   </div>
@@ -897,7 +897,7 @@ function AdminsTab() {
             <option value="admin">Admin</option>
             <option value="moderator">Moderator</option>
           </select>
-          <Button onClick={grant} disabled={adding}>
+          <Button onClick={grant} disabled={adding} title="Grant the entered user the selected role (admin or moderator)">
             {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             Grant
           </Button>
@@ -994,12 +994,12 @@ function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; ema
         </div>
         <div className="flex items-center gap-2">
           {!isSuper && (
-            <Button size="sm" variant="outline" onClick={() => { setExpanded(e => !e); loadTabs(); }}>
+            <Button size="sm" variant="outline" onClick={() => { setExpanded(e => !e); loadTabs(); }} title="Configure which admin sections this user can access">
               <ShieldCheck className="h-3.5 w-3.5 mr-1" /> {expanded ? "Hide" : "Permissions"}
             </Button>
           )}
           {!isSuper && (
-            <Button size="sm" variant="destructive" onClick={onRevoke}>
+            <Button size="sm" variant="destructive" onClick={onRevoke} title="Remove this user's admin access entirely">
               <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
             </Button>
           )}

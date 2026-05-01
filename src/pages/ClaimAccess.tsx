@@ -4,6 +4,7 @@ import { Shield, CheckCircle, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function ClaimAccess() {
   const navigate = useNavigate();
@@ -91,6 +92,9 @@ export default function ClaimAccess() {
               </Button>
             </CardContent>
           </Card>
+          <div className="mt-8 max-w-md mx-auto">
+            <AdSlot slot="0000000000" format="auto" minHeight={250} />
+          </div>
         </main>
       </div>
     </div>

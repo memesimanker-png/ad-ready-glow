@@ -11,6 +11,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { getTodaySchedule } from "@/lib/day-schedule";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { AdSlot } from "@/components/AdSlot";
 
 const adProviders = [
   { id: "linkvertise", name: "Free Key", description: "" },
@@ -281,6 +282,7 @@ export default function VerifyProviderSelect() {
               </Card>
             );
           })()}
+          <AdSlot slot="0000000000" format="auto" minHeight={250} />
         </div>
       </main>
     </div>

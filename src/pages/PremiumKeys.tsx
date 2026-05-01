@@ -12,6 +12,7 @@ import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { AdSlot } from "@/components/AdSlot";
 
 const tiers = [
   {
@@ -384,6 +385,9 @@ export default function PremiumKeys() {
           paypalClientId={paypalClientId}
         />
       )}
+      <div className="container max-w-5xl pb-12">
+        <AdSlot slot="0000000000" format="auto" minHeight={280} />
+      </div>
     </Layout>
   );
 }

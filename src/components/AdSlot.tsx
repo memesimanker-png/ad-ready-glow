@@ -9,20 +9,14 @@ declare global {
 
 const PUBLISHER_ID = "ca-pub-8877213222492502";
 
-// Routes where AdSense MUST NOT be shown — gates, monetization-conflict pages, auth, admin.
-// AdSense disallows ads alongside popunder/redirect monetization (Monetag/Linkvertise) on the same page.
+// Routes where AdSense MUST NOT be shown — admin, auth, and dashboard only.
+// User wants ads on key/verify pages to maximize earnings; let AdSense flag if it's a problem.
 const BLOCKED_ROUTE_PATTERNS = [
-  /^\/verify(\/|$)/,
-  /^\/access-key/,
-  /^\/ad-return/,
-  /^\/keys$/,
   /^\/admin/,
   /^\/login/,
   /^\/signup/,
   /^\/register/,
   /^\/dashboard/,
-  /^\/claim-access/,
-  /^\/blocked/,
   /^\/unsubscribe/,
 ];
 

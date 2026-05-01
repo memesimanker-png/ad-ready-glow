@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Key, Clock, Shield, Zap, Crown, CheckCircle, Play } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { AdSlot } from "@/components/AdSlot";
 
 export default function Keys() {
   const { t } = useTranslation();
@@ -139,6 +140,7 @@ export default function Keys() {
               </CardContent>
             </Card>
           </div>
+          <AdSlot slot="0000000000" format="auto" minHeight={280} />
         </div>
       </section>
     </Layout>
