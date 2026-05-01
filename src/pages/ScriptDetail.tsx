@@ -9,6 +9,7 @@ import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
+import { EmailScriptButton } from "@/components/EmailScriptButton";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -216,9 +217,12 @@ export default function ScriptDetail() {
               </section>
             ) : (
               <section className="mb-8">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h2 className="text-lg font-semibold">Script Code</h2>
-                  <CopyButton text={script.code} />
+                  <div className="flex gap-2">
+                    <EmailScriptButton script={script} />
+                    <CopyButton text={script.code} />
+                  </div>
                 </div>
                 <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
                   <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
