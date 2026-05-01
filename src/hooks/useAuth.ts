@@ -70,3 +70,24 @@ export function useIsSuperAdmin() {
 
   return { isSuperAdmin, loading, user };
 }
+
+export const ALL_ADMIN_TABS = ["scripts", "orders", "generate", "accounts", "messages", "users", "admins"] as const;
+export type AdminTab = typeof ALL_ADMIN_TABS[number];
+
+export function useAdminTabs() {
+  const { user, loading: authLoading } = useAuth();
+  const [tabs, setTabs] = useState<AdminTab[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) { setTabs([]); setLoading(false); return; }
+    supabase.rpc("get_admin_tabs" as any, { _user_id: user.id })
+      .then(({ data }) => {
+        setTabs(((data as string[]) || []) as AdminTab[]);
+        setLoading(false);
+      });
+  }, [user, authLoading]);
+
+  return { tabs, loading };
+}
