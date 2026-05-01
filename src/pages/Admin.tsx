@@ -373,11 +373,11 @@ function ScriptsTab() {
               <Button
                 size="sm"
                 variant="outline"
-                title="Notify all subscribers about this script"
+                title="🔔 In-app notification only — sends a bell-icon alert to every signed-up user (NOT an email). Bulk marketing emails aren't supported."
                 disabled={notifyingId === s.id}
                 onClick={async () => {
                   if (notifyingId) return;
-                  if (!confirm(`Send an in-app notification to all signed-up users about "${s.title}"?`)) return;
+                  if (!confirm(`Send an IN-APP notification (🔔 bell icon) to all signed-up users about "${s.title}"?\n\nThis does NOT send an email — bulk marketing emails are not supported.`)) return;
                   setNotifyingId(s.id);
                   try {
                     const { data, error } = await supabase.rpc("broadcast_notification", {

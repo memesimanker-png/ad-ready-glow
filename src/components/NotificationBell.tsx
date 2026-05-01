@@ -30,6 +30,7 @@ export function NotificationBell() {
       const { data } = await supabase
         .from("notifications")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(20);
       if (data) setItems(data as Notification[]);
@@ -60,7 +61,7 @@ export function NotificationBell() {
     const ids = items.filter((n) => !n.read).map((n) => n.id);
     if (ids.length === 0) return;
     setItems((prev) => prev.map((n) => ({ ...n, read: true })));
-    await supabase.from("notifications").update({ read: true }).in("id", ids);
+    await supabase.from("notifications").update({ read: true }).eq("user_id", userId).in("id", ids);
   };
 
   if (!userId) return null;
