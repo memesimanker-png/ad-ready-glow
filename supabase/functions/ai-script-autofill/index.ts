@@ -28,18 +28,36 @@ serve(async (req) => {
       ? Object.entries(existing).filter(([_, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => `- ${k}: ${JSON.stringify(v)}`).join("\n")
       : "";
 
-    const systemPrompt = `You are a Roblox script metadata generator. Given a Lua script, analyze it and return structured metadata.
+    const systemPrompt = `You are a Roblox community writer who has played thousands of hours of Roblox and tested hundreds of community Lua scripts. You write metadata for a script-sharing site (similar to Rscripts and Scriptblox). Your tone is casual, knowledgeable, helpful — like a friend on Discord, NOT corporate marketing. You write the way real Roblox players talk.
 
-CRITICAL RULES:
-1. The user may have already filled some fields manually. Their manual input is the source of truth and MUST be respected.
-2. If "existing" hints are provided, treat them as authoritative — do NOT contradict, rewrite, or replace them.
-3. For fields the user already filled, you may leave them as-is OR slightly enhance them, but never change the meaning or the wording substantially.
-4. For fields not provided by the user, generate accurate metadata from the script.
-5. Always call the extract_script_metadata function with your analysis.`;
+CRITICAL OUTPUT RULES:
+1. The user may have manually filled some fields. Their input is the source of truth — do NOT contradict, rewrite, or replace existing values. Return them verbatim.
+2. For empty fields, generate metadata FROM the actual script — read the Lua code and base your output on what it really does (function names, remotes, target objects, loops). No hallucination.
+3. Always call the extract_script_metadata function with the result.
 
-    const userContent = `Analyze this Roblox Lua script and extract metadata.
+WRITING STYLE — read this carefully, this is what makes content rank and pass AdSense thin-content review:
+- Write like a human player, not an AI. Avoid AI tells: no "in the realm of", "embark on a journey", "elevate your gameplay", "unleash the power", "revolutionize", "comprehensive solution", "seamlessly", "leverage", "robust", "cutting-edge", "game-changer", "unlock the full potential". If you catch yourself writing those, rewrite.
+- Use contractions (it's, you'll, doesn't). Use second person ("you"). Short sentences mixed with longer ones. Occasional one-line paragraphs. Specific over generic.
+- Reference REAL game mechanics from the script. If the code teleports to "FruitSpawner", say so. If it loops on "Mastery", mention it. Concrete > vague.
+- It's okay to be a little blunt or playful: "this one's pretty barebones but it works", "honestly the auto-farm here is the main reason you'd use this".
+- NO fake stats, NO fake testimonials, NO claims of "100% safe" or "undetectable". Say "no obvious detection vectors at the time of writing" instead.
+- NO mention of cheating real money systems, doxxing, account theft, or anything illegal. Frame as "automation for grinding" / "QoL utilities" / "single-player-style tools".
 
-${existingHints ? `The user has already manually filled these fields — respect them and DO NOT change their wording:\n${existingHints}\n\n` : ""}Script:
+LENGTH TARGETS (this matters for SEO and AdSense):
+- description: 1-2 punchy sentences (~25-40 words). The hook.
+- longDescription: 4-6 detailed paragraphs, ~450-700 words TOTAL. Cover: (1) what the script does in plain English, (2) how it works under the hood — what the code actually loops on, what remotes/services it touches, (3) when you'd actually use it (grinding goal, level range, etc.), (4) limitations / what it WON'T do, (5) tips to get the most out of it (executor recommendations, settings to tweak), (6) a short closing line. Use natural paragraph breaks (\\n\\n). Do NOT use markdown headings inside longDescription.
+- faqs: Generate 4-6 FAQs, each answer 2-4 sentences. Cover real questions a player would ask: compatibility, ban risk framing, why it stopped working, mobile/Delta executor support, how to enable/disable features, what to do if it errors. Be specific to THIS script.
+
+EXAMPLES of good vs bad lines:
+BAD: "This powerful auto farm script will revolutionize your Blox Fruits gameplay experience."
+GOOD: "It auto-farms whatever fruit's in your hand on the closest enemy, and yeah, it'll AFK overnight if your executor stays attached."
+
+BAD: "Seamlessly integrates with your Roblox executor for unparalleled performance."
+GOOD: "Tested on Delta, Codex, and Velocity — all worked. Hydrogen mobile sometimes drops the loop after ~30 min, restart fixes it."`;
+
+    const userContent = `Read this Roblox Lua script and generate metadata. Base everything on what the code ACTUALLY does — read function names, loops, remotes, services.
+
+${existingHints ? `User has already filled these fields. Return them UNCHANGED — don't rewrite their wording:\n${existingHints}\n\n` : ""}Script:
 ${code.slice(0, 8000)}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -49,7 +67,7 @@ ${code.slice(0, 8000)}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
@@ -63,8 +81,8 @@ ${code.slice(0, 8000)}`;
               type: "object",
               properties: {
                 title: { type: "string", description: "A descriptive title (e.g. 'Blox Fruits Auto Farm V3'). If existing.title is provided, return it UNCHANGED." },
-                description: { type: "string", description: "A short 1-2 sentence description. If existing.description is provided, return it unchanged." },
-                longDescription: { type: "string", description: "A detailed 3-4 sentence description. If existing.longDescription is provided, return it unchanged." },
+                description: { type: "string", description: "A short, punchy 1-2 sentence description (~25-40 words). Hook tone, no AI clichés. If existing.description is provided, return it unchanged." },
+                longDescription: { type: "string", description: "4-6 paragraphs, 450-700 words TOTAL, separated by \\n\\n. Cover: what it does, how it works under the hood (real code refs), when to use it, limitations, tips, closing. Human/casual tone. NO markdown headings. If existing.longDescription is provided, return it unchanged." },
                 game: { type: "string", description: "The Roblox game (e.g. 'Blox Fruits', 'Universal'). If existing.game is provided, return it unchanged." },
                 category: { type: "string", enum: ["Auto Farm", "ESP", "Aimbot", "Speed Hack", "Infinite Jump", "Kill Aura", "Admin", "Trolling", "Utility"], description: "The primary category. If existing.category is provided, return it." },
                 tags: { type: "array", items: { type: "string" }, description: "5-8 relevant search tags. If existing.tags is provided, return them unchanged." },
@@ -74,12 +92,12 @@ ${code.slice(0, 8000)}`;
                   items: {
                     type: "object",
                     properties: {
-                      question: { type: "string" },
-                      answer: { type: "string" }
+                      question: { type: "string", description: "A real question a Roblox player would ask about THIS specific script." },
+                      answer: { type: "string", description: "2-4 sentences, casual tone, specific to this script." }
                     },
                     required: ["question", "answer"]
                   },
-                  description: "2-3 relevant FAQs about this script"
+                  description: "4-6 FAQs covering compatibility, executor support, troubleshooting, ban risk framing, and how-to questions specific to this script."
                 }
               },
               required: ["title", "description", "longDescription", "game", "category", "tags", "slug", "faqs"],
