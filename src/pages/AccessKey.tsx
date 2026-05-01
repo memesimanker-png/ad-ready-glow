@@ -189,35 +189,6 @@ export default function AccessKey() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
-                onClick={handleDirectLinkClick}
-                className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all"
-              >
-                <MousePointerClick className="mr-2 h-4 w-4" />
-                {directLinkClicks >= 2 ? "✓ Completed!" : `Open Link (${directLinkClicks}/2)`}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2 clicks completed</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-black/70 flex flex-col">
-      <header className="container py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">COMBO WICK</h1>
-          </div>
-          <LanguageSelector />
-        </div>
-      </header>
-
-      <main className="flex-1 container flex flex-col items-center justify-center py-12">
-        <div className="max-w-md w-full mx-auto space-y-6">
-          <div className="text-center space-y-2">
             <Key className="h-12 w-12 text-primary mx-auto" />
             <h1 className="text-3xl font-bold">Access Key Generator</h1>
             <p className="text-muted-foreground">Generate your HWID access key below.</p>
