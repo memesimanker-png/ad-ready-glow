@@ -3,15 +3,7 @@
 import * as React from 'npm:react@18.3.1'
 
 import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
+  Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 
 interface SignupEmailProps {
@@ -21,37 +13,33 @@ interface SignupEmailProps {
   confirmationUrl: string
 }
 
-export const SignupEmail = ({
-  siteName,
-  siteUrl,
-  recipient,
-  confirmationUrl,
-}: SignupEmailProps) => (
+export const SignupEmail = ({ siteName, siteUrl, recipient, confirmationUrl }: SignupEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Confirm your email for {siteName}</Preview>
+    <Preview>Welcome to Combo_WICK — verify your email to unlock scripts</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
-        <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
-        </Text>
-        <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Verify Email
-        </Button>
+        <Section style={header}>
+          <Heading style={brand}>COMBO_WICK</Heading>
+        </Section>
+        <Section style={card}>
+          <Heading style={h1}>Welcome aboard 🚀</Heading>
+          <Text style={text}>
+            Thanks for joining{' '}
+            <Link href={siteUrl} style={link}><strong>Combo_WICK</strong></Link>
+            . Confirm <strong>{recipient}</strong> to unlock free scripts, premium keys, and our Roblox toolkit.
+          </Text>
+          <Section style={btnWrap}>
+            <Button style={button} href={confirmationUrl}>Verify Email</Button>
+          </Section>
+          <Text style={fineprint}>
+            Button not working? Paste this link into your browser:<br />
+            <Link href={confirmationUrl} style={link}>{confirmationUrl}</Link>
+          </Text>
+        </Section>
         <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
+          Didn't sign up? You can safely ignore this email.<br />
+          © Combo_WICK · combowick.com
         </Text>
       </Container>
     </Body>
@@ -60,27 +48,15 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif', padding: '24px 0' }
+const container = { maxWidth: '560px', margin: '0 auto', padding: '0 16px' }
+const header = { textAlign: 'center' as const, padding: '8px 0 20px' }
+const brand = { fontFamily: 'Orbitron, Arial, sans-serif', fontSize: '20px', fontWeight: 800 as const, letterSpacing: '4px', color: '#7c3aed', margin: 0 }
+const card = { background: 'linear-gradient(180deg, #faf7ff 0%, #ffffff 100%)', border: '1px solid #ece4ff', borderRadius: '12px', padding: '32px 28px' }
+const h1 = { fontFamily: 'Orbitron, Arial, sans-serif', fontSize: '24px', fontWeight: 700 as const, color: '#1a1033', margin: '0 0 16px' }
+const text = { fontSize: '15px', color: '#4a4458', lineHeight: '1.6', margin: '0 0 24px' }
+const btnWrap = { textAlign: 'center' as const, margin: '8px 0 24px' }
+const button = { background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', color: '#ffffff', fontSize: '15px', fontWeight: 600 as const, borderRadius: '10px', padding: '14px 32px', textDecoration: 'none', display: 'inline-block' }
+const link = { color: '#7c3aed', textDecoration: 'underline', wordBreak: 'break-all' as const }
+const fineprint = { fontSize: '12px', color: '#8b85a0', lineHeight: '1.5', margin: '16px 0 0' }
+const footer = { fontSize: '12px', color: '#9b96b0', textAlign: 'center' as const, margin: '24px 0 0', lineHeight: '1.6' }

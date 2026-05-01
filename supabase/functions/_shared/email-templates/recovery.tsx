@@ -1,44 +1,30 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
+import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
-} from 'npm:@react-email/components@0.0.22'
+interface RecoveryEmailProps { siteName: string; confirmationUrl: string }
 
-interface RecoveryEmailProps {
-  siteName: string
-  confirmationUrl: string
-}
-
-export const RecoveryEmail = ({
-  siteName,
-  confirmationUrl,
-}: RecoveryEmailProps) => (
+export const RecoveryEmail = ({ confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>Reset your Combo_WICK password</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
-        <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
-        <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
-        </Text>
+        <Section style={header}><Heading style={brand}>COMBO_WICK</Heading></Section>
+        <Section style={card}>
+          <Heading style={h1}>Reset your password</Heading>
+          <Text style={text}>
+            We got a request to reset your Combo_WICK password. Tap the button below to choose a new one — the link expires shortly for your safety.
+          </Text>
+          <Section style={btnWrap}>
+            <Button style={button} href={confirmationUrl}>Reset Password</Button>
+          </Section>
+          <Text style={fineprint}>
+            Didn't ask for this? Ignore this email and your password stays the same.
+          </Text>
+        </Section>
+        <Text style={footer}>© Combo_WICK · combowick.com</Text>
       </Container>
     </Body>
   </Html>
@@ -46,26 +32,14 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif', padding: '24px 0' }
+const container = { maxWidth: '560px', margin: '0 auto', padding: '0 16px' }
+const header = { textAlign: 'center' as const, padding: '8px 0 20px' }
+const brand = { fontFamily: 'Orbitron, Arial, sans-serif', fontSize: '20px', fontWeight: 800 as const, letterSpacing: '4px', color: '#7c3aed', margin: 0 }
+const card = { background: 'linear-gradient(180deg, #faf7ff 0%, #ffffff 100%)', border: '1px solid #ece4ff', borderRadius: '12px', padding: '32px 28px' }
+const h1 = { fontFamily: 'Orbitron, Arial, sans-serif', fontSize: '24px', fontWeight: 700 as const, color: '#1a1033', margin: '0 0 16px' }
+const text = { fontSize: '15px', color: '#4a4458', lineHeight: '1.6', margin: '0 0 24px' }
+const btnWrap = { textAlign: 'center' as const, margin: '8px 0 24px' }
+const button = { background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', color: '#ffffff', fontSize: '15px', fontWeight: 600 as const, borderRadius: '10px', padding: '14px 32px', textDecoration: 'none', display: 'inline-block' }
+const fineprint = { fontSize: '12px', color: '#8b85a0', lineHeight: '1.5', margin: '16px 0 0' }
+const footer = { fontSize: '12px', color: '#9b96b0', textAlign: 'center' as const, margin: '24px 0 0', lineHeight: '1.6' }
