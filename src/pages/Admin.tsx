@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { useIsAdmin, useIsSuperAdmin } from "@/hooks/useAuth";
+import { useIsAdmin, useIsSuperAdmin, useAdminTabs, ALL_ADMIN_TABS, type AdminTab } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
