@@ -7,10 +7,8 @@ import { Layout } from "@/components/Layout";
 import { CopyButton } from "@/components/CopyButton";
 import { ScriptCard } from "@/components/ScriptCard";
 import { GameThumbnail } from "@/components/GameThumbnail";
-import { DirectLinkOverlay } from "@/components/DirectLinkOverlay";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
-import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -79,10 +77,6 @@ export default function ScriptDetail() {
     }
   };
 
-  // Fire popunder at most once every 5 minutes (shared across pages)
-  useEffect(() => {
-    loadMonetagPopunder();
-  }, []);
 
   const scriptJsonLd = useMemo(() => {
     if (!script) return [];
@@ -147,7 +141,6 @@ export default function ScriptDetail() {
         ]}
         jsonLd={scriptJsonLd}
       />
-      <DirectLinkOverlay />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-6">
           <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">

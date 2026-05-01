@@ -8,9 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
-import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
-import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 
 export default function VerifyStep1() {
   const navigate = useNavigate();
@@ -47,9 +45,7 @@ export default function VerifyStep1() {
 
   return (
     <>
-      <SkipAdsBanner />
-      <SkipAdsFloatButton />
-      <div className="min-h-screen bg-black/70 flex flex-col pt-12">
+      <div className="min-h-screen bg-black/70 flex flex-col">
         <header className="container py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

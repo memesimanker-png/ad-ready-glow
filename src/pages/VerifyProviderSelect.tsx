@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, MousePointerClick, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,7 @@ const adProviders = [
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
-const DIRECT_LINK_COOLDOWN_MINUTES = 5;
 const WAIT_TIME_SECONDS = 3;
 
 export default function VerifyProviderSelect() {
@@ -32,13 +30,11 @@ export default function VerifyProviderSelect() {
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
   const [showSubscriptionGate, setShowSubscriptionGate] = useState(false);
-  const [showDirectLinkGate, setShowDirectLinkGate] = useState(false);
 
   const [youtubeCompleted, setYoutubeCompleted] = useState(false);
   const [discordCompleted, setDiscordCompleted] = useState(false);
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
-  const [directLinkClicks, setDirectLinkClicks] = useState(0);
 
 
   useEffect(() => {
@@ -55,22 +51,8 @@ export default function VerifyProviderSelect() {
       setShowSubscriptionGate(true);
     }
 
-    const directLinkCompletedAt = localStorage.getItem("direct_link_completed");
-    if (directLinkCompletedAt) {
-      const minutesSince = (Date.now() - new Date(directLinkCompletedAt).getTime()) / (1000 * 60);
-      if (minutesSince >= DIRECT_LINK_COOLDOWN_MINUTES) {
-        setShowDirectLinkGate(true);
-        localStorage.removeItem("direct_link_clicks");
-        setDirectLinkClicks(0);
-      } else {
-        setShowDirectLinkGate(false);
-      }
-    } else {
-      setShowDirectLinkGate(true);
-    }
-
-    const savedClicks = localStorage.getItem("direct_link_clicks");
-    if (savedClicks) setDirectLinkClicks(parseInt(savedClicks, 10));
+    localStorage.removeItem("direct_link_completed");
+    localStorage.removeItem("direct_link_clicks");
 
     localStorage.removeItem("step1_completed");
     localStorage.removeItem("step2_completed");
@@ -111,13 +93,6 @@ export default function VerifyProviderSelect() {
     }
   }, [youtubeCompleted, discordCompleted, showSubscriptionGate, toast]);
 
-  useEffect(() => {
-    if (directLinkClicks >= 2 && showDirectLinkGate) {
-      localStorage.setItem("direct_link_completed", new Date().toISOString());
-      setShowDirectLinkGate(false);
-      toast({ title: "Access Granted!", description: "You can now select a verification provider." });
-    }
-  }, [directLinkClicks, showDirectLinkGate, toast]);
 
   const handleYoutubeClick = () => {
     window.open(YOUTUBE_URL, "_blank");
@@ -131,18 +106,6 @@ export default function VerifyProviderSelect() {
     toast({ title: "Opening Discord", description: `Please join and wait ${WAIT_TIME_SECONDS} seconds...` });
   };
 
-  const handleDirectLinkClick = () => {
-    const newClickCount = directLinkClicks + 1;
-    setDirectLinkClicks(newClickCount);
-    localStorage.setItem("direct_link_clicks", newClickCount.toString());
-    window.open(DIRECT_LINK_URL, "_blank");
-
-    if (newClickCount >= 2) {
-      toast({ title: "Completed!", description: "You've clicked the button 2 times. Thank you!" });
-    } else {
-      toast({ title: "Link Opened", description: `Click ${2 - newClickCount} more time${2 - newClickCount > 1 ? "s" : ""} after returning.` });
-    }
-  };
 
   const handleProviderSelect = (providerId: string) => {
     localStorage.setItem("selected_ad_provider", providerId);
@@ -160,7 +123,7 @@ export default function VerifyProviderSelect() {
   if (!mounted) return null;
 
   const subscriptionGateCompleted = youtubeCompleted && discordCompleted;
-  const directLinkGateCompleted = directLinkClicks >= 2;
+  
   const youtubeProgress = youtubeTimer > 0 ? ((WAIT_TIME_SECONDS - youtubeTimer) / WAIT_TIME_SECONDS) * 100 : youtubeCompleted ? 100 : 0;
   const discordProgress = discordTimer > 0 ? ((WAIT_TIME_SECONDS - discordTimer) / WAIT_TIME_SECONDS) * 100 : discordCompleted ? 100 : 0;
 
@@ -283,23 +246,7 @@ export default function VerifyProviderSelect() {
               });
             }
 
-            if (showDirectLinkGate) {
-              steps.push({
-                key: "click",
-                title: "Quick Click Gate",
-                done: directLinkGateCompleted,
-                icon: <MousePointerClick className="h-4 w-4" />,
-                render: () => (
-                  <div className="space-y-2">
-                    <Button onClick={handleDirectLinkClick} className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all">
-                      <MousePointerClick className="mr-2 h-4 w-4" />
-                      {directLinkClicks >= 2 ? "✓ Completed!" : `Click This Button (${directLinkClicks}/2)`}
-                    </Button>
-                    <Progress value={(directLinkClicks / 2) * 100} className="h-1" />
-                  </div>
-                ),
-              });
-            }
+
 
             steps.push({
               key: "provider",

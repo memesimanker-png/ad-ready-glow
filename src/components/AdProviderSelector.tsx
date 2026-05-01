@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ExternalLink, ShoppingCart } from "lucide-react";
+
 
 interface AdProvider {
   id: string;
@@ -61,49 +61,8 @@ export function AdProviderSelector({ providers, onSelect, selectedProvider }: Ad
         </RadioGroup>
 
         <div className="pt-4 border-t border-border">
-          <p className="text-sm text-muted-foreground mb-3 font-medium">Looking for something else?</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <a
-              href="/premium-keys"
-              className="group relative bg-purple-600 hover:bg-purple-500 rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] text-left overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-md bg-purple-700 flex items-center justify-center">
-                    <ShoppingCart className="w-4 h-4 text-white" />
-                  </div>
-                  <h3 className="text-white font-bold text-xs">Request Script/Buy Keys</h3>
-                </div>
-                <div className="flex items-center gap-1 text-purple-200 text-xs font-semibold">
-                  Premium Keys <ExternalLink size={10} />
-                </div>
-              </div>
-            </a>
-            <a
-              href="/scripts"
-              className="group relative bg-green-600 hover:bg-green-500 rounded-lg p-3 transition-all duration-300 hover:scale-[1.02] text-left overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-md bg-green-700 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                  </div>
-                  <h3 className="text-white font-bold text-xs">See All Scripts</h3>
-                </div>
-                <div className="flex items-center gap-1 text-green-200 text-xs font-semibold">
-                  Browse Scripts <ExternalLink size={10} />
-                </div>
-              </div>
-            </a>
-          </div>
-
-          {/* Linkvertise wait-time disclaimer */}
-          <p className="mt-4 text-[11px] text-muted-foreground leading-relaxed border border-border/40 rounded-md p-3 bg-muted/20">
-            <span className="font-semibold text-foreground">Heads up:</span> Linkvertise sets the wait timers (including the ~1 hour cooldown) on their end — <span className="font-semibold text-foreground">we don't control them</span>. They use those timers to pay creators per verification. Want to skip ad-walls completely? Grab a <a href="/premium-keys" className="text-primary underline underline-offset-2 hover:no-underline">Premium Key</a>.
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <span className="font-semibold text-foreground">Note:</span> Linkvertise sets the wait timers on their end — we don't control them. Prefer to skip the wait? Visit our <a href="/premium-keys" className="text-primary underline underline-offset-2 hover:no-underline">Premium Keys</a> page.
           </p>
         </div>
       </CardContent>

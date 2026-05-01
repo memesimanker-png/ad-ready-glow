@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Copy, User, Clock, Shield, Key, MousePointerClick, Loader2 } from "lucide-react";
+import { Copy, User, Clock, Shield, Key, Loader2 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { loadMonetagPopunder } from "@/lib/monetag-popunder";
 
 interface StoredKeyData {
   key: string;
@@ -15,8 +14,6 @@ interface StoredKeyData {
   username?: string;
   generated_at: number;
 }
-
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 
 export default function AccessKey() {
   const navigate = useNavigate();
@@ -26,15 +23,7 @@ export default function AccessKey() {
   const [keyExpiresAt, setKeyExpiresAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
-  const [directLinkClicks, setDirectLinkClicks] = useState(0);
-  const [directLinkCompleted, setDirectLinkCompleted] = useState(false);
-  const [showDirectLinkGate, setShowDirectLinkGate] = useState(true);
   const [error, setError] = useState("");
-
-  // Fire popunder at most once every 5 minutes (shared across pages)
-  useEffect(() => {
-    loadMonetagPopunder();
-  }, []);
 
   // Verify steps are completed & load stored key
   useEffect(() => {
@@ -60,8 +49,6 @@ export default function AccessKey() {
           setKeyExpiresAt(expiryDate.toISOString());
           setUsername(keyData.username || "");
           setCanGenerate(false);
-          setShowDirectLinkGate(false);
-          setDirectLinkCompleted(true);
         } else {
           localStorage.removeItem("hwid_key_data");
         }
@@ -97,8 +84,6 @@ export default function AccessKey() {
         setGeneratedKey(data.key || "");
         setKeyExpiresAt(expiryDate.toISOString());
         setCanGenerate(false);
-        setShowDirectLinkGate(false);
-        setDirectLinkCompleted(true);
       }
     } catch (err) {
       console.error("Error checking existing key:", err);
@@ -122,17 +107,6 @@ export default function AccessKey() {
     }
   }, [keyExpiresAt, toast, navigate]);
 
-  const handleDirectLinkClick = () => {
-    const newClicks = directLinkClicks + 1;
-    setDirectLinkClicks(newClicks);
-    window.open(DIRECT_LINK_URL, "_blank");
-
-    if (newClicks >= 2) {
-      setDirectLinkCompleted(true);
-      setTimeout(() => setShowDirectLinkGate(false), 1000);
-      toast({ title: "Gate Completed!", description: "You can now access the key generator." });
-    }
-  };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
@@ -199,35 +173,6 @@ export default function AccessKey() {
     const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m`;
   };
-
-  // Direct link gate
-  if (showDirectLinkGate && !directLinkCompleted) {
-    return (
-      <div className="min-h-screen bg-black/70 flex items-center justify-center p-4">
-        <div className="space-y-4 w-full max-w-md">
-          <Card className="border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MousePointerClick className="h-5 w-5 text-primary" />
-                One More Step!
-              </CardTitle>
-              <CardDescription>Click the button below 2 times to access the key generator</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
-                onClick={handleDirectLinkClick}
-                className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg transition-all"
-              >
-                <MousePointerClick className="mr-2 h-4 w-4" />
-                {directLinkClicks >= 2 ? "✓ Completed!" : `Open Link (${directLinkClicks}/2)`}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">Progress: {directLinkClicks}/2 clicks completed</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
