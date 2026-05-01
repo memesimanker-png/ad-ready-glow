@@ -762,16 +762,16 @@ function MessagesTab() {
                 </div>
                 <div className="flex flex-col gap-1.5 flex-shrink-0">
                   {m.status !== "archived" && (
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")}>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "archived")} title="Move this message to the archive (hidden from active list)">
                       <MailX className="h-3.5 w-3.5 mr-1" /> Archive
                     </Button>
                   )}
                   {m.status === "new" && (
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")}>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(m.id, "read")} title="Mark this message as read">
                       <MailOpen className="h-3.5 w-3.5 mr-1" /> Mark read
                     </Button>
                   )}
-                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)}>
+                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => remove(m.id)} title="Permanently delete this message">
                     <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                   </Button>
                 </div>
