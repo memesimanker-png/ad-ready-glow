@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { useIsAdmin, useIsSuperAdmin } from "@/hooks/useAuth";
+import { useIsAdmin, useIsSuperAdmin, useAdminTabs, ALL_ADMIN_TABS, type AdminTab } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,11 @@ const emptyScript = {
 export default function Admin() {
   const { isAdmin, loading, user } = useIsAdmin();
   const { isSuperAdmin } = useIsSuperAdmin();
+  const { tabs: allowedTabs, loading: tabsLoading } = useAdminTabs();
   const { toast } = useToast();
+  const can = (t: AdminTab) => isSuperAdmin || allowedTabs.includes(t);
 
-  if (loading) {
+  if (loading || tabsLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -35,6 +37,8 @@ export default function Admin() {
       </Layout>
     );
   }
+
+  const defaultTab = (allowedTabs[0] as string) || "scripts";
 
   if (!user) return <Navigate to="/login" replace />;
   if (!isAdmin) {
@@ -64,24 +68,24 @@ export default function Admin() {
           </div>
         </div>
 
-        <Tabs defaultValue="scripts" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
-            <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>
-            {isSuperAdmin && <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
-            {isSuperAdmin && <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
-            <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>
-            <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>
-            <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>
-            {isSuperAdmin && <TabsTrigger value="admins" className="gap-2"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="scripts" className="gap-2"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
+            {can("orders") && <TabsTrigger value="orders" className="gap-2"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
+            {can("generate") && <TabsTrigger value="generate" className="gap-2"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
+            {can("accounts") && <TabsTrigger value="accounts" className="gap-2"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>}
+            {can("messages") && <TabsTrigger value="messages" className="gap-2"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
+            {can("users") && <TabsTrigger value="users" className="gap-2"><Users className="h-4 w-4" /> Users</TabsTrigger>}
+            {can("admins") && <TabsTrigger value="admins" className="gap-2"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="scripts"><ScriptsTab /></TabsContent>
-          {isSuperAdmin && <TabsContent value="orders"><OrdersTab /></TabsContent>}
-          {isSuperAdmin && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
-          <TabsContent value="accounts"><AccountsTab /></TabsContent>
-          <TabsContent value="messages"><MessagesTab /></TabsContent>
-          <TabsContent value="users"><UsersTab /></TabsContent>
-          {isSuperAdmin && <TabsContent value="admins"><AdminsTab /></TabsContent>}
+          {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
+          {can("orders") && <TabsContent value="orders"><OrdersTab /></TabsContent>}
+          {can("generate") && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
+          {can("accounts") && <TabsContent value="accounts"><AccountsTab /></TabsContent>}
+          {can("messages") && <TabsContent value="messages"><MessagesTab /></TabsContent>}
+          {can("users") && <TabsContent value="users"><UsersTab /></TabsContent>}
+          {can("admins") && <TabsContent value="admins"><AdminsTab /></TabsContent>}
         </Tabs>
       </main>
     </Layout>
@@ -912,26 +916,11 @@ function AdminsTab() {
         ) : (
           <div className="space-y-2">
             {rows.map((r, i) => (
-              <Card key={`${r.user_id}-${r.role}-${i}`} className="p-4 flex items-center justify-between gap-3 flex-wrap">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-sm truncate">{r.email}</span>
-                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                      r.role === "super_admin" ? "bg-primary/15 text-primary border-primary/30"
-                      : r.role === "admin" ? "bg-yellow-500/15 text-yellow-300 border-yellow-500/30"
-                      : "bg-blue-500/15 text-blue-300 border-blue-500/30"
-                    }`}>
-                      {r.role.replace("_", " ")}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{r.user_id.slice(0, 8)}…</p>
-                </div>
-                {r.role !== "super_admin" && (
-                  <Button size="sm" variant="destructive" onClick={() => revoke(r.user_id, r.role)}>
-                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
-                  </Button>
-                )}
-              </Card>
+              <AdminRow
+                key={`${r.user_id}-${r.role}-${i}`}
+                row={r}
+                onRevoke={() => revoke(r.user_id, r.role)}
+              />
             ))}
           </div>
         )}
@@ -939,3 +928,116 @@ function AdminsTab() {
     </div>
   );
 }
+
+/* ─── Single admin row with inline permissions editor ─── */
+const MANAGEABLE_TABS: Array<{ key: AdminTab; label: string }> = [
+  { key: "scripts", label: "Scripts" },
+  { key: "accounts", label: "Accounts" },
+  { key: "messages", label: "Messages" },
+  { key: "users", label: "Users" },
+];
+
+function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; email?: string }; onRevoke: () => void }) {
+  const { toast } = useToast();
+  const [tabs, setTabs] = useState<AdminTab[]>([]);
+  const [expanded, setExpanded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const isSuper = row.role === "super_admin";
+
+  const loadTabs = async () => {
+    if (loaded || isSuper) return;
+    const { data } = await supabase
+      .from("admin_permissions" as any)
+      .select("tabs")
+      .eq("user_id", row.user_id)
+      .maybeSingle();
+    const t = (data as any)?.tabs as string[] | undefined;
+    setTabs((t && t.length ? t : ["scripts", "accounts", "messages", "users"]) as AdminTab[]);
+    setLoaded(true);
+  };
+
+  const toggle = (t: AdminTab) => {
+    setTabs(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+  };
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase.rpc("set_admin_tabs" as any, { _user_id: row.user_id, _tabs: tabs });
+    setSaving(false);
+    if (error) {
+      toast({ variant: "destructive", title: "Failed", description: error.message });
+      return;
+    }
+    toast({ title: "Permissions saved", description: `${row.email} can access ${tabs.length} tab${tabs.length === 1 ? "" : "s"}.` });
+  };
+
+  return (
+    <Card className="p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-sm truncate">{row.email}</span>
+            <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+              isSuper ? "bg-primary/15 text-primary border-primary/30"
+              : row.role === "admin" ? "bg-yellow-500/15 text-yellow-300 border-yellow-500/30"
+              : "bg-blue-500/15 text-blue-300 border-blue-500/30"
+            }`}>
+              {row.role.replace("_", " ")}
+            </span>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{row.user_id.slice(0, 8)}…</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!isSuper && (
+            <Button size="sm" variant="outline" onClick={() => { setExpanded(e => !e); loadTabs(); }}>
+              <ShieldCheck className="h-3.5 w-3.5 mr-1" /> {expanded ? "Hide" : "Permissions"}
+            </Button>
+          )}
+          {!isSuper && (
+            <Button size="sm" variant="destructive" onClick={onRevoke}>
+              <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {expanded && !isSuper && (
+        <div className="border-t border-border pt-3 space-y-3">
+          <p className="text-[11px] text-muted-foreground">
+            Choose which dashboard tabs <strong>{row.email}</strong> can see. Orders, Generate Key, and Admins are <strong>super-admin only</strong> and can't be granted.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {MANAGEABLE_TABS.map(({ key, label }) => {
+              const checked = tabs.includes(key);
+              return (
+                <label
+                  key={key}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                    checked ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-secondary/30 text-muted-foreground hover:border-border/80"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggle(key)}
+                    className="accent-primary h-3.5 w-3.5"
+                  />
+                  {label}
+                </label>
+              );
+            })}
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Save className="h-3.5 w-3.5 mr-1" />}
+              Save permissions
+            </Button>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
