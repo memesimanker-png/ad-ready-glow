@@ -24,7 +24,9 @@ const emptyScript = {
 export default function Admin() {
   const { isAdmin, loading, user } = useIsAdmin();
   const { isSuperAdmin } = useIsSuperAdmin();
+  const { tabs: allowedTabs, loading: tabsLoading } = useAdminTabs();
   const { toast } = useToast();
+  const can = (t: AdminTab) => isSuperAdmin || allowedTabs.includes(t);
 
   if (loading) {
     return (
