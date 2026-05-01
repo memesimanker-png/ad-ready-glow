@@ -932,9 +932,12 @@ function AdminsTab() {
 /* ─── Single admin row with inline permissions editor ─── */
 const MANAGEABLE_TABS: Array<{ key: AdminTab; label: string }> = [
   { key: "scripts", label: "Scripts" },
+  { key: "orders", label: "Orders" },
+  { key: "generate", label: "Generate Key" },
   { key: "accounts", label: "Accounts" },
   { key: "messages", label: "Messages" },
   { key: "users", label: "Users" },
+  { key: "admins", label: "Admins" },
 ];
 
 function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; email?: string }; onRevoke: () => void }) {
@@ -1006,9 +1009,10 @@ function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; ema
       {expanded && !isSuper && (
         <div className="border-t border-border pt-3 space-y-3">
           <p className="text-[11px] text-muted-foreground">
-            Choose which dashboard tabs <strong>{row.email}</strong> can see. Orders, Generate Key, and Admins are <strong>super-admin only</strong> and can't be granted.
+            Choose which dashboard tabs <strong>{row.email}</strong> can see.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+
             {MANAGEABLE_TABS.map(({ key, label }) => {
               const checked = tabs.includes(key);
               return (
