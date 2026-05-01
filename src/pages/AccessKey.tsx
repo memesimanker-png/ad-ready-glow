@@ -49,8 +49,6 @@ export default function AccessKey() {
           setKeyExpiresAt(expiryDate.toISOString());
           setUsername(keyData.username || "");
           setCanGenerate(false);
-          setShowDirectLinkGate(false);
-          setDirectLinkCompleted(true);
         } else {
           localStorage.removeItem("hwid_key_data");
         }
@@ -86,8 +84,6 @@ export default function AccessKey() {
         setGeneratedKey(data.key || "");
         setKeyExpiresAt(expiryDate.toISOString());
         setCanGenerate(false);
-        setShowDirectLinkGate(false);
-        setDirectLinkCompleted(true);
       }
     } catch (err) {
       console.error("Error checking existing key:", err);
@@ -111,17 +107,6 @@ export default function AccessKey() {
     }
   }, [keyExpiresAt, toast, navigate]);
 
-  const handleDirectLinkClick = () => {
-    const newClicks = directLinkClicks + 1;
-    setDirectLinkClicks(newClicks);
-    window.open(DIRECT_LINK_URL, "_blank");
-
-    if (newClicks >= 2) {
-      setDirectLinkCompleted(true);
-      setTimeout(() => setShowDirectLinkGate(false), 1000);
-      toast({ title: "Gate Completed!", description: "You can now access the key generator." });
-    }
-  };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
