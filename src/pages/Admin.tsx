@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
