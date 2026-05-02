@@ -10,6 +10,7 @@ import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, Eye
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
+import { DiscordPostDialog } from "@/components/DiscordPostDialog";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 
