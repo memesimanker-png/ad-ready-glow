@@ -28,6 +28,7 @@ const BLOCKED_ROUTE_PATTERNS = [
   /^\/claim-access/,
   /^\/ad-return/,
   /^\/blocked/,
+  /^\/premium-keys/,
 ];
 
 type Props = {
