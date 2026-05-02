@@ -327,11 +327,13 @@ Deno.serve(async (req) => {
   // The dispatcher (process-email-queue) handles sending, retries, and rate-limit backoff.
 
   // Log pending BEFORE enqueue so we have a record even if enqueue crashes
+  const _scriptIdMeta = templateData?.scriptId || templateData?.script_id || null
   await supabase.from('email_send_log').insert({
     message_id: messageId,
     template_name: templateName,
     recipient_email: effectiveRecipient,
     status: 'pending',
+    metadata: _scriptIdMeta ? { script_id: String(_scriptIdMeta) } : null,
   })
 
   const { error: enqueueError } = await supabase.rpc('enqueue_email', {
