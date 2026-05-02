@@ -10,9 +10,8 @@ const corsHeaders = {
 const SITE_URL = 'https://combowick.com'
 const BRAND_COLOR = 0x7C3AED // violet-600
 const BOT_USERNAME = 'Combo_WICK'
-// Public branding assets (served from the live site, so Discord can fetch them)
-const BOT_AVATAR = `${SITE_URL}/icon-512.png`
-const BRAND_BANNER = `${SITE_URL}/og-image.png` // fallback hero banner if no game image
+// Fallback branding avatar (Roblox logo PNG hosted on Wikipedia commons — always reachable by Discord CDN)
+const FALLBACK_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Roblox_Logo.svg/512px-Roblox_Logo.svg.png'
 
 function extractFeatures(longDescription: string | null | undefined, fallback: string): string[] {
   if (!longDescription) return splitBullets(fallback)
@@ -29,16 +28,18 @@ function splitBullets(text: string): string[] {
   return text.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 4)
 }
 
-function gameIcon(universeId: number | null | undefined): string | undefined {
+// Resolves the actual square game icon image URL (Roblox API returns JSON)
+async function resolveGameIcon(universeId: number | null | undefined): Promise<string | undefined> {
   if (!universeId) return undefined
-  return `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`
-}
-
-// Larger landscape thumbnail (banner) for the embed image slot
-function gameBanner(universeId: number | null | undefined): string | undefined {
-  if (!universeId) return undefined
-  return `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&countPerUniverse=1&defaults=true&size=768x432&format=Png`
-  // ^ this is JSON, not a direct image — see resolveBanner below
+  try {
+    const r = await fetch(
+      `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`,
+    )
+    if (!r.ok) return undefined
+    const j = await r.json()
+    const url = j?.data?.[0]?.imageUrl
+    return typeof url === 'string' ? url : undefined
+  } catch { return undefined }
 }
 
 // Resolves the actual landscape image URL via Roblox API (returns first thumbnail)
@@ -52,9 +53,7 @@ async function resolveBanner(universeId: number | null | undefined): Promise<str
     const j = await r.json()
     const url = j?.data?.[0]?.thumbnails?.[0]?.imageUrl
     return typeof url === 'string' ? url : undefined
-  } catch {
-    return undefined
-  }
+  } catch { return undefined }
 }
 
 function fmtDate(d: string | null | undefined): string {
@@ -112,8 +111,12 @@ Deno.serve(async (req) => {
 
     const features = extractFeatures(script.long_description, script.description)
     const url = `${SITE_URL}/scripts/${script.slug}`
-    const icon = gameIcon(script.game_universe_id)
-    const banner = (await resolveBanner(script.game_universe_id)) || BRAND_BANNER
+    const [icon, resolvedBanner] = await Promise.all([
+      resolveGameIcon(script.game_universe_id),
+      resolveBanner(script.game_universe_id),
+    ])
+    const banner = resolvedBanner || icon || FALLBACK_AVATAR
+    const avatar = icon || FALLBACK_AVATAR
     const tagList = Array.isArray(script.tags) ? script.tags.filter(Boolean).slice(0, 6) : []
     const status = script.verified ? '✅ Verified' : '🆕 New'
     const trending = script.trending ? ' • 🔥 Trending' : ''
@@ -142,7 +145,7 @@ Deno.serve(async (req) => {
 
     fields.push({
       name: '🔗 Get the Script',
-      value: `**[▶ Open Script Page](${url})** • [🌐 combowick.com](${SITE_URL}) • [💬 Discord](https://discord.gg/lovable-dev)`,
+      value: `**[▶ Open Script Page](${url})** • [🌐 combowick.com](${SITE_URL})`,
       inline: false,
     })
 
@@ -150,7 +153,7 @@ Deno.serve(async (req) => {
       author: {
         name: 'Combo_WICK • Premium Scripts',
         url: SITE_URL,
-        icon_url: BOT_AVATAR,
+        icon_url: avatar,
       },
       title: `${script.title}`,
       url,
@@ -162,7 +165,7 @@ Deno.serve(async (req) => {
       image: { url: banner },
       footer: {
         text: `Combo_WICK Scripts • ${script.game || 'Roblox'} • Always run on a trusted executor`,
-        icon_url: BOT_AVATAR,
+        icon_url: avatar,
       },
       timestamp: new Date().toISOString(),
     }
@@ -187,7 +190,7 @@ Deno.serve(async (req) => {
 
     const payload = {
       username: BOT_USERNAME,
-      avatar_url: BOT_AVATAR,
+      avatar_url: avatar,
       content: body.mention ? String(body.mention).slice(0, 200) : undefined,
       embeds: [embed],
       components,
