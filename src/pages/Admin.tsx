@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -176,6 +176,7 @@ function ScriptsTab() {
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [notifyingId, setNotifyingId] = useState<string | null>(null);
+  const [discordingId, setDiscordingId] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const { toast } = useToast();
@@ -397,6 +398,31 @@ function ScriptsTab() {
                 }}
               >
                 {notifyingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                title="📣 Post this script to your Discord webhook (rich embed with title, game, features, link). Use AFTER you've finished editing — only press when the script is ready to announce."
+                disabled={discordingId === s.id}
+                onClick={async () => {
+                  if (discordingId) return;
+                  if (!confirm(`Post "${s.title}" to Discord now?\n\nMake sure the script is finished — this sends a rich embed announcement.`)) return;
+                  setDiscordingId(s.id);
+                  try {
+                    const { error } = await supabase.functions.invoke("post-script-to-discord", {
+                      body: { scriptId: s.id },
+                    });
+                    if (error) {
+                      toast({ variant: "destructive", title: "Discord post failed", description: error.message });
+                    } else {
+                      toast({ title: "Posted to Discord!", description: s.title });
+                    }
+                  } finally {
+                    setDiscordingId(null);
+                  }
+                }}
+              >
+                {discordingId === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3" />}
               </Button>
               <Button size="sm" variant="outline" onClick={() => editScript(s)} title="Edit script"><Edit className="h-3 w-3" /></Button>
               <Button size="sm" variant="destructive" onClick={() => deleteScript(s.id)} title="Delete script permanently"><Trash2 className="h-3 w-3" /></Button>

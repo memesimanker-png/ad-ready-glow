@@ -483,6 +483,10 @@ export type Database = {
         Returns: number
       }
       check_contact_rate_limit: { Args: { _user_id: string }; Returns: boolean }
+      check_email_rate_limit: {
+        Args: { _recipient: string; _script_id: string }
+        Returns: Json
+      }
       claim_accounts_for_purchase: {
         Args: {
           _package_size: number

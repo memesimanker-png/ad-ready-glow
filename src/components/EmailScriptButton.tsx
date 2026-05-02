@@ -37,12 +37,13 @@ export function EmailScriptButton({ script }: Props) {
         setLoading(false);
         return;
       }
-      const { error } = await supabase.functions.invoke("send-transactional-email", {
+      const { data, error } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "script-delivery",
           recipientEmail: trimmed,
           idempotencyKey: `script-${script.id}-${trimmed.toLowerCase()}-${Date.now()}`,
           templateData: {
+            scriptId: script.id,
             scriptTitle: script.title,
             scriptGame: script.game,
             scriptUrl: `https://combowick.com/scripts/${script.slug}`,
@@ -50,7 +51,11 @@ export function EmailScriptButton({ script }: Props) {
           },
         },
       });
-      if (error) throw error;
+      if (error) {
+        const msg = (data as any)?.error || error.message || "Try again later.";
+        toast({ variant: "destructive", title: "Slow down", description: msg });
+        return;
+      }
       toast({ title: "Sent!", description: `Script emailed to ${trimmed}.` });
       setOpen(false);
       setEmail("");
