@@ -176,6 +176,7 @@ function ScriptsTab() {
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [notifyingId, setNotifyingId] = useState<string | null>(null);
+  const [discordingId, setDiscordingId] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const { toast } = useToast();
