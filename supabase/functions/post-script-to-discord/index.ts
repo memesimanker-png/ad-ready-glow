@@ -28,16 +28,18 @@ function splitBullets(text: string): string[] {
   return text.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 4)
 }
 
-function gameIcon(universeId: number | null | undefined): string | undefined {
+// Resolves the actual square game icon image URL (Roblox API returns JSON)
+async function resolveGameIcon(universeId: number | null | undefined): Promise<string | undefined> {
   if (!universeId) return undefined
-  return `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`
-}
-
-// Larger landscape thumbnail (banner) for the embed image slot
-function gameBanner(universeId: number | null | undefined): string | undefined {
-  if (!universeId) return undefined
-  return `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&countPerUniverse=1&defaults=true&size=768x432&format=Png`
-  // ^ this is JSON, not a direct image — see resolveBanner below
+  try {
+    const r = await fetch(
+      `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`,
+    )
+    if (!r.ok) return undefined
+    const j = await r.json()
+    const url = j?.data?.[0]?.imageUrl
+    return typeof url === 'string' ? url : undefined
+  } catch { return undefined }
 }
 
 // Resolves the actual landscape image URL via Roblox API (returns first thumbnail)
@@ -51,9 +53,7 @@ async function resolveBanner(universeId: number | null | undefined): Promise<str
     const j = await r.json()
     const url = j?.data?.[0]?.thumbnails?.[0]?.imageUrl
     return typeof url === 'string' ? url : undefined
-  } catch {
-    return undefined
-  }
+  } catch { return undefined }
 }
 
 function fmtDate(d: string | null | undefined): string {
