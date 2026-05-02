@@ -11,7 +11,7 @@ const SITE_URL = 'https://combowick.com'
 const BRAND_COLOR = 0x7C3AED // violet-600
 const BOT_USERNAME = 'Combo_WICK'
 // Fallback branding avatar (Roblox logo PNG hosted on Wikipedia commons — always reachable by Discord CDN)
-const FALLBACK_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Roblox_Logo.svg/512px-Roblox_Logo.svg.png'
+const FALLBACK_AVATAR = 'https://wsrv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/6/69/Roblox_Logo.svg/512px-Roblox_Logo.svg.png&w=512&h=512&output=png'
 
 function extractFeatures(longDescription: string | null | undefined, fallback: string): string[] {
   if (!longDescription) return splitBullets(fallback)
