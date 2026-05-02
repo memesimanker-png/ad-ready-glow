@@ -9,8 +9,11 @@ declare global {
 
 const PUBLISHER_ID = "ca-pub-8877213222492502";
 
-// Routes where AdSense MUST NOT be shown — admin, auth, and dashboard only.
-// User wants ads on key/verify pages to maximize earnings; let AdSense flag if it's a problem.
+// Routes where AdSense MUST NOT be shown.
+// AdSense flagged "Site Behavior: Navigation" — ads inside key/verify/claim flows
+// look like next-step buttons and cause accidental clicks. They are now blocked
+// site-wide on every navigation/action-only page. Ads are kept ONLY on real
+// content pages (home, blog, scripts catalog, script detail, premium-keys info).
 const BLOCKED_ROUTE_PATTERNS = [
   /^\/admin/,
   /^\/login/,
@@ -18,6 +21,13 @@ const BLOCKED_ROUTE_PATTERNS = [
   /^\/register/,
   /^\/dashboard/,
   /^\/unsubscribe/,
+  // Action / navigation flows — DO NOT place ads here (AdSense policy: navigation)
+  /^\/verify/,
+  /^\/keys?$/,
+  /^\/access-key/,
+  /^\/claim-access/,
+  /^\/ad-return/,
+  /^\/blocked/,
 ];
 
 type Props = {
