@@ -111,8 +111,12 @@ Deno.serve(async (req) => {
 
     const features = extractFeatures(script.long_description, script.description)
     const url = `${SITE_URL}/scripts/${script.slug}`
-    const icon = gameIcon(script.game_universe_id)
-    const banner = (await resolveBanner(script.game_universe_id)) || BRAND_BANNER
+    const [icon, resolvedBanner] = await Promise.all([
+      resolveGameIcon(script.game_universe_id),
+      resolveBanner(script.game_universe_id),
+    ])
+    const banner = resolvedBanner || icon || FALLBACK_AVATAR
+    const avatar = icon || FALLBACK_AVATAR
     const tagList = Array.isArray(script.tags) ? script.tags.filter(Boolean).slice(0, 6) : []
     const status = script.verified ? '✅ Verified' : '🆕 New'
     const trending = script.trending ? ' • 🔥 Trending' : ''
@@ -141,7 +145,7 @@ Deno.serve(async (req) => {
 
     fields.push({
       name: '🔗 Get the Script',
-      value: `**[▶ Open Script Page](${url})** • [🌐 combowick.com](${SITE_URL}) • [💬 Discord](https://discord.gg/lovable-dev)`,
+      value: `**[▶ Open Script Page](${url})** • [🌐 combowick.com](${SITE_URL})`,
       inline: false,
     })
 
