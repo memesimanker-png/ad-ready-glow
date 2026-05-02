@@ -10,9 +10,8 @@ const corsHeaders = {
 const SITE_URL = 'https://combowick.com'
 const BRAND_COLOR = 0x7C3AED // violet-600
 const BOT_USERNAME = 'Combo_WICK'
-// Public branding assets (served from the live site, so Discord can fetch them)
-const BOT_AVATAR = `${SITE_URL}/icon-512.png`
-const BRAND_BANNER = `${SITE_URL}/og-image.png` // fallback hero banner if no game image
+// Fallback branding avatar (Roblox logo PNG hosted on Wikipedia commons — always reachable by Discord CDN)
+const FALLBACK_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Roblox_Logo.svg/512px-Roblox_Logo.svg.png'
 
 function extractFeatures(longDescription: string | null | undefined, fallback: string): string[] {
   if (!longDescription) return splitBullets(fallback)
