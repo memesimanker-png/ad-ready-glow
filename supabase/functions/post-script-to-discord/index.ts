@@ -122,10 +122,11 @@ Deno.serve(async (req) => {
 
     const features = extractFeatures(script.long_description, script.description)
     const url = `${SITE_URL}/scripts/${script.slug}`
-    const [icon, resolvedBanner] = await Promise.all([
-      resolveGameIcon(script.game_universe_id),
-      resolveBanner(script.game_universe_id),
-    ])
+    const rawId = script.game_universe_id
+    const universeId = rawId ? await getUniverseId(rawId) : null
+    const [icon, resolvedBanner] = universeId
+      ? await Promise.all([resolveGameIcon(universeId), resolveBanner(universeId)])
+      : [undefined, undefined]
     const banner = resolvedBanner || icon || FALLBACK_AVATAR
     const avatar = icon || FALLBACK_AVATAR
     const tagList = Array.isArray(script.tags) ? script.tags.filter(Boolean).slice(0, 6) : []
