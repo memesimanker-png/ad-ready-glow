@@ -64,9 +64,7 @@ export function useSearchScripts(query: string, category: string) {
   return useQuery({
     queryKey: ["scripts", "search", query, category],
     // Cards rarely change. Cache aggressively — 15 min stale, 30 min in-memory.
-    // This is a safer alternative to a service worker cache: no preview-iframe
-    // breakage, no conflict with the existing Monetag sw_2.js, and repeat
-    // navigations within a session hit ZERO DB queries.
+    // Repeat navigations within a session hit ZERO DB queries.
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
