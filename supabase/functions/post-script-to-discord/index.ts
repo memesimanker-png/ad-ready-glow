@@ -28,31 +28,42 @@ function splitBullets(text: string): string[] {
   return text.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean).slice(0, 4)
 }
 
-// Resolves the actual square game icon image URL (Roblox API returns JSON)
-async function resolveGameIcon(universeId: number | null | undefined): Promise<string | undefined> {
-  if (!universeId) return undefined
+// wsrv.nl proxy — Discord's media proxy is more reliable fetching from wsrv than from rbxcdn directly
+function proxy(url: string, w: number, h: number): string {
+  return `https://wsrv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ''))}&w=${w}&h=${h}&output=png`
+}
+
+// The DB sometimes stores a Roblox PLACE id instead of a UNIVERSE id.
+// Thumbnail endpoints only accept universe ids, so probe first; if empty, resolve place->universe.
+async function getUniverseId(id: number): Promise<number | null> {
   try {
-    const r = await fetch(
-      `https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`,
-    )
-    if (!r.ok) return undefined
+    const probe = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${id}&size=150x150&format=Png&isCircular=false`)
+    const pj = await probe.json().catch(() => ({}))
+    if (Array.isArray(pj?.data) && pj.data.length > 0 && pj.data[0]?.imageUrl) return id
+  } catch {}
+  try {
+    const r = await fetch(`https://apis.roblox.com/universes/v1/places/${id}/universe`)
+    if (!r.ok) return null
+    const j = await r.json()
+    return typeof j?.universeId === 'number' ? j.universeId : null
+  } catch { return null }
+}
+
+async function resolveGameIcon(universeId: number): Promise<string | undefined> {
+  try {
+    const r = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeId}&size=512x512&format=Png&isCircular=false`)
     const j = await r.json()
     const url = j?.data?.[0]?.imageUrl
-    return typeof url === 'string' ? url : undefined
+    return typeof url === 'string' ? proxy(url, 512, 512) : undefined
   } catch { return undefined }
 }
 
-// Resolves the actual landscape image URL via Roblox API (returns first thumbnail)
-async function resolveBanner(universeId: number | null | undefined): Promise<string | undefined> {
-  if (!universeId) return undefined
+async function resolveBanner(universeId: number): Promise<string | undefined> {
   try {
-    const r = await fetch(
-      `https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&countPerUniverse=1&defaults=true&size=768x432&format=Png`,
-    )
-    if (!r.ok) return undefined
+    const r = await fetch(`https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds=${universeId}&countPerUniverse=1&defaults=true&size=768x432&format=Png`)
     const j = await r.json()
     const url = j?.data?.[0]?.thumbnails?.[0]?.imageUrl
-    return typeof url === 'string' ? url : undefined
+    return typeof url === 'string' ? proxy(url, 1280, 720) : undefined
   } catch { return undefined }
 }
 
