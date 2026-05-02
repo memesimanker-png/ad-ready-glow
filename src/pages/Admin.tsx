@@ -414,6 +414,11 @@ function ScriptsTab() {
           </Card>
         ))}
       </div>
+      <DiscordPostDialog
+        open={!!discordTarget}
+        onOpenChange={(v) => { if (!v) setDiscordTarget(null); }}
+        script={discordTarget}
+      />
     </div>
   );
 }
