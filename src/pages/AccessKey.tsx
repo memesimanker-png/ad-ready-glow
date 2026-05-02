@@ -7,7 +7,7 @@ import { Copy, User, Clock, Shield, Key, Loader2 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { AdSlot } from "@/components/AdSlot";
+
 
 interface StoredKeyData {
   key: string;
@@ -263,9 +263,6 @@ export default function AccessKey() {
               )}
             </CardContent>
           </Card>
-          <div className="mt-8">
-            <AdSlot slot="0000000000" format="auto" minHeight={250} />
-          </div>
         </div>
       </main>
     </div>
