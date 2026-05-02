@@ -125,6 +125,32 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // 1.5 Rate limit script-delivery sends: 5/hour per recipient + 60s/script cooldown.
+  if (templateName === 'script-delivery') {
+    const scriptId = templateData?.scriptId || templateData?.script_id || null
+    const { data: rl, error: rlErr } = await supabase.rpc('check_email_rate_limit', {
+      _recipient: effectiveRecipient,
+      _script_id: scriptId,
+    })
+    if (rlErr) {
+      console.error('Rate limit check failed', { error: rlErr })
+      return new Response(JSON.stringify({ error: 'Rate limit check failed' }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    if (rl && rl.allowed === false) {
+      return new Response(
+        JSON.stringify({
+          error: rl.reason === 'per_script_cooldown'
+            ? 'Please wait a moment before resending this script.'
+            : 'Email limit reached (5 per hour). Try again later.',
+          retry_after_seconds: rl.retry_after_seconds,
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(rl.retry_after_seconds || 60) } }
+      )
+    }
+  }
+
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
