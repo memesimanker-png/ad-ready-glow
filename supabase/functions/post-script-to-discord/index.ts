@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
       author: {
         name: 'Combo_WICK • Premium Scripts',
         url: SITE_URL,
-        icon_url: BOT_AVATAR,
+        icon_url: avatar,
       },
       title: `${script.title}`,
       url,
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
       image: { url: banner },
       footer: {
         text: `Combo_WICK Scripts • ${script.game || 'Roblox'} • Always run on a trusted executor`,
-        icon_url: BOT_AVATAR,
+        icon_url: avatar,
       },
       timestamp: new Date().toISOString(),
     }
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
 
     const payload = {
       username: BOT_USERNAME,
-      avatar_url: BOT_AVATAR,
+      avatar_url: avatar,
       content: body.mention ? String(body.mention).slice(0, 200) : undefined,
       embeds: [embed],
       components,
