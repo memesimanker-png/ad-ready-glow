@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -22,14 +22,6 @@ type KeyPurchase = {
   created_at: string;
   user_id: string | null;
   customer_email: string | null;
-};
-
-type RobloxAccount = {
-  id: string;
-  username: string;
-  password: string;
-  package_size: number;
-  claimed_at: string;
 };
 
 type ContactMessage = {
@@ -55,7 +47,7 @@ type BadgeInfo = {
 };
 
 // Highest tier wins (lifetime > monthly > trial). Only counts non-expired keys.
-function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | null {
+function getUserBadge(keys: KeyPurchase[]): BadgeInfo | null {
   const now = Date.now();
   const active = keys.filter(k => !k.expires_at || new Date(k.expires_at).getTime() > now);
   if (active.some(k => k.tier === "lifetime")) {
@@ -67,9 +59,6 @@ function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | n
   if (active.some(k => k.tier === "trial-7day")) {
     return { label: "Trial Member", icon: Zap, className: "bg-success/15 text-success border-success/40" };
   }
-  if (accountsCount > 0) {
-    return { label: "Verified Buyer", icon: ShieldCheck, className: "bg-secondary text-secondary-foreground border-border" };
-  }
   return null;
 }
 
@@ -78,11 +67,9 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [keys, setKeys] = useState<KeyPurchase[]>([]);
-  const [accounts, setAccounts] = useState<RobloxAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
-  const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
-  const [tab, setTab] = useState<"keys" | "accounts" | "messages">("keys");
+  const [tab, setTab] = useState<"keys" | "messages">("keys");
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
@@ -108,9 +95,8 @@ export default function Dashboard() {
             .eq("user_id", data.user.id)
             .order("created_at", { ascending: false });
 
-      const [keysRes, accountsRes, messagesRes] = await Promise.all([
+      const [keysRes, messagesRes] = await Promise.all([
         keysQuery,
-        supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
         supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
       ]);
 
@@ -120,7 +106,6 @@ export default function Dashboard() {
       const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
 
       setKeys(uniqKeys);
-      setAccounts((accountsRes.data as RobloxAccount[]) || []);
       setMessages((messagesRes.data as ContactMessage[]) || []);
       setLoading(false);
     });
@@ -130,17 +115,6 @@ export default function Dashboard() {
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
-  };
-
-  const exportAccounts = () => {
-    const txt = accounts.map(a => `${a.username}:${a.password}`).join("\n");
-    const blob = new Blob([txt], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `combowick-accounts-${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const submitSupport = (e: React.FormEvent) => {
@@ -207,11 +181,11 @@ Message: ${supportForm.message || "(none)"}
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="font-heading text-3xl font-bold mb-2">My Dashboard</h1>
-            <p className="text-muted-foreground">Manage your premium keys and Roblox accounts</p>
+            <p className="text-muted-foreground">Manage your premium keys and support messages</p>
           </div>
 
           {(() => {
-            const badge = getUserBadge(keys, accounts.length);
+            const badge = getUserBadge(keys);
             const Icon = badge?.icon;
             return (
               <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-muted/30 border border-border/50 flex-wrap">
@@ -346,12 +320,6 @@ Message: ${supportForm.message || "(none)"}
               <Key className="h-4 w-4" /> Premium Keys ({keys.length})
             </button>
             <button
-              onClick={() => setTab("accounts")}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "accounts" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-            >
-              <User2 className="h-4 w-4" /> Roblox Accounts ({accounts.length})
-            </button>
-            <button
               onClick={() => setTab("messages")}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "messages" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
@@ -408,62 +376,6 @@ Message: ${supportForm.message || "(none)"}
                     </Card>
                   );
                 })}
-              </div>
-            )
-          )}
-
-          {tab === "accounts" && (
-            accounts.length === 0 ? (
-              <Card className="p-12 text-center border-dashed">
-                <User2 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-semibold mb-2">No Roblox Accounts Yet</p>
-                <p className="text-muted-foreground mb-6">Account packages are now handled manually — contact us on Discord for availability and custom orders.</p>
-                <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
-                  <Button>Contact on Discord</Button>
-                </a>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{accounts.length} accounts delivered</p>
-                  <Button variant="outline" size="sm" onClick={exportAccounts}>
-                    <Download className="h-4 w-4 mr-2" /> Export as .txt
-                  </Button>
-                </div>
-                <div className="grid gap-3">
-                  {accounts.map((acc) => {
-                    const visible = !!showPwd[acc.id];
-                    return (
-                      <Card key={acc.id} className="p-4 border-primary/20">
-                        <div className="flex items-center justify-between gap-4 flex-wrap">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Pkg {acc.package_size}</span>
-                              <span className="text-xs text-muted-foreground">Delivered {new Date(acc.claimed_at).toLocaleDateString()}</span>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2">
-                              <code className="text-sm font-mono font-semibold">{acc.username}</code>
-                              <code className="text-xs font-mono text-muted-foreground break-all">
-                                {visible ? acc.password : "•".repeat(Math.min(16, acc.password.length))}
-                              </code>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => setShowPwd(p => ({ ...p, [acc.id]: !p[acc.id] }))} title={visible ? "Hide password" : "Show password"}>
-                              {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.username, `u-${acc.id}`)} title="Copy username">
-                              {copied === `u-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.password, `p-${acc.id}`)} title="Copy password">
-                              {copied === `p-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
               </div>
             )
           )}

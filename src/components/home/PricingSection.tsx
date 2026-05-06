@@ -6,9 +6,9 @@ import { useTranslation } from "@/lib/translation-context";
 import { motion } from "framer-motion";
 
 const packages = [
-  { size: 25, price: 6, perAccount: "0.24", label: "Starter", popular: false },
-  { size: 50, price: 11, perAccount: "0.22", label: "Popular", popular: true },
-  { size: 100, price: 20, perAccount: "0.20", label: "Pro", popular: false },
+  { duration: "7 Days", price: 5, label: "Starter", popular: false },
+  { duration: "30 Days", price: 9.99, label: "Popular", popular: true },
+  { duration: "Lifetime", price: 49.99, label: "Pro", popular: false },
 ];
 
 export function PricingSection() {
@@ -35,8 +35,8 @@ export function PricingSection() {
         </motion.div>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {packages.map((pkg, i) => (
-            <motion.div
-              key={pkg.size}
+              <motion.div
+                key={pkg.duration}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -58,16 +58,16 @@ export function PricingSection() {
                 <div className="text-center mb-8">
                   <h3 className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4">{t(pkg.label)}</h3>
                   <div className="text-5xl font-bold mb-2 font-heading">${pkg.price}</div>
-                  <p className="text-sm text-muted-foreground">{pkg.size} Accounts • ${pkg.perAccount}/ea</p>
+                  <p className="text-sm text-muted-foreground">{pkg.duration} Premium Key</p>
                 </div>
                 <ul className="space-y-3 mb-10">
                   {[
-                    t("Verified accounts"),
+                    t("Instant premium key"),
                     t("Instant delivery"),
                     t("PayPal buyer protection"),
                     t("Dashboard access"),
-                    ...(pkg.size >= 50 ? [t("Bulk discount applied")] : []),
-                    ...(pkg.size >= 100 ? [t("Priority support")] : []),
+                    ...(pkg.popular ? [t("Priority updates")] : []),
+                    ...(pkg.duration === "Lifetime" ? [t("Priority support")] : []),
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-3 text-sm">
                       <Check className="h-4 w-4 text-primary flex-shrink-0" />
@@ -75,7 +75,7 @@ export function PricingSection() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/payment">
+                <Link to="/premium-keys">
                   <Button
                     className={`w-full uppercase tracking-wider text-xs font-bold py-6 ${
                       pkg.popular ? "neon-glow" : ""
