@@ -181,11 +181,11 @@ Message: ${supportForm.message || "(none)"}
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="font-heading text-3xl font-bold mb-2">My Dashboard</h1>
-            <p className="text-muted-foreground">Manage your premium keys and Roblox accounts</p>
+            <p className="text-muted-foreground">Manage your premium keys and support messages</p>
           </div>
 
           {(() => {
-            const badge = getUserBadge(keys, accounts.length);
+            const badge = getUserBadge(keys);
             const Icon = badge?.icon;
             return (
               <div className="flex items-center gap-3 mb-6 p-4 rounded-lg bg-muted/30 border border-border/50 flex-wrap">
@@ -318,12 +318,6 @@ Message: ${supportForm.message || "(none)"}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "keys" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
               <Key className="h-4 w-4" /> Premium Keys ({keys.length})
-            </button>
-            <button
-              onClick={() => setTab("accounts")}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === "accounts" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-            >
-              <User2 className="h-4 w-4" /> Roblox Accounts ({accounts.length})
             </button>
             <button
               onClick={() => setTab("messages")}
