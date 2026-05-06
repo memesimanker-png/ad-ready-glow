@@ -95,9 +95,8 @@ export default function Dashboard() {
             .eq("user_id", data.user.id)
             .order("created_at", { ascending: false });
 
-      const [keysRes, accountsRes, messagesRes] = await Promise.all([
+      const [keysRes, messagesRes] = await Promise.all([
         keysQuery,
-        supabase.from("roblox_accounts").select("id,username,password,package_size,claimed_at").eq("claimed_by", data.user.id).order("claimed_at", { ascending: false }),
         supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
       ]);
 
@@ -107,7 +106,6 @@ export default function Dashboard() {
       const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
 
       setKeys(uniqKeys);
-      setAccounts((accountsRes.data as RobloxAccount[]) || []);
       setMessages((messagesRes.data as ContactMessage[]) || []);
       setLoading(false);
     });
@@ -117,17 +115,6 @@ export default function Dashboard() {
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
-  };
-
-  const exportAccounts = () => {
-    const txt = accounts.map(a => `${a.username}:${a.password}`).join("\n");
-    const blob = new Blob([txt], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `combowick-accounts-${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const submitSupport = (e: React.FormEvent) => {
