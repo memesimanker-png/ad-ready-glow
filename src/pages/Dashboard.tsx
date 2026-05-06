@@ -380,62 +380,6 @@ Message: ${supportForm.message || "(none)"}
             )
           )}
 
-          {tab === "accounts" && (
-            accounts.length === 0 ? (
-              <Card className="p-12 text-center border-dashed">
-                <User2 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg font-semibold mb-2">No Roblox Accounts Yet</p>
-                <p className="text-muted-foreground mb-6">Account packages are now handled manually — contact us on Discord for availability and custom orders.</p>
-                <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer">
-                  <Button>Contact on Discord</Button>
-                </a>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{accounts.length} accounts delivered</p>
-                  <Button variant="outline" size="sm" onClick={exportAccounts}>
-                    <Download className="h-4 w-4 mr-2" /> Export as .txt
-                  </Button>
-                </div>
-                <div className="grid gap-3">
-                  {accounts.map((acc) => {
-                    const visible = !!showPwd[acc.id];
-                    return (
-                      <Card key={acc.id} className="p-4 border-primary/20">
-                        <div className="flex items-center justify-between gap-4 flex-wrap">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Pkg {acc.package_size}</span>
-                              <span className="text-xs text-muted-foreground">Delivered {new Date(acc.claimed_at).toLocaleDateString()}</span>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2">
-                              <code className="text-sm font-mono font-semibold">{acc.username}</code>
-                              <code className="text-xs font-mono text-muted-foreground break-all">
-                                {visible ? acc.password : "•".repeat(Math.min(16, acc.password.length))}
-                              </code>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => setShowPwd(p => ({ ...p, [acc.id]: !p[acc.id] }))} title={visible ? "Hide password" : "Show password"}>
-                              {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.username, `u-${acc.id}`)} title="Copy username">
-                              {copied === `u-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => copyText(acc.password, `p-${acc.id}`)} title="Copy password">
-                              {copied === `p-${acc.id}` ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            )
-          )}
-
           {tab === "messages" && (
             messages.length === 0 ? (
               <Card className="p-12 text-center border-dashed">
