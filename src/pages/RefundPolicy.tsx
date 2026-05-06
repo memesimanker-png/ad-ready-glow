@@ -26,7 +26,7 @@ export default function RefundPolicy() {
               <div>
                 <h2 className="font-heading text-xl font-bold text-destructive mb-2">All Sales Are Final — No Refunds</h2>
                 <p className="text-foreground text-sm leading-relaxed">
-                  Due to the instant digital nature of our products (premium keys and digital credentials), all sales are final. We do not offer refunds under any circumstances. Products are delivered immediately upon payment and cannot be returned or reversed.
+                  Due to the instant digital nature of our premium keys, all sales are final. We do not offer refunds under any circumstances. Products are delivered immediately upon payment and cannot be returned or reversed.
                 </p>
               </div>
             </div>
@@ -35,13 +35,13 @@ export default function RefundPolicy() {
           <Card className="p-8 bg-glass mb-6">
             <h2 className="font-heading text-2xl font-semibold mb-4">Why We Cannot Offer General Refunds</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              Unlike physical products that can be returned and resold, digital account credentials become compromised once shared. Once you receive and view login credentials, there is no way to "un-deliver" that information. This policy is standard across the digital goods industry and protects both buyers and sellers.
+              Unlike physical products that can be returned and resold, digital premium keys are delivered instantly and can be used immediately. Once a key is issued, there is no way to "un-deliver" that access. This policy is standard across the digital goods industry and protects both buyers and sellers.
             </p>
             <ul className="space-y-3">
               {[
                 "Products are delivered instantly and automatically upon payment confirmation",
-                "Digital credentials cannot be returned or reversed once accessed",
-                "Account login details provide immediate access to premium features",
+                "Premium keys cannot be returned or reversed once delivered",
+                "License keys provide immediate access to premium features",
                 "All product information, pricing, and features are clearly displayed before purchase",
                 "PayPal buyer protection applies to all transactions for additional security",
               ].map((item) => (
@@ -73,7 +73,7 @@ export default function RefundPolicy() {
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground list-disc ml-6">
               <li>Product descriptions, features, and what's included in each package</li>
-              <li>Package size (25, 50, or 100 accounts) and pricing</li>
+              <li>Premium key duration, access type, and pricing</li>
               <li>Our Terms of Service and this Refund Policy</li>
               <li>Your PayPal account has sufficient funds or a valid payment method</li>
             </ul>
