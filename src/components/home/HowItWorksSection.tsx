@@ -7,7 +7,7 @@ export function HowItWorksSection() {
   const steps = [
     { step: "01", title: t("Choose Your Package"), desc: t("step_1_desc") },
     { step: "02", title: t("Complete Payment"), desc: t("step_2_desc") },
-    { step: "03", title: t("Access Your Accounts"), desc: t("step_3_desc") },
+    { step: "03", title: t("Access Your Key"), desc: t("step_3_desc") },
   ];
 
   return (
