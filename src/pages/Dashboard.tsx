@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, User2, Download, Eye, EyeOff, Crown, Sparkles, Zap, ShieldCheck, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -22,14 +22,6 @@ type KeyPurchase = {
   created_at: string;
   user_id: string | null;
   customer_email: string | null;
-};
-
-type RobloxAccount = {
-  id: string;
-  username: string;
-  password: string;
-  package_size: number;
-  claimed_at: string;
 };
 
 type ContactMessage = {
@@ -55,7 +47,7 @@ type BadgeInfo = {
 };
 
 // Highest tier wins (lifetime > monthly > trial). Only counts non-expired keys.
-function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | null {
+function getUserBadge(keys: KeyPurchase[]): BadgeInfo | null {
   const now = Date.now();
   const active = keys.filter(k => !k.expires_at || new Date(k.expires_at).getTime() > now);
   if (active.some(k => k.tier === "lifetime")) {
@@ -67,9 +59,6 @@ function getUserBadge(keys: KeyPurchase[], accountsCount: number): BadgeInfo | n
   if (active.some(k => k.tier === "trial-7day")) {
     return { label: "Trial Member", icon: Zap, className: "bg-success/15 text-success border-success/40" };
   }
-  if (accountsCount > 0) {
-    return { label: "Verified Buyer", icon: ShieldCheck, className: "bg-secondary text-secondary-foreground border-border" };
-  }
   return null;
 }
 
@@ -78,11 +67,9 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [keys, setKeys] = useState<KeyPurchase[]>([]);
-  const [accounts, setAccounts] = useState<RobloxAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
-  const [showPwd, setShowPwd] = useState<Record<string, boolean>>({});
-  const [tab, setTab] = useState<"keys" | "accounts" | "messages">("keys");
+  const [tab, setTab] = useState<"keys" | "messages">("keys");
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
