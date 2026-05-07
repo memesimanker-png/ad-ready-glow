@@ -289,15 +289,19 @@ export default function AccessKey() {
               ) : (
                 <Button
                   onClick={generateKey}
-                  disabled={!canGenerate || isLoading}
+                  disabled={!canGenerate || isLoading || (cooldownUntil !== null && cooldownRemaining > 0)}
                   className="w-full bg-gradient-to-r from-primary to-purple-500 hover:shadow-lg transition-all"
                 >
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                  ) : !adClicked ? (
-                    <><Key className="mr-2 h-4 w-4" /> Continue (Step 1 of 2)</>
-                  ) : (
+                  ) : cooldownUntil && cooldownRemaining > 0 ? (
+                    <><Clock className="mr-2 h-4 w-4" /> Cooldown: {Math.floor(cooldownRemaining / 60000)}:{String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, "0")}</>
+                  ) : cooldownUntil && cooldownRemaining <= 0 ? (
                     <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
+                  ) : adClicks < REQUIRED_AD_CLICKS ? (
+                    <><Key className="mr-2 h-4 w-4" /> Continue ({adClicks + 1} of {REQUIRED_AD_CLICKS})</>
+                  ) : (
+                    <><Key className="mr-2 h-4 w-4" /> Start 5-Min Cooldown</>
                   )}
                 </Button>
               )}
