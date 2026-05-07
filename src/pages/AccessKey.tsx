@@ -25,6 +25,9 @@ export default function AccessKey() {
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [error, setError] = useState("");
+  const [adClicked, setAdClicked] = useState(false);
+
+  const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 
   // Verify steps are completed & load stored key
   useEffect(() => {
