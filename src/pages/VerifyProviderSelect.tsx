@@ -252,6 +252,43 @@ export default function VerifyProviderSelect() {
 
 
             steps.push({
+              key: "ad-gate",
+              title: "Quick Ad Step (10-min wait)",
+              done: adGateCompleted,
+              icon: <ExternalLink className="h-4 w-4" />,
+              render: () => {
+                const inCooldown = cooldownUntil !== null && cooldownRemaining > 0;
+                const mins = Math.floor(cooldownRemaining / 60000);
+                const secs = String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, "0");
+                return (
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Click the button <span className="text-foreground font-semibold">2 times</span> (it opens a sponsor link in a new tab). On the <span className="text-foreground font-semibold">3rd click</span>, a 10-minute cooldown starts — once it ends, this step unlocks automatically.
+                    </p>
+                    <Button
+                      onClick={handleAdGateClick}
+                      disabled={inCooldown || adGateCompleted}
+                      className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg hover:shadow-primary/40 transition-all"
+                    >
+                      {adGateCompleted ? (
+                        <><CheckCircle2 className="mr-2 h-4 w-4" /> Cooldown Complete</>
+                      ) : inCooldown ? (
+                        <><Clock className="mr-2 h-4 w-4" /> Cooldown: {mins}:{secs}</>
+                      ) : adClicks < REQUIRED_AD_CLICKS ? (
+                        <><ExternalLink className="mr-2 h-4 w-4" /> Open Sponsor ({adClicks + 1} of {REQUIRED_AD_CLICKS})</>
+                      ) : (
+                        <><Clock className="mr-2 h-4 w-4" /> Start 10-Minute Cooldown</>
+                      )}
+                    </Button>
+                    {inCooldown && (
+                      <Progress value={((COOLDOWN_MS - cooldownRemaining) / COOLDOWN_MS) * 100} className="h-1" />
+                    )}
+                  </div>
+                );
+              },
+            });
+
+            steps.push({
               key: "provider",
               title: "Get Your Free Key",
               done: false,
