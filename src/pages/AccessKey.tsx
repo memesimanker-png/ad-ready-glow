@@ -112,9 +112,17 @@ export default function AccessKey() {
   }, [keyExpiresAt, toast, navigate]);
 
 
+  const handleAdClick = () => {
+    window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+    setAdClicked(true);
+  };
+
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-
+    if (!adClicked) {
+      handleAdClick();
+      return;
+    }
     setIsLoading(true);
     setError("");
 
