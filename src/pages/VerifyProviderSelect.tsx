@@ -102,6 +102,36 @@ export default function VerifyProviderSelect() {
     }
   }, [youtubeCompleted, discordCompleted, showSubscriptionGate, toast]);
 
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const tick = () => {
+      const remaining = Math.max(0, cooldownUntil - Date.now());
+      setCooldownRemaining(remaining);
+      if (remaining <= 0) {
+        setAdGateCompleted(true);
+        setCooldownUntil(null);
+      }
+    };
+    tick();
+    const i = setInterval(tick, 1000);
+    return () => clearInterval(i);
+  }, [cooldownUntil]);
+
+  const handleAdGateClick = () => {
+    if (cooldownUntil || adGateCompleted) return;
+    if (adClicks < REQUIRED_AD_CLICKS) {
+      window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+      const next = adClicks + 1;
+      setAdClicks(next);
+      if (next >= REQUIRED_AD_CLICKS) {
+        toast({ title: "Almost there", description: "Click once more to start the 10-minute cooldown." });
+      }
+      return;
+    }
+    // 3rd click → start cooldown
+    setCooldownUntil(Date.now() + COOLDOWN_MS);
+    toast({ title: "Cooldown started", description: "Please wait 10 minutes before continuing." });
+  };
 
   const handleYoutubeClick = () => {
     window.open(YOUTUBE_URL, "_blank");
