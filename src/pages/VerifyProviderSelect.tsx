@@ -40,6 +40,11 @@ export default function VerifyProviderSelect() {
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
 
+  const [adClicks, setAdClicks] = useState(0);
+  const [adGateCompleted, setAdGateCompleted] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
 
   useEffect(() => {
     setMounted(true);
