@@ -116,15 +116,38 @@ export default function AccessKey() {
   }, [keyExpiresAt, toast, navigate]);
 
 
+  // Cooldown ticker
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const tick = () => {
+      const remaining = Math.max(0, cooldownUntil - Date.now());
+      setCooldownRemaining(remaining);
+      if (remaining <= 0) {
+        setCooldownUntil(null);
+        setAdClicks(0);
+      }
+    };
+    tick();
+    const i = setInterval(tick, 1000);
+    return () => clearInterval(i);
+  }, [cooldownUntil]);
+
   const handleAdClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
-    setAdClicked(true);
+    setAdClicks((c) => c + 1);
   };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-    if (!adClicked) {
+    if (cooldownUntil && Date.now() < cooldownUntil) return;
+    if (adClicks < REQUIRED_AD_CLICKS) {
       handleAdClick();
+      return;
+    }
+    // 3rd click: start 5-min cooldown, then generate
+    if (!cooldownUntil) {
+      setCooldownUntil(Date.now() + COOLDOWN_MS);
+      toast({ title: "Please wait", description: "5-minute cooldown started before key generation." });
       return;
     }
     setIsLoading(true);
