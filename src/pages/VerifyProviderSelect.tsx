@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock, ExternalLink, Clock, CalendarDays } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
