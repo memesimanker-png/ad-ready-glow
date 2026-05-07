@@ -21,6 +21,9 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const REQUIRED_AD_CLICKS = 2;
+const COOLDOWN_MS = 10 * 60 * 1000;
 
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
