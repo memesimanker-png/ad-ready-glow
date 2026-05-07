@@ -25,13 +25,9 @@ export default function AccessKey() {
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [error, setError] = useState("");
-  const [adClicks, setAdClicks] = useState(0);
-  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
-  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [adClicked, setAdClicked] = useState(false);
 
   const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
-  const REQUIRED_AD_CLICKS = 2;
-  const COOLDOWN_MS = 5 * 60 * 1000;
 
   // Verify steps are completed & load stored key
   useEffect(() => {
@@ -116,38 +112,15 @@ export default function AccessKey() {
   }, [keyExpiresAt, toast, navigate]);
 
 
-  // Cooldown ticker
-  useEffect(() => {
-    if (!cooldownUntil) return;
-    const tick = () => {
-      const remaining = Math.max(0, cooldownUntil - Date.now());
-      setCooldownRemaining(remaining);
-      if (remaining <= 0) {
-        setCooldownUntil(null);
-        setAdClicks(0);
-      }
-    };
-    tick();
-    const i = setInterval(tick, 1000);
-    return () => clearInterval(i);
-  }, [cooldownUntil]);
-
   const handleAdClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
-    setAdClicks((c) => c + 1);
+    setAdClicked(true);
   };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-    if (cooldownUntil && Date.now() < cooldownUntil) return;
-    if (adClicks < REQUIRED_AD_CLICKS) {
+    if (!adClicked) {
       handleAdClick();
-      return;
-    }
-    // 3rd click: start 5-min cooldown, then generate
-    if (!cooldownUntil) {
-      setCooldownUntil(Date.now() + COOLDOWN_MS);
-      toast({ title: "Please wait", description: "5-minute cooldown started before key generation." });
       return;
     }
     setIsLoading(true);
@@ -289,19 +262,15 @@ export default function AccessKey() {
               ) : (
                 <Button
                   onClick={generateKey}
-                  disabled={!canGenerate || isLoading || (cooldownUntil !== null && cooldownRemaining > 0)}
+                  disabled={!canGenerate || isLoading}
                   className="w-full bg-gradient-to-r from-primary to-purple-500 hover:shadow-lg transition-all"
                 >
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                  ) : cooldownUntil && cooldownRemaining > 0 ? (
-                    <><Clock className="mr-2 h-4 w-4" /> Cooldown: {Math.floor(cooldownRemaining / 60000)}:{String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, "0")}</>
-                  ) : cooldownUntil && cooldownRemaining <= 0 ? (
-                    <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
-                  ) : adClicks < REQUIRED_AD_CLICKS ? (
-                    <><Key className="mr-2 h-4 w-4" /> Continue ({adClicks + 1} of {REQUIRED_AD_CLICKS})</>
+                  ) : !adClicked ? (
+                    <><Key className="mr-2 h-4 w-4" /> Continue (Step 1 of 2)</>
                   ) : (
-                    <><Key className="mr-2 h-4 w-4" /> Start 5-Min Cooldown</>
+                    <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
                   )}
                 </Button>
               )}
