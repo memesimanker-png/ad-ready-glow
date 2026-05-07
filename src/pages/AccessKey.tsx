@@ -25,6 +25,9 @@ export default function AccessKey() {
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [error, setError] = useState("");
+  const [adClicked, setAdClicked] = useState(false);
+
+  const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
 
   // Verify steps are completed & load stored key
   useEffect(() => {
@@ -109,9 +112,17 @@ export default function AccessKey() {
   }, [keyExpiresAt, toast, navigate]);
 
 
+  const handleAdClick = () => {
+    window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+    setAdClicked(true);
+  };
+
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-
+    if (!adClicked) {
+      handleAdClick();
+      return;
+    }
     setIsLoading(true);
     setError("");
 
@@ -256,6 +267,8 @@ export default function AccessKey() {
                 >
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                  ) : !adClicked ? (
+                    <><Key className="mr-2 h-4 w-4" /> Continue (Step 1 of 2)</>
                   ) : (
                     <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
                   )}
