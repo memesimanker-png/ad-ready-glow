@@ -303,7 +303,30 @@ export default function VerifyProviderSelect() {
             const overallPercent = totalGates === 0 ? 100 : Math.round((completedCount / totalGates) * 100);
 
             return (
-              <Card className="border-primary/30 overflow-hidden">
+              <>
+                <div className={`mb-4 rounded-lg border p-3 flex items-start gap-3 ${
+                  todaySchedule.skipStep2
+                    ? "border-green-500/40 bg-green-500/10"
+                    : "border-primary/20 bg-primary/5"
+                }`}>
+                  <CalendarDays className={`h-4 w-4 mt-0.5 shrink-0 ${todaySchedule.skipStep2 ? "text-green-400" : "text-primary"}`} />
+                  <div className="text-xs leading-relaxed">
+                    {todaySchedule.skipStep2 ? (
+                      <>
+                        <p className="font-semibold text-green-300">{todaySchedule.label} — Step 2 Skipped Today</p>
+                        <p className="text-muted-foreground mt-0.5">You're getting a faster path today. Lucky you.</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-foreground">Skip Step 2 on certain days</p>
+                        <p className="text-muted-foreground mt-0.5">
+                          Step 2 is automatically skipped on <span className="text-foreground font-medium">Wednesday</span>, <span className="text-foreground font-medium">Friday</span>, and <span className="text-foreground font-medium">weekends</span> — come back then for a quicker verification.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <Card className="border-primary/30 overflow-hidden">
                 <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 via-transparent to-primary/5">
                   <div className="flex items-center justify-between gap-2">
                     <div>
