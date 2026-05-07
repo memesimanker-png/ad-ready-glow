@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock, ExternalLink, Clock, CalendarDays } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,9 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const REQUIRED_AD_CLICKS = 2;
+const COOLDOWN_MS = 10 * 60 * 1000;
 
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
@@ -36,6 +39,11 @@ export default function VerifyProviderSelect() {
   const [discordCompleted, setDiscordCompleted] = useState(false);
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
+
+  const [adClicks, setAdClicks] = useState(0);
+  const [adGateCompleted, setAdGateCompleted] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
 
   useEffect(() => {
@@ -94,6 +102,36 @@ export default function VerifyProviderSelect() {
     }
   }, [youtubeCompleted, discordCompleted, showSubscriptionGate, toast]);
 
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const tick = () => {
+      const remaining = Math.max(0, cooldownUntil - Date.now());
+      setCooldownRemaining(remaining);
+      if (remaining <= 0) {
+        setAdGateCompleted(true);
+        setCooldownUntil(null);
+      }
+    };
+    tick();
+    const i = setInterval(tick, 1000);
+    return () => clearInterval(i);
+  }, [cooldownUntil]);
+
+  const handleAdGateClick = () => {
+    if (cooldownUntil || adGateCompleted) return;
+    if (adClicks < REQUIRED_AD_CLICKS) {
+      window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+      const next = adClicks + 1;
+      setAdClicks(next);
+      if (next >= REQUIRED_AD_CLICKS) {
+        toast({ title: "Almost there", description: "Click once more to start the 10-minute cooldown." });
+      }
+      return;
+    }
+    // 3rd click → start cooldown
+    setCooldownUntil(Date.now() + COOLDOWN_MS);
+    toast({ title: "Cooldown started", description: "Please wait 10 minutes before continuing." });
+  };
 
   const handleYoutubeClick = () => {
     window.open(YOUTUBE_URL, "_blank");
@@ -214,6 +252,43 @@ export default function VerifyProviderSelect() {
 
 
             steps.push({
+              key: "ad-gate",
+              title: "Quick Ad Step (10-min wait)",
+              done: adGateCompleted,
+              icon: <ExternalLink className="h-4 w-4" />,
+              render: () => {
+                const inCooldown = cooldownUntil !== null && cooldownRemaining > 0;
+                const mins = Math.floor(cooldownRemaining / 60000);
+                const secs = String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, "0");
+                return (
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Click the button <span className="text-foreground font-semibold">2 times</span> (it opens a sponsor link in a new tab). On the <span className="text-foreground font-semibold">3rd click</span>, a 10-minute cooldown starts — once it ends, this step unlocks automatically.
+                    </p>
+                    <Button
+                      onClick={handleAdGateClick}
+                      disabled={inCooldown || adGateCompleted}
+                      className="w-full bg-gradient-to-r from-primary via-purple-500 to-primary hover:shadow-lg hover:shadow-primary/40 transition-all"
+                    >
+                      {adGateCompleted ? (
+                        <><CheckCircle2 className="mr-2 h-4 w-4" /> Cooldown Complete</>
+                      ) : inCooldown ? (
+                        <><Clock className="mr-2 h-4 w-4" /> Cooldown: {mins}:{secs}</>
+                      ) : adClicks < REQUIRED_AD_CLICKS ? (
+                        <><ExternalLink className="mr-2 h-4 w-4" /> Open Sponsor ({adClicks + 1} of {REQUIRED_AD_CLICKS})</>
+                      ) : (
+                        <><Clock className="mr-2 h-4 w-4" /> Start 10-Minute Cooldown</>
+                      )}
+                    </Button>
+                    {inCooldown && (
+                      <Progress value={((COOLDOWN_MS - cooldownRemaining) / COOLDOWN_MS) * 100} className="h-1" />
+                    )}
+                  </div>
+                );
+              },
+            });
+
+            steps.push({
               key: "provider",
               title: "Get Your Free Key",
               done: false,
@@ -228,7 +303,30 @@ export default function VerifyProviderSelect() {
             const overallPercent = totalGates === 0 ? 100 : Math.round((completedCount / totalGates) * 100);
 
             return (
-              <Card className="border-primary/30 overflow-hidden">
+              <>
+                <div className={`mb-4 rounded-lg border p-3 flex items-start gap-3 ${
+                  todaySchedule.skipStep2
+                    ? "border-green-500/40 bg-green-500/10"
+                    : "border-primary/20 bg-primary/5"
+                }`}>
+                  <CalendarDays className={`h-4 w-4 mt-0.5 shrink-0 ${todaySchedule.skipStep2 ? "text-green-400" : "text-primary"}`} />
+                  <div className="text-xs leading-relaxed">
+                    {todaySchedule.skipStep2 ? (
+                      <>
+                        <p className="font-semibold text-green-300">{todaySchedule.label} — Step 2 Skipped Today</p>
+                        <p className="text-muted-foreground mt-0.5">You're getting a faster path today. Lucky you.</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-foreground">Skip Step 2 on certain days</p>
+                        <p className="text-muted-foreground mt-0.5">
+                          Step 2 is automatically skipped on <span className="text-foreground font-medium">Wednesday</span>, <span className="text-foreground font-medium">Friday</span>, and <span className="text-foreground font-medium">weekends</span> — come back then for a quicker verification.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <Card className="border-primary/30 overflow-hidden">
                 <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 via-transparent to-primary/5">
                   <div className="flex items-center justify-between gap-2">
                     <div>
@@ -280,6 +378,7 @@ export default function VerifyProviderSelect() {
                   </ol>
                 </CardContent>
               </Card>
+              </>
             );
           })()}
           
