@@ -74,7 +74,7 @@ export default function Admin() {
             {can("scripts") && <TabsTrigger value="scripts" className="gap-2" title="Manage all scripts (create, edit, delete, send notifications)"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
             {can("orders") && <TabsTrigger value="orders" className="gap-2" title="View premium key purchase orders and payments"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
             {can("generate") && <TabsTrigger value="generate" className="gap-2" title="Manually generate a premium key for a customer"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
-            {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage Roblox accounts inventory available for claim"><UserCheck className="h-4 w-4" /> Accounts</TabsTrigger>}
+            {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage legacy private inventory"><UserCheck className="h-4 w-4" /> Inventory</TabsTrigger>}
             {can("messages") && <TabsTrigger value="messages" className="gap-2" title="Read and reply to contact form messages"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
             {can("users") && <TabsTrigger value="users" className="gap-2" title="View and manage registered user accounts"><Users className="h-4 w-4" /> Users</TabsTrigger>}
             {can("admins") && <TabsTrigger value="admins" className="gap-2" title="Grant or revoke admin/moderator access"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
@@ -576,7 +576,7 @@ function AccountsTab() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `roblox-accounts-${Date.now()}.txt`;
+    link.download = `legacy-inventory-${Date.now()}.txt`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -650,7 +650,7 @@ function AccountsTab() {
       )}
 
       <p className="text-xs text-muted-foreground text-center pt-4">
-        Read-only view — accounts page is removed from the public site. Manage inventory via Discord / direct database access.
+        Read-only private inventory view — removed from the public site.
       </p>
     </div>
   );
