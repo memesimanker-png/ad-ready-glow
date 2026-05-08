@@ -175,7 +175,33 @@ export default function VerifyProviderSelect() {
       </header>
 
       <main className="flex-1 container flex flex-col items-center justify-center py-8">
-        <div className="max-w-xl w-full mx-auto">
+        <div className="max-w-xl w-full mx-auto space-y-4">
+          {/* Skip-Step-2 schedule notice — high contrast so users actually see it */}
+          <div
+            className={`rounded-lg border-2 p-4 ${
+              todaySchedule.skipStep2
+                ? "border-green-400 bg-green-500/15 text-green-100"
+                : "border-amber-400/70 bg-amber-500/10 text-amber-100"
+            }`}
+            role="note"
+          >
+            <div className="flex items-start gap-3">
+              <Sparkles className="h-5 w-5 mt-0.5 shrink-0" />
+              <div className="text-sm leading-relaxed">
+                {todaySchedule.skipStep2 ? (
+                  <p className="font-semibold">
+                    🎉 {todaySchedule.label} — Step 2 is skipped today! You only need 2 steps to get your key.
+                  </p>
+                ) : (
+                  <p className="font-semibold">Today requires all 3 steps.</p>
+                )}
+                <p className="mt-1 text-xs opacity-90">
+                  <span className="font-semibold">Skip-Step-2 days:</span> Wednesday, Friday, Saturday & Sunday. On those days you only do 2 steps instead of 3.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Build the active step list dynamically so the UI is never confusing */}
           {(() => {
             type Step = {
