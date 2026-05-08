@@ -8,7 +8,7 @@ export default function Privacy() {
     <Layout>
       <SEOHead
         title="Privacy Policy — Combo_WICK"
-        description="The Combo_WICK privacy policy. What data we collect, how we use it, third-party processors (PayPal, Supabase, Google), and your GDPR rights."
+        description="The Combo_WICK privacy policy. What data we collect, how we use it, third-party processors, advertising cookies, and your GDPR rights."
         breadcrumbs={[{ name: "Home", url: "/" }, { name: "Privacy", url: "/privacy" }]}
       />
       <section className="py-16 sm:py-20">
@@ -23,7 +23,7 @@ export default function Privacy() {
 
           <Card className="p-8 bg-glass mb-6">
             <p className="text-muted-foreground leading-relaxed">
-              At ComboWick ("we," "us," or "our"), we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website at combowick.com and use our services for purchasing Roblox accounts and premium keys.
+              At ComboWick ("we," "us," or "our"), we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website at combowick.com and use our Roblox script library, tutorials, key verification flow, and premium key services.
             </p>
           </Card>
 
@@ -46,7 +46,7 @@ export default function Privacy() {
               {
                 title: "2. How We Use Your Information",
                 content: `We use collected information for the following legitimate purposes:
-• Service Delivery: Process your transactions and deliver purchased Roblox accounts and keys
+• Service Delivery: Process your transactions, manage premium key access, and support script-related services
 • Account Management: Create and maintain your ComboWick user account and dashboard
 • Customer Support: Respond to inquiries, troubleshoot issues, and provide purchase assistance
 • Security: Detect and prevent fraud, unauthorized access, and security incidents
