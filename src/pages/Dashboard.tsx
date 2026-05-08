@@ -167,7 +167,7 @@ Message: ${supportForm.message || "(none)"}
           <Card className="p-12 text-center max-w-md">
             <LogIn className="h-12 w-12 text-primary mx-auto mb-4" />
             <h2 className="font-heading text-2xl font-bold mb-2">Login Required</h2>
-            <p className="text-muted-foreground mb-6">Sign in to view your purchased premium keys and Roblox accounts.</p>
+            <p className="text-muted-foreground mb-6">Sign in to view your purchased premium keys and support messages.</p>
             <Button onClick={() => navigate("/login")} className="w-full">Sign In</Button>
           </Card>
         </div>
