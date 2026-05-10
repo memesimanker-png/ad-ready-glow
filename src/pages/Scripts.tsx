@@ -40,7 +40,7 @@ export default function Scripts() {
   const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
   const STORAGE_KEY = "scripts_dl_state";
   const MAX_CLICKS = 2;
-  const COOLDOWN_MS = 30 * 60 * 1000;
+  const COOLDOWN_MS = 5 * 60 * 1000;
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       // Only count primary-button clicks on real interactive elements
