@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { VideoBackground } from "@/components/VideoBackground";
 import { motion } from "framer-motion";
 import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
+import { PaidGameCard } from "@/components/PaidGameCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
