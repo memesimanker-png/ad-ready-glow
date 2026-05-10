@@ -273,7 +273,7 @@ export default function PremiumKeys() {
                   <div className="flex flex-col gap-2">
                     <Button
                       onClick={() => handlePurchase({
-                        id: `${g.id}-monthly`,
+                        id: "monthly",
                         nameKey: `${g.title} — Monthly`,
                         price: g.monthlyPrice,
                         color: "",
