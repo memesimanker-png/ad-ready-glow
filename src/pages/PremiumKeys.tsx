@@ -290,7 +290,7 @@ export default function PremiumKeys() {
                     {g.lifetimePrice && (
                       <Button
                         onClick={() => handlePurchase({
-                          id: `${g.id}-lifetime`,
+                          id: "lifetime",
                           nameKey: `${g.title} — Lifetime`,
                           price: g.lifetimePrice,
                           color: "",
