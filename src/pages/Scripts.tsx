@@ -35,6 +35,47 @@ export default function Scripts() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Monetag Direct Link — fires on user clicks inside the page,
+  // max 2 times then a 30-minute cooldown so it isn't annoying.
+  const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+  const STORAGE_KEY = "scripts_dl_state";
+  const MAX_CLICKS = 2;
+  const COOLDOWN_MS = 30 * 60 * 1000;
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      // Only count primary-button clicks on real interactive elements
+      if (e.button !== 0) return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const interactive = target.closest("a, button, [role='button']");
+      if (!interactive) return;
+      // Skip clicks inside form fields / search input
+      if ((target as HTMLElement).closest("input, textarea, select")) return;
+
+      let state: { count: number; firstAt: number; cooldownUntil: number } = { count: 0, firstAt: 0, cooldownUntil: 0 };
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) state = JSON.parse(raw);
+      } catch {}
+      const now = Date.now();
+      if (state.cooldownUntil && now < state.cooldownUntil) return;
+      if (state.cooldownUntil && now >= state.cooldownUntil) {
+        state = { count: 0, firstAt: 0, cooldownUntil: 0 };
+      }
+
+      // Open ad in a background tab — does not interrupt the user's navigation
+      try { window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer"); } catch {}
+
+      const newCount = state.count + 1;
+      const next = newCount >= MAX_CLICKS
+        ? { count: 0, firstAt: 0, cooldownUntil: now + COOLDOWN_MS }
+        : { count: newCount, firstAt: state.firstAt || now, cooldownUntil: 0 };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+    };
+    document.addEventListener("click", handler, true);
+    return () => document.removeEventListener("click", handler, true);
+  }, []);
+
   const { data: results = [], isLoading } = useSearchScripts(query, category);
   // Always-fetched (cached 15min, near zero cost) — used to surface a featured/sponsored
   // paid script even when the user is searching/filtering. Today the only paid script
