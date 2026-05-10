@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { VideoBackground } from "@/components/VideoBackground";
 import { motion } from "framer-motion";
 import { PayPalCheckoutModal } from "@/components/PayPalCheckoutModal";
+import { PaidGameCard } from "@/components/PaidGameCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
@@ -220,96 +221,75 @@ export default function PremiumKeys() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                id: "script-desert-war",
                 game: "Desert War [UPDATE] 🌴",
                 title: "Desert War Script",
+                subtitle: "Combat utility suite",
                 features: ["Infinite Ammo", "Kill All", "Aimbot", "ESP", "HitBox Expander", "Invisibility"],
                 monthlyPrice: 9,
                 thumbnail: "https://tr.rbxcdn.com/180DAY-07ecdc2f6af0cebd23dc934b6bbbf614/768/432/Image/Png/noFilter",
-                badge: "2.0",
-                badgeColor: "bg-red-500",
+                badge: { text: "2.0", variant: "red" as const },
+                warning: "Use a fresh / alt account — main accounts at your own risk.",
+                changelog: [
+                  { id: 1, version: "v2.0", changes: "Rewrote aimbot for new map update.", created_at: "2026-05-01" },
+                  { id: 2, version: "v1.8", changes: "Added invisibility toggle.", created_at: "2026-04-15" },
+                ],
               },
               {
-                id: "script-jurassic-blocky",
                 game: "Jurassic Blocky",
                 title: "Jurassic Blocky Script",
+                subtitle: "Auto farm + PvP",
                 features: ["Auto Collect Amber", "Kill All Goat", "Kill Players", "Unpatched & Working"],
                 monthlyPrice: 7,
                 lifetimePrice: 11,
                 thumbnail: "https://tr.rbxcdn.com/180DAY-72007dc11099c62685db43551189ca26/768/432/Image/Png/noFilter",
-                badge: "UNPATCHED",
-                badgeColor: "bg-purple-500",
+                badge: { text: "UNPATCHED", variant: "primary" as const },
+                changelog: [
+                  { id: 1, version: "v1.4", changes: "Bypass for latest anti-cheat patch.", created_at: "2026-05-05" },
+                ],
               },
               {
-                id: "script-state-of-anarchy",
                 game: "State of Anarchy",
                 title: "State of Anarchy Script",
+                subtitle: "Full PvP toolkit",
                 features: ["Kill All Players", "ESP / Wallhack", "Teleport to Loot", "Aim-Bot", "Hitbox Expander"],
                 monthlyPrice: 10,
                 lifetimePrice: 17,
                 thumbnail: "https://tr.rbxcdn.com/180DAY-43670f7186821eb93f47c92d53729cdd/768/432/Image/Png/noFilter",
-                badge: "POPULAR",
-                badgeColor: "bg-primary",
+                badge: { text: "POPULAR", variant: "amber" as const },
+                warning: "Stay low-profile — heavy usage may flag your account.",
+                changelog: [
+                  { id: 1, version: "v3.1", changes: "Improved teleport reliability.", created_at: "2026-04-28" },
+                ],
               },
-            ].map((g) => (
-              <Card key={g.title} className="overflow-hidden card-neon border-yellow-500/20 flex flex-col">
-                <div className="relative aspect-video">
-                  <img src={g.thumbnail} alt={g.game} className="w-full h-full object-cover" loading="lazy" decoding="async" width={640} height={360} />
-                  {g.badge && (
-                    <span className={`absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full ${g.badgeColor} text-white`}>{t(g.badge)}</span>
-                  )}
-                </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <p className="text-xs text-muted-foreground mb-1">{g.game}</p>
-                  <h3 className="font-heading font-bold text-lg mb-3">{t(g.title)}</h3>
-                  <ul className="space-y-1.5 mb-4 flex-1">
-                    {g.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm">
-                        <Check className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
-                        <span>{t(f)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={() => handlePurchase({
-                        id: "monthly",
-                        nameKey: `${g.title} — Monthly`,
-                        price: g.monthlyPrice,
-                        color: "",
-                        borderColor: "",
-                        featureKeys: [],
-                        buttonTextKey: "",
-                        buttonStyle: "",
-                        isSubscription: false,
-                      } as any)}
-                      className="w-full py-5 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold shadow-lg shadow-yellow-500/30"
-                    >
-                      🛒 {t("Buy Monthly")} — ${g.monthlyPrice}/{t("mo")}
-                    </Button>
-                    {g.lifetimePrice && (
-                      <Button
-                        onClick={() => handlePurchase({
-                          id: "lifetime",
-                          nameKey: `${g.title} — Lifetime`,
-                          price: g.lifetimePrice,
-                          color: "",
-                          borderColor: "",
-                          featureKeys: [],
-                          buttonTextKey: "",
-                          buttonStyle: "",
-                          isSubscription: false,
-                        } as any)}
-                        variant="outline"
-                        className="w-full py-5 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/10 font-bold"
-                      >
-                        ⭐ {t("Buy Lifetime")} — ${g.lifetimePrice}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
+            ].map((g) => {
+              const pricing = [
+                { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly") },
+                ...(g.lifetimePrice
+                  ? [{ price: g.lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment") }]
+                  : []),
+              ];
+              return (
+                <PaidGameCard
+                  key={g.title}
+                  game={g.game}
+                  title={g.title}
+                  subtitle={g.subtitle}
+                  thumbnail={g.thumbnail}
+                  badge={g.badge}
+                  features={g.features}
+                  warning={g.warning}
+                  changelog={g.changelog}
+                  pricing={pricing}
+                  onSelectPlan={(plan) => handlePurchase({
+                    id: plan.period === "month" ? "monthly" : "lifetime",
+                    nameKey: `${g.title} — ${plan.label}`,
+                    price: plan.price,
+                    color: "", borderColor: "", featureKeys: [],
+                    buttonTextKey: "", buttonStyle: "", isSubscription: false,
+                  } as any)}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
