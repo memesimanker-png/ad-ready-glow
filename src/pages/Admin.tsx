@@ -6,11 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare, Upload, ImageIcon, X } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
 import { DiscordPostDialog } from "@/components/DiscordPostDialog";
+import { compressImage } from "@/lib/image-compress";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 
@@ -20,6 +21,7 @@ const emptyScript = {
   code: DEFAULT_SCRIPT_CODE, faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
   youtube_url: "" as string, is_paid: false, gameUrl: "" as string,
+  thumbnail_url: "" as string,
 };
 
 export default function Admin() {
@@ -180,9 +182,37 @@ function ScriptsTab() {
   const [discordTarget, setDiscordTarget] = useState<{ id: string; title: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
   const { toast } = useToast();
 
   const set = (k: string, v: any) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const handleThumbnailUpload = async (file: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please choose an image file", variant: "destructive" });
+      return;
+    }
+    setUploadingThumb(true);
+    try {
+      const compressed = await compressImage(file, { maxDim: 800, quality: 0.82 });
+      const ext = compressed.name.split(".").pop() || "jpg";
+      const path = `${form.slug || "script"}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("script-thumbnails")
+        .upload(path, compressed, { cacheControl: "31536000", upsert: false, contentType: compressed.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("script-thumbnails").getPublicUrl(path);
+      set("thumbnail_url", data.publicUrl);
+      const kb = Math.round(compressed.size / 1024);
+      const origKb = Math.round(file.size / 1024);
+      toast({ title: "Thumbnail uploaded", description: `Compressed ${origKb}KB → ${kb}KB` });
+    } catch (e: any) {
+      toast({ title: "Upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingThumb(false);
+    }
+  };
 
   const aiAutofill = async () => {
     if (!form.code.trim()) { toast({ title: "Paste script code first", variant: "destructive" }); return; }
@@ -243,6 +273,7 @@ function ScriptsTab() {
         youtube_url: form.youtube_url || null,
         is_paid: form.is_paid,
         game_url: builtGameUrl,
+        thumbnail_url: form.thumbnail_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -278,6 +309,7 @@ function ScriptsTab() {
       youtube_url: s.youtube_url || "",
       is_paid: !!s.is_paid,
       gameUrl: s.game_url || "",
+      thumbnail_url: s.thumbnail_url || "",
     });
     setEditingId(s.id);
     setShowForm(true);
@@ -323,6 +355,50 @@ function ScriptsTab() {
                 {CATEGORIES.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+          </div>
+
+          {/* Custom thumbnail upload (overrides Roblox auto-fetch) */}
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              🖼️ Custom Thumbnail <span className="text-muted-foreground font-normal">(optional — overrides Roblox auto-thumbnail)</span>
+            </label>
+            <div className="flex items-center gap-3">
+              {form.thumbnail_url ? (
+                <div className="relative shrink-0">
+                  <img src={form.thumbnail_url} alt="Thumbnail preview" className="w-16 h-16 rounded-lg object-cover border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => set("thumbnail_url", "")}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 hover:scale-110 transition-transform"
+                    title="Remove custom thumbnail"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center border border-dashed border-border shrink-0">
+                  <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
+              <label className={`${inputCls} flex-1 flex items-center justify-center gap-2 cursor-pointer hover:bg-secondary/70 transition-colors ${uploadingThumb ? "opacity-50 pointer-events-none" : ""}`}>
+                {uploadingThumb ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                <span>{uploadingThumb ? "Compressing & uploading…" : (form.thumbnail_url ? "Replace image" : "Choose image (auto-compressed)")}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingThumb}
+                  onChange={e => {
+                    const f = e.target.files?.[0];
+                    if (f) handleThumbnailUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Any size accepted — automatically resized to max 800px and compressed to keep load fast.
+            </p>
           </div>
           <div><label className="text-sm font-medium mb-1 block">Short Description</label><input value={form.description} onChange={e => set("description", e.target.value)} className={inputCls} /></div>
           <div><label className="text-sm font-medium mb-1 block">Long Description</label><textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)} rows={3} className={inputCls} /></div>

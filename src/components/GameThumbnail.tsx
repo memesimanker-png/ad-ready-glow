@@ -4,6 +4,8 @@ import { Gamepad2 } from "lucide-react";
 interface GameThumbnailProps {
   gameName: string;
   universeId?: number | null;
+  /** Custom thumbnail URL — when provided, overrides the Roblox auto-fetch. */
+  customUrl?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
@@ -14,8 +16,10 @@ const sizeMap = {
   lg: "w-20 h-20 rounded-xl",
 };
 
-export function GameThumbnail({ gameName, universeId, className = "", size = "sm" }: GameThumbnailProps) {
-  const thumbnail = useGameThumbnail(universeId);
+export function GameThumbnail({ gameName, universeId, customUrl, className = "", size = "sm" }: GameThumbnailProps) {
+  // Skip the Roblox fetch entirely when admin uploaded a custom image.
+  const fetched = useGameThumbnail(customUrl ? null : universeId);
+  const thumbnail = customUrl || fetched;
 
   return thumbnail ? (
     <img

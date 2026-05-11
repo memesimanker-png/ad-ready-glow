@@ -17,6 +17,7 @@ export type Script = {
   is_paid?: boolean;
   youtube_url?: string | null;
   game_url?: string | null;
+  thumbnail_url?: string | null;
 };
 
 export const CATEGORIES = [
