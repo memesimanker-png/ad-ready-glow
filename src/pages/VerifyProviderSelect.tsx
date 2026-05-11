@@ -11,6 +11,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { getTodaySchedule } from "@/lib/day-schedule";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { NoIndex } from "@/components/NoIndex";
 
 
 const adProviders = [
@@ -130,6 +131,7 @@ export default function VerifyProviderSelect() {
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
       <FloatingYouTubePlayer step="provider-select" />
 
       {showTutorialPopup && (

@@ -4,6 +4,7 @@ import { Shield, CheckCircle, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { NoIndex } from "@/components/NoIndex";
 
 
 export default function ClaimAccess() {
@@ -38,6 +39,7 @@ export default function ClaimAccess() {
   if (error && !hwid) {
     return (
       <div className="min-h-screen flex items-center justify-center">
+      <NoIndex />
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <Button onClick={() => navigate("/")}>Go Home</Button>

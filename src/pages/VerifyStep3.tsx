@@ -9,6 +9,7 @@ import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
+import { NoIndex } from "@/components/NoIndex";
 
 
 export default function VerifyStep3() {
@@ -48,6 +49,7 @@ export default function VerifyStep3() {
   return (
     <>
       <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
         <header className="container py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
