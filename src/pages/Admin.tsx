@@ -182,9 +182,37 @@ function ScriptsTab() {
   const [discordTarget, setDiscordTarget] = useState<{ id: string; title: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
   const { toast } = useToast();
 
   const set = (k: string, v: any) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const handleThumbnailUpload = async (file: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please choose an image file", variant: "destructive" });
+      return;
+    }
+    setUploadingThumb(true);
+    try {
+      const compressed = await compressImage(file, { maxDim: 800, quality: 0.82 });
+      const ext = compressed.name.split(".").pop() || "jpg";
+      const path = `${form.slug || "script"}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("script-thumbnails")
+        .upload(path, compressed, { cacheControl: "31536000", upsert: false, contentType: compressed.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("script-thumbnails").getPublicUrl(path);
+      set("thumbnail_url", data.publicUrl);
+      const kb = Math.round(compressed.size / 1024);
+      const origKb = Math.round(file.size / 1024);
+      toast({ title: "Thumbnail uploaded", description: `Compressed ${origKb}KB → ${kb}KB` });
+    } catch (e: any) {
+      toast({ title: "Upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingThumb(false);
+    }
+  };
 
   const aiAutofill = async () => {
     if (!form.code.trim()) { toast({ title: "Paste script code first", variant: "destructive" }); return; }
