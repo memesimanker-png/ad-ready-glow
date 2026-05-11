@@ -359,6 +359,7 @@ export type Database = {
           long_description: string | null
           slug: string
           tags: string[] | null
+          thumbnail_url: string | null
           title: string
           trending: boolean | null
           updated_at: string | null
@@ -379,6 +380,7 @@ export type Database = {
           long_description?: string | null
           slug: string
           tags?: string[] | null
+          thumbnail_url?: string | null
           title: string
           trending?: boolean | null
           updated_at?: string | null
@@ -399,6 +401,7 @@ export type Database = {
           long_description?: string | null
           slug?: string
           tags?: string[] | null
+          thumbnail_url?: string | null
           title?: string
           trending?: boolean | null
           updated_at?: string | null
