@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Shield, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { NoIndex } from "@/components/NoIndex";
 
 type VerificationStep = "step1" | "step2" | "step3";
 
@@ -141,6 +142,7 @@ export default function AdReturn() {
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
       <header className="container py-6">
         <div className="flex items-center gap-2">
           <Shield className="h-6 w-6 text-primary" />

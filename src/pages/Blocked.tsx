@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Shield, AlertTriangle, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { NoIndex } from "@/components/NoIndex";
 
 export default function Blocked() {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ export default function Blocked() {
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
       <header className="container py-6">
         <div className="flex items-center gap-2">
           <Shield className="h-6 w-6 text-primary" />

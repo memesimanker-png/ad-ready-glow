@@ -7,6 +7,7 @@ import { Copy, User, Clock, Shield, Key, Loader2 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { NoIndex } from "@/components/NoIndex";
 
 
 interface StoredKeyData {
@@ -188,6 +189,7 @@ export default function AccessKey() {
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
       <header className="container py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

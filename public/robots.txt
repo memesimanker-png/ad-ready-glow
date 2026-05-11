@@ -1,9 +1,29 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /blocked
+Disallow: /ad-return
+Disallow: /ad-return/
+Disallow: /verify/
+Disallow: /access-key
+Disallow: /claim-access
+Disallow: /register
+Disallow: /unsubscribe
 Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /blocked
+Disallow: /ad-return
+Disallow: /ad-return/
+Disallow: /verify/
+Disallow: /access-key
+Disallow: /claim-access
+Disallow: /register
+Disallow: /unsubscribe
 Crawl-delay: 2
 
 User-agent: Twitterbot

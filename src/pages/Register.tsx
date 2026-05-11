@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
+import { NoIndex } from "@/components/NoIndex";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-[url('/images/hacker-background.jpg')] bg-cover bg-center bg-fixed flex flex-col">
+      <NoIndex />
       <div className="min-h-screen bg-black/70 flex flex-col">
         <header className="container py-6">
           <div className="flex items-center gap-2">

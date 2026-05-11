@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MailX, CheckCircle2, AlertTriangle } from "lucide-react";
+import { NoIndex } from "@/components/NoIndex";
 
 type State = "loading" | "valid" | "already" | "invalid" | "submitting" | "done" | "error";
 
@@ -46,6 +47,7 @@ export default function Unsubscribe() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <NoIndex />
       <Card className="max-w-md w-full border-primary/30">
         <CardHeader>
           <div className="flex items-center gap-2">

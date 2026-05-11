@@ -12,6 +12,7 @@ import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { NoIndex } from "@/components/NoIndex";
 
 
 export default function VerifyStep2() {
@@ -76,6 +77,7 @@ export default function VerifyStep2() {
   return (
     <>
       <div className="min-h-screen bg-black/70 flex flex-col">
+      <NoIndex />
         <header className="container py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
