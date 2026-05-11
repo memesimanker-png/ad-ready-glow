@@ -15,7 +15,7 @@ export function ScriptCard({ script }: { script: Script }) {
   return (
     <article className="group relative flex flex-col rounded-lg border border-border bg-card hover:border-primary/50 transition-all duration-200 overflow-hidden">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <GameThumbnail gameName={script.game} universeId={(script as any).game_universe_id} size="sm" />
+        <GameThumbnail gameName={script.game} universeId={(script as any).game_universe_id} customUrl={(script as any).thumbnail_url} size="sm" />
         <div className="flex flex-wrap items-center gap-2 min-w-0">
           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
             {script.game}
