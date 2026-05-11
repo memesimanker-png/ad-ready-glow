@@ -6,11 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare, Upload, ImageIcon, X } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
 import { DiscordPostDialog } from "@/components/DiscordPostDialog";
+import { compressImage } from "@/lib/image-compress";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 
@@ -20,6 +21,7 @@ const emptyScript = {
   code: DEFAULT_SCRIPT_CODE, faqs: [] as { question: string; answer: string }[],
   trending: false, verified: true, gameUniverseId: "" as string,
   youtube_url: "" as string, is_paid: false, gameUrl: "" as string,
+  thumbnail_url: "" as string,
 };
 
 export default function Admin() {
@@ -243,6 +245,7 @@ function ScriptsTab() {
         youtube_url: form.youtube_url || null,
         is_paid: form.is_paid,
         game_url: builtGameUrl,
+        thumbnail_url: form.thumbnail_url || null,
       };
       if (editingId) {
         const { error } = await supabase.from("scripts").update(payload).eq("id", editingId);
@@ -278,6 +281,7 @@ function ScriptsTab() {
       youtube_url: s.youtube_url || "",
       is_paid: !!s.is_paid,
       gameUrl: s.game_url || "",
+      thumbnail_url: s.thumbnail_url || "",
     });
     setEditingId(s.id);
     setShowForm(true);
