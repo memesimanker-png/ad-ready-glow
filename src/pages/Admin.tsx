@@ -356,6 +356,50 @@ function ScriptsTab() {
               </select>
             </div>
           </div>
+
+          {/* Custom thumbnail upload (overrides Roblox auto-fetch) */}
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              🖼️ Custom Thumbnail <span className="text-muted-foreground font-normal">(optional — overrides Roblox auto-thumbnail)</span>
+            </label>
+            <div className="flex items-center gap-3">
+              {form.thumbnail_url ? (
+                <div className="relative shrink-0">
+                  <img src={form.thumbnail_url} alt="Thumbnail preview" className="w-16 h-16 rounded-lg object-cover border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => set("thumbnail_url", "")}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 hover:scale-110 transition-transform"
+                    title="Remove custom thumbnail"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center border border-dashed border-border shrink-0">
+                  <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
+              <label className={`${inputCls} flex-1 flex items-center justify-center gap-2 cursor-pointer hover:bg-secondary/70 transition-colors ${uploadingThumb ? "opacity-50 pointer-events-none" : ""}`}>
+                {uploadingThumb ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                <span>{uploadingThumb ? "Compressing & uploading…" : (form.thumbnail_url ? "Replace image" : "Choose image (auto-compressed)")}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingThumb}
+                  onChange={e => {
+                    const f = e.target.files?.[0];
+                    if (f) handleThumbnailUpload(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Any size accepted — automatically resized to max 800px and compressed to keep load fast.
+            </p>
+          </div>
           <div><label className="text-sm font-medium mb-1 block">Short Description</label><input value={form.description} onChange={e => set("description", e.target.value)} className={inputCls} /></div>
           <div><label className="text-sm font-medium mb-1 block">Long Description</label><textarea value={form.longDescription} onChange={e => set("longDescription", e.target.value)} rows={3} className={inputCls} /></div>
           <div>
