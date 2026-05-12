@@ -10,6 +10,8 @@ import { generateLinkvertiseUrl } from "@/lib/linkvertise";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { NoIndex } from "@/components/NoIndex";
+import { SkipAdsBanner } from "@/components/SkipAdsBanner";
+import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 
 
 export default function VerifyStep3() {
@@ -59,6 +61,7 @@ export default function VerifyStep3() {
             <LanguageSelector />
           </div>
         </header>
+        <SkipAdsBanner />
         <main className="flex-1 container flex flex-col items-center justify-center py-12">
           <div className="max-w-2xl w-full mx-auto space-y-6">
             <div className="space-y-2 text-center">
@@ -96,6 +99,7 @@ export default function VerifyStep3() {
             </Card>
           </div>
         </main>
+        <SkipAdsFloatButton />
       </div>
     </>
   );

@@ -1,13 +1,10 @@
 import { useEffect } from "react";
 
-/**
- * Injects <meta name="robots" content="noindex,nofollow"> into <head>.
- * Use on gate pages (verify, ad-return, access-key, claim-access, blocked,
- * register, unsubscribe) so Googlebot doesn't index dead-end pages and flag
- * the site for "navigation issues" during AdSense review.
- */
 export function NoIndex() {
   useEffect(() => {
+    const crawlableGatePaths = ["/verify", "/ad-return", "/access-key", "/claim-access", "/blocked", "/register"];
+    if (crawlableGatePaths.some((path) => window.location.pathname.startsWith(path))) return;
+
     const meta = document.createElement("meta");
     meta.name = "robots";
     meta.content = "noindex,nofollow";

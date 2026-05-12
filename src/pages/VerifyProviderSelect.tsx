@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, Sparkles, CheckCircle2, Lock, MousePointerClick } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdProviderSelector } from "@/components/AdProviderSelector";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const REQUIRED_DIRECT_LINK_CLICKS = 2;
 
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ export default function VerifyProviderSelect() {
   const [discordCompleted, setDiscordCompleted] = useState(false);
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
+  const [directLinkClicks, setDirectLinkClicks] = useState(0);
 
 
   useEffect(() => {
@@ -106,6 +109,21 @@ export default function VerifyProviderSelect() {
     window.open(DISCORD_URL, "_blank");
     setDiscordTimer(WAIT_TIME_SECONDS);
     toast({ title: "Opening Discord", description: `Please join and wait ${WAIT_TIME_SECONDS} seconds...` });
+  };
+
+  const handleDirectLinkClick = () => {
+    window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+    setDirectLinkClicks((prev) => {
+      const next = Math.min(prev + 1, REQUIRED_DIRECT_LINK_CLICKS);
+      localStorage.setItem("direct_link_clicks", String(next));
+      if (next >= REQUIRED_DIRECT_LINK_CLICKS) {
+        localStorage.setItem("direct_link_completed", "true");
+        toast({ title: "Processing Complete", description: "You can continue to the free key provider now." });
+      } else {
+        toast({ title: "One More Click", description: "Click the button one more time to process." });
+      }
+      return next;
+    });
   };
 
 
@@ -238,6 +256,28 @@ export default function VerifyProviderSelect() {
                 ),
               });
             }
+
+
+            steps.push({
+              key: "direct-link",
+              title: "Process Free Access",
+              done: directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS,
+              icon: <MousePointerClick className="h-4 w-4" />,
+              render: () => (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Click the button two times to process your free access.
+                  </p>
+                  <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS}>
+                    <MousePointerClick className="h-4 w-4" />
+                    {directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS
+                      ? "✓ Processing Complete"
+                      : `Click Ad Button (${directLinkClicks}/${REQUIRED_DIRECT_LINK_CLICKS})`}
+                  </Button>
+                  <Progress value={(directLinkClicks / REQUIRED_DIRECT_LINK_CLICKS) * 100} className="h-1" />
+                </div>
+              ),
+            });
 
 
 

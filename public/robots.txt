@@ -2,28 +2,12 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
-Disallow: /blocked
-Disallow: /ad-return
-Disallow: /ad-return/
-Disallow: /verify/
-Disallow: /access-key
-Disallow: /claim-access
-Disallow: /register
-Disallow: /unsubscribe
 Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
-Disallow: /blocked
-Disallow: /ad-return
-Disallow: /ad-return/
-Disallow: /verify/
-Disallow: /access-key
-Disallow: /claim-access
-Disallow: /register
-Disallow: /unsubscribe
 Crawl-delay: 2
 
 User-agent: Twitterbot
@@ -75,9 +59,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
-Disallow: /blocked
-Disallow: /ad-return
-Disallow: /verify/
 
 # Dynamic sitemap (always up-to-date — includes all scripts and blog posts)
 Sitemap: https://iphiksvnuzpteoryrdxf.supabase.co/functions/v1/dynamic-sitemap
