@@ -8,6 +8,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
+import { SkipAdsBanner } from "@/components/SkipAdsBanner";
+import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 
 
 interface StoredKeyData {
@@ -199,6 +201,7 @@ export default function AccessKey() {
           <LanguageSelector />
         </div>
       </header>
+      <SkipAdsBanner />
 
       <main className="flex-1 container flex flex-col items-center justify-center py-12">
         <div className="max-w-md w-full mx-auto space-y-6">
@@ -280,6 +283,7 @@ export default function AccessKey() {
           </Card>
         </div>
       </main>
+      <SkipAdsFloatButton />
     </div>
   );
 }
