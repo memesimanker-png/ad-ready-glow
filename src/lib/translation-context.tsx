@@ -71,11 +71,46 @@ async function fetchTranslations(lang: string, texts: string[]): Promise<Record<
 export function TranslationProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<LangCode>(() => {
     const saved = localStorage.getItem("combowick-lang");
-    return (saved as LangCode) || "en";
+    if (saved) return saved as LangCode;
+    const supported: LangCode[] = ["en","fr","th","ko","zh-CN","de","ru","id","pt","fil","es","vi"];
+    const navLang = (navigator.language || "en").toLowerCase();
+    const exact = supported.find((c) => c.toLowerCase() === navLang);
+    if (exact) return exact;
+    const base = navLang.split("-")[0];
+    const match = supported.find((c) => c.toLowerCase().split("-")[0] === base);
+    return (match || "en") as LangCode;
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const [, forceUpdate] = useState(0);
   const langRef = useRef(currentLanguage);
+
+  // IP-based country detection — refines auto-pick if user hasn't manually set a language
+  useEffect(() => {
+    if (localStorage.getItem("combowick-lang")) return;
+    if (localStorage.getItem("combowick-geo-checked")) return;
+    const COUNTRY_TO_LANG: Record<string, LangCode> = {
+      FR: "fr", BE: "fr", LU: "fr", MC: "fr",
+      ES: "es", MX: "es", AR: "es", CO: "es", CL: "es", PE: "es", VE: "es",
+      DE: "de", AT: "de", CH: "de",
+      BR: "pt", PT: "pt",
+      RU: "ru", BY: "ru", KZ: "ru",
+      CN: "zh-CN", TW: "zh-CN", HK: "zh-CN", SG: "zh-CN",
+      KR: "ko", TH: "th", ID: "id", PH: "fil", VN: "vi",
+    };
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((d) => {
+        const country = (d?.country_code || d?.country || "").toUpperCase();
+        const detected = COUNTRY_TO_LANG[country];
+        localStorage.setItem("combowick-geo-checked", "1");
+        if (detected && detected !== langRef.current) {
+          setCurrentLanguage(detected);
+          langRef.current = detected;
+          document.documentElement.lang = detected;
+        }
+      })
+      .catch(() => { localStorage.setItem("combowick-geo-checked", "1"); });
+  }, []);
 
   const setLanguage = useCallback((langCode: string) => {
     const code = langCode as LangCode;

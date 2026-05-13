@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "@/lib/translation-context";
 import { LANGUAGES, LangCode } from "@/lib/translations";
-import { Globe, ChevronDown } from "lucide-react";
+import { Globe, ChevronDown, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface LanguageSelectorProps {
@@ -10,7 +10,7 @@ interface LanguageSelectorProps {
 }
 
 export function LanguageSelector({ dropUp = false, inline = false }: LanguageSelectorProps) {
-  const { currentLanguage, setLanguage } = useTranslation();
+  const { currentLanguage, setLanguage, isTranslating } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const current = LANGUAGES.find((l) => l.code === currentLanguage) || LANGUAGES[0];
@@ -40,7 +40,11 @@ export function LanguageSelector({ dropUp = false, inline = false }: LanguageSel
         >
           <Globe className="h-4 w-4 text-primary" />
           <span>{current.label}</span>
-          <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
+          {isTranslating ? (
+            <Loader2 className="h-3 w-3 animate-spin text-primary" />
+          ) : (
+            <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
+          )}
         </button>
       </div>
       <AnimatePresence>

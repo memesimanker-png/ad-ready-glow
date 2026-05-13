@@ -192,6 +192,7 @@ export default function AccessKey() {
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
+      <SkipAdsBanner />
       <header className="container py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -201,7 +202,6 @@ export default function AccessKey() {
           <LanguageSelector />
         </div>
       </header>
-      <SkipAdsBanner />
 
       <main className="flex-1 container flex flex-col items-center justify-center py-12">
         <div className="max-w-md w-full mx-auto space-y-6">
