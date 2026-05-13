@@ -1,26 +1,26 @@
 import { Link } from "react-router-dom";
-import { Crown, Sparkles } from "lucide-react";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 export function SkipAdsBanner() {
+  const [isVisible, setIsVisible] = useState(true);
+  if (!isVisible) return null;
+
   return (
-    <div className="border-y border-primary/20 bg-card/80 backdrop-blur">
-      <div className="container flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-            <Sparkles className="h-4 w-4" />
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-foreground">Want to skip the ad steps?</p>
-            <p className="text-xs text-muted-foreground">Premium keys unlock faster access without the free-key verification route.</p>
-          </div>
+    <div className="fixed top-0 left-0 right-0 z-50 bg-purple-600 text-white py-2.5 px-4 shadow-lg border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.9),0_0_60px_rgba(168,85,247,0.6),0_0_90px_rgba(168,85,247,0.3)]">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="flex-1 text-center">
+          <Link to="/premium-keys" className="text-sm md:text-base font-semibold hover:underline">
+            Skip Ads — Instant Premium Keys | Click Here
+          </Link>
         </div>
-        <Link
-          to="/premium-keys"
-          className="inline-flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+        <button
+          onClick={() => setIsVisible(false)}
+          className="ml-4 p-1 hover:bg-white/20 rounded transition-colors"
+          aria-label="Close banner"
         >
-          <Crown className="h-4 w-4" />
-          View Premium
-        </Link>
+          <X className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );

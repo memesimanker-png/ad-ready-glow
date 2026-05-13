@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom";
-import { Crown } from "lucide-react";
 
 export function SkipAdsFloatButton() {
   return (
     <Link
       to="/premium-keys"
-      className="fixed bottom-4 right-4 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 sm:h-auto sm:w-auto sm:gap-2 sm:rounded-md sm:px-4 sm:py-3"
-      aria-label="View Premium Keys"
+      className="fixed bottom-24 right-4 z-50 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-lg shadow-lg transition-colors duration-200 text-sm font-semibold border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.9),0_0_60px_rgba(168,85,247,0.6),0_0_90px_rgba(168,85,247,0.3)] animate-bounce"
     >
-      <Crown className="h-5 w-5" />
-      <span className="hidden text-sm font-semibold sm:inline">Skip Ads</span>
+      Skip Ads
     </Link>
   );
 }

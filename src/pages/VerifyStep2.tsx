@@ -15,6 +15,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
+import SlidingAd from "@/components/SlidingAd";
 
 
 export default function VerifyStep2() {
@@ -173,6 +174,7 @@ export default function VerifyStep2() {
           </div>
         </main>
         <SkipAdsFloatButton />
+        <SlidingAd />
       </div>
     </>
   );
