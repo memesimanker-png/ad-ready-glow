@@ -86,9 +86,9 @@ export default function Index() {
                 {t("Premium Keys")}
               </Button>
             </Link>
-            <Link to="/wall-of-fame">
-              <Button variant="ghost" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider text-muted-foreground hover:text-bronze-light">
-                Wall of Fame
+            <Link to="/keys">
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
+                {t("Get Key")}
               </Button>
             </Link>
           </motion.div>

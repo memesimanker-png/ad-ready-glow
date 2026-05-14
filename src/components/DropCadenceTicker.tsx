@@ -62,7 +62,7 @@ export function DropCadenceTicker() {
             </span>
             <div className="flex flex-col">
               <span className="font-serif text-[10px] uppercase tracking-[0.35em] text-bronze-light/80">
-                Cadence
+                Drop Schedule
               </span>
               <span className="font-serif text-sm sm:text-base text-ivory">
                 Mon · Wed · Fri — 18:00 UTC
