@@ -71,7 +71,7 @@ export default function VerifyStep3() {
             </div>
             <Card>
               <div className="p-6 pb-0">
-                <YouTubeVideoPlayer step="step3" timerSeconds={15} onTimerComplete={() => setButtonEnabled(true)} />
+                <YouTubeVideoPlayer step="step3" timerSeconds={4} onTimerComplete={() => setButtonEnabled(true)} />
               </div>
               <CardHeader>
                 <CardTitle>{t("Final Verification")}</CardTitle>
