@@ -80,18 +80,31 @@ export function useSearchScripts(query: string, category: string) {
 
 export function useRelatedScripts(scriptId: string, game: string, category: string) {
   return useQuery({
-    queryKey: ["scripts", "related", scriptId],
+    queryKey: ["scripts", "related", scriptId, game, category],
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("scripts")
         .select(LIST_COLS)
         .neq("id", scriptId)
-        .or(`game.eq.${game},category.eq.${category}`)
-        .limit(3);
+        .order("trending", { ascending: false })
+        .order("updated_at", { ascending: false });
+
+      const filters: string[] = [];
+      if (game) filters.push(`game.eq.${game}`);
+      if (category) filters.push(`category.eq.${category}`);
+      if (filters.length) query = query.or(filters.join(","));
+
+      const { data, error } = await query.limit(20);
       if (error) throw error;
-      return (data || []).map(mapRow);
+      const rows = (data || []).map(mapRow);
+      // Shuffle so users see variety on each visit instead of the same 3.
+      for (let i = rows.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [rows[i], rows[j]] = [rows[j], rows[i]];
+      }
+      return rows.slice(0, 3);
     },
     enabled: !!scriptId,
   });
