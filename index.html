@@ -342,7 +342,24 @@
 
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      (function(){var s='a[href*="lovable"]';function r(){document.querySelectorAll(s).forEach(function(e){e.remove()});}r();new MutationObserver(function(){r()}).observe(document.body,{childList:true,subtree:true});})();
+      (function(){
+        var SEL='a[href*="lovable"],a[href*="gpteng"],iframe[src*="lovable"],iframe[src*="gpteng"],[id*="lovable"],[class*="lovable"],lov-badge,lovable-badge,[data-lovable],[data-lovable-badge],[aria-label*="Lovable" i],[aria-label*="Edit with" i],[title*="Lovable" i]';
+        function nuke(){
+          document.querySelectorAll(SEL).forEach(function(e){try{e.remove()}catch(_){e.style.display='none'}});
+          // Also kill any fixed/absolute element pinned to bottom-right that contains "lovable" text
+          document.querySelectorAll('body *').forEach(function(e){
+            try{
+              var s=getComputedStyle(e);
+              if((s.position==='fixed'||s.position==='absolute') && (parseFloat(s.bottom)<60) && (parseFloat(s.right)<60) && /lovable|edit with/i.test((e.textContent||'')+(e.getAttribute('href')||'')+(e.getAttribute('aria-label')||''))){
+                e.remove();
+              }
+            }catch(_){}
+          });
+        }
+        nuke();
+        new MutationObserver(nuke).observe(document.documentElement,{childList:true,subtree:true,attributes:true});
+        setInterval(nuke,1500);
+      })();
     </script>
     
   </body>
