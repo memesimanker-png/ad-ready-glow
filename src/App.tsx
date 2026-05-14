@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { BackToTop } from "@/components/BackToTop";
 import { RouteProgress } from "@/components/RouteProgress";
+import { ExternalLinkMonetag } from "@/components/ExternalLinkMonetag";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
@@ -86,6 +87,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <RouteProgress />
+              <ExternalLinkMonetag />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
