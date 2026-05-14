@@ -80,6 +80,7 @@ export default function Admin() {
             {can("messages") && <TabsTrigger value="messages" className="gap-2" title="Read and reply to contact form messages"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
             {can("users") && <TabsTrigger value="users" className="gap-2" title="View and manage registered user accounts"><Users className="h-4 w-4" /> Users</TabsTrigger>}
             {can("admins") && <TabsTrigger value="admins" className="gap-2" title="Grant or revoke admin/moderator access"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            {isSuperAdmin && <TabsTrigger value="settings" className="gap-2" title="Edit Discord webhook and other site settings"><MessageSquare className="h-4 w-4" /> Settings</TabsTrigger>}
           </TabsList>
 
           {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
@@ -89,6 +90,7 @@ export default function Admin() {
           {can("messages") && <TabsContent value="messages"><MessagesTab /></TabsContent>}
           {can("users") && <TabsContent value="users"><UsersTab /></TabsContent>}
           {can("admins") && <TabsContent value="admins"><AdminsTab /></TabsContent>}
+          {isSuperAdmin && <TabsContent value="settings"><SettingsTab /></TabsContent>}
         </Tabs>
       </main>
     </Layout>
