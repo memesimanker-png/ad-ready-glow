@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, AlertTriangle, CheckCircle2, Key, TrendingUp, Gamepad2, Code, CreditCard, Users, Settings, DollarSign, ShieldCheck, Layers, Monitor, Coins, Flag, Gift } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const posts: Record<string, { title: string; category: string; date: string; readTime: string; content: React.ReactNode }> = {
   "roblox-account-security-guide": {
@@ -1145,8 +1146,45 @@ export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const post = slug && posts[slug] ? posts[slug] : fallbackPost;
 
+  const isoDate = (() => {
+    const d = new Date(post.date);
+    return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+  })();
+
+  const seoTitle = `${post.title} | ComboWick Blog`.slice(0, 60);
+  const seoDescription = `${post.title} — ${post.category} guide on ComboWick. ${post.readTime}.`.slice(0, 160);
+  const canonicalUrl = `https://combowick.com/blog/${slug ?? ""}`;
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    datePublished: isoDate,
+    dateModified: isoDate,
+    author: { "@type": "Organization", name: "ComboWick" },
+    publisher: {
+      "@type": "Organization",
+      name: "ComboWick",
+      logo: { "@type": "ImageObject", url: "https://combowick.com/images/combo-wick-logo.png" },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    articleSection: post.category,
+  };
+
   return (
     <Layout>
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        canonical={canonicalUrl}
+        ogType="article"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Blog", url: "/blog" },
+          { name: post.title, url: `/blog/${slug ?? ""}` },
+        ]}
+        jsonLd={articleSchema}
+      />
       <article className="py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
