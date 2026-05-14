@@ -83,6 +83,39 @@ export default function ScriptAdmin() {
     }
     setLoading(true);
     try {
+      // Auto-create per-game GitHub loader file. The loader simply re-runs the
+      // default IQ script — so we keep ONE source of truth but get a unique
+      // loadstring per game (more pageviews = more ad revenue).
+      const fileName = form.game
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join("");
+      let finalCode = form.code;
+      if (fileName) {
+        const loaderContent = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
+        try {
+          const res = await fetch(
+            `https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Script/files/${fileName}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content: loaderContent, message: `Add loader for ${form.game}` }),
+            }
+          );
+          if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(`GitHub API ${res.status}: ${txt.slice(0, 200)}`);
+          }
+          finalCode = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/${fileName}'))();`;
+          toast({ title: `GitHub loader created: ${fileName}` });
+        } catch (ghErr: any) {
+          toast({ title: "GitHub loader failed", description: ghErr.message, variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+      }
       const { error } = await supabase.from("scripts").insert({
         title: form.title,
         slug: form.slug,
