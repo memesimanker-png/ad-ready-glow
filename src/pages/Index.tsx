@@ -9,6 +9,7 @@ import { BlogPreviewSection } from "@/components/home/BlogPreviewSection";
 import { GallerySection } from "@/components/home/GallerySection";
 import { FeaturedScriptsSection } from "@/components/home/FeaturedScriptsSection";
 import { VideoBackground } from "@/components/VideoBackground";
+import { DropCadenceTicker } from "@/components/DropCadenceTicker";
 import { AdSlot } from "@/components/AdSlot";
 import { useTranslation } from "@/lib/translation-context";
 import { motion } from "framer-motion";
@@ -95,6 +96,8 @@ export default function Index() {
 
         <div className="absolute bottom-0 left-0 right-0 h-px line-glow" />
       </section>
+
+      <DropCadenceTicker />
 
       <FeaturedScriptsSection />
 

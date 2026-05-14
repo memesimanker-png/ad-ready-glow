@@ -18,62 +18,66 @@
 
 @layer base {
   :root {
-    --background: 230 30% 4%;
-    --foreground: 220 20% 95%;
+    /* Renaissance-Noir — black, bronze, ivory. Quiet authority. */
+    --background: 30 8% 4%;
+    --foreground: 40 25% 90%;
 
-    --card: 230 25% 7%;
-    --card-foreground: 220 20% 95%;
+    --card: 30 8% 7%;
+    --card-foreground: 40 25% 90%;
 
-    --popover: 230 25% 7%;
-    --popover-foreground: 220 20% 95%;
+    --popover: 30 8% 6%;
+    --popover-foreground: 40 25% 90%;
 
-    --primary: 250 80% 65%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary = bronze */
+    --primary: 36 55% 50%;
+    --primary-foreground: 30 10% 6%;
 
-    --secondary: 230 20% 10%;
-    --secondary-foreground: 220 20% 90%;
+    --secondary: 30 8% 10%;
+    --secondary-foreground: 40 20% 85%;
 
-    --muted: 230 18% 8%;
-    --muted-foreground: 225 15% 50%;
+    --muted: 30 6% 9%;
+    --muted-foreground: 38 12% 55%;
 
-    --accent: 280 70% 55%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent = warm ivory highlight */
+    --accent: 38 60% 62%;
+    --accent-foreground: 30 10% 6%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 230 15% 12%;
-    --input: 230 15% 12%;
-    --ring: 250 80% 65%;
+    --border: 36 25% 14%;
+    --input: 36 20% 12%;
+    --ring: 36 55% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
-    --success: 160 84% 39%;
+    --success: 150 50% 42%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
 
-    --neon-cyan: 220 80% 60%;
-    --neon-purple: 280 70% 55%;
-    --neon-blue: 250 80% 65%;
-    --neon-pink: 310 80% 55%;
+    /* Legacy neon tokens remapped to bronze family for backward compat */
+    --neon-cyan: 38 60% 62%;
+    --neon-purple: 36 55% 50%;
+    --neon-blue: 36 55% 50%;
+    --neon-pink: 32 50% 32%;
 
-    --sidebar-background: 230 25% 5%;
-    --sidebar-foreground: 220 20% 90%;
-    --sidebar-primary: 250 80% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 18% 10%;
-    --sidebar-accent-foreground: 220 20% 90%;
-    --sidebar-border: 230 15% 12%;
-    --sidebar-ring: 250 80% 65%;
+    --sidebar-background: 30 8% 5%;
+    --sidebar-foreground: 40 25% 88%;
+    --sidebar-primary: 36 55% 50%;
+    --sidebar-primary-foreground: 30 10% 6%;
+    --sidebar-accent: 30 8% 9%;
+    --sidebar-accent-foreground: 40 25% 88%;
+    --sidebar-border: 36 25% 14%;
+    --sidebar-ring: 36 55% 50%;
 
-    --font-heading: 'Orbitron', system-ui, sans-serif;
-    --font-subheading: 'Space Grotesk', system-ui, sans-serif;
+    /* Cinzel/Trajan-style for headings, Inter for body */
+    --font-heading: 'Cinzel', 'Trajan Pro', Georgia, serif;
+    --font-subheading: 'Cinzel', Georgia, serif;
     --font-body: 'Inter', system-ui, sans-serif;
     --font-serif: 'Cinzel', 'Trajan Pro', Georgia, serif;
 
-    /* Renaissance bronze accent palette — quiet authority */
-    --bronze: 36 55% 48%;
-    --bronze-light: 38 60% 62%;
+    --bronze: 36 55% 50%;
+    --bronze-light: 38 65% 65%;
     --bronze-dark: 32 50% 32%;
     --ivory: 40 30% 92%;
   }
@@ -103,86 +107,86 @@
   }
 
   ::selection {
-    background: hsl(250 80% 65% / 0.3);
-    color: hsl(0 0% 100%);
+    background: hsl(36 55% 50% / 0.35);
+    color: hsl(40 30% 95%);
   }
 
   ::-webkit-scrollbar {
     width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: hsl(230 30% 4%);
+    background: hsl(30 8% 4%);
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(250 80% 65% / 0.3);
+    background: hsl(36 55% 50% / 0.35);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(250 80% 65% / 0.5);
+    background: hsl(36 55% 50% / 0.6);
   }
 }
 
 @layer utilities {
   .text-gradient-primary {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(250 80% 65%), hsl(280 70% 55%));
+    background-image: linear-gradient(135deg, hsl(38 65% 65%), hsl(36 55% 50%));
   }
 
   .text-gradient-neon {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(90deg, hsl(220 80% 60%), hsl(250 80% 65%), hsl(310 80% 55%));
+    background-image: linear-gradient(90deg, hsl(40 30% 92%), hsl(38 65% 65%), hsl(36 55% 50%));
   }
 
   .bg-gradient-hero {
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(250 80% 65% / 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 80% 20%, hsl(280 70% 55% / 0.06) 0%, transparent 50%),
-                hsl(230 30% 4%);
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(36 55% 50% / 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, hsl(32 50% 32% / 0.08) 0%, transparent 50%),
+                hsl(30 8% 4%);
   }
 
   .bg-gradient-section {
-    background: radial-gradient(ellipse 60% 50% at 50% 100%, hsl(280 70% 55% / 0.05) 0%, transparent 60%),
-                hsl(230 30% 4%);
+    background: radial-gradient(ellipse 60% 50% at 50% 100%, hsl(36 55% 50% / 0.06) 0%, transparent 60%),
+                hsl(30 8% 4%);
   }
 
   .bg-glass {
     @apply bg-card/60 backdrop-blur-xl;
-    border: 1px solid hsl(250 80% 65% / 0.1);
+    border: 1px solid hsl(36 55% 50% / 0.12);
   }
 
   .bg-glass-strong {
-    background: linear-gradient(135deg, hsl(230 25% 8% / 0.9), hsl(230 25% 6% / 0.95));
+    background: linear-gradient(135deg, hsl(30 8% 8% / 0.92), hsl(30 8% 5% / 0.96));
     backdrop-filter: blur(20px);
-    border: 1px solid hsl(250 80% 65% / 0.15);
+    border: 1px solid hsl(36 55% 50% / 0.18);
   }
 
   .card-neon {
     position: relative;
-    background: linear-gradient(135deg, hsl(230 25% 7%), hsl(230 25% 5%));
-    border: 1px solid hsl(250 80% 65% / 0.15);
+    background: linear-gradient(135deg, hsl(30 8% 7%), hsl(30 8% 5%));
+    border: 1px solid hsl(36 55% 50% / 0.18);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .card-neon:hover {
-    border-color: hsl(250 80% 65% / 0.4);
-    box-shadow: 0 0 30px -10px hsl(250 80% 65% / 0.2),
-                0 0 60px -20px hsl(280 70% 55% / 0.1),
-                inset 0 1px 0 hsl(250 80% 65% / 0.1);
+    border-color: hsl(36 55% 50% / 0.45);
+    box-shadow: 0 0 30px -10px hsl(36 55% 50% / 0.25),
+                0 0 60px -20px hsl(38 65% 65% / 0.10),
+                inset 0 1px 0 hsl(38 65% 65% / 0.10);
   }
 
   .card-premium {
     position: relative;
-    background: linear-gradient(135deg, hsl(230 25% 7%), hsl(230 25% 5%));
-    border: 1px solid hsl(280 70% 55% / 0.3);
-    box-shadow: 0 0 40px -15px hsl(280 70% 55% / 0.2);
+    background: linear-gradient(135deg, hsl(30 8% 8%), hsl(30 8% 5%));
+    border: 1px solid hsl(36 55% 50% / 0.4);
+    box-shadow: 0 0 40px -15px hsl(36 55% 50% / 0.25);
   }
 
   .neon-glow {
-    box-shadow: 0 0 20px -5px hsl(250 80% 65% / 0.3),
-                0 0 40px -10px hsl(250 80% 65% / 0.15);
+    box-shadow: 0 0 20px -5px hsl(36 55% 50% / 0.4),
+                0 0 40px -10px hsl(36 55% 50% / 0.18);
   }
 
   .neon-glow-purple {
-    box-shadow: 0 0 20px -5px hsl(280 70% 55% / 0.3),
-                0 0 40px -10px hsl(280 70% 55% / 0.15);
+    box-shadow: 0 0 20px -5px hsl(32 50% 32% / 0.4),
+                0 0 40px -10px hsl(38 65% 65% / 0.18);
   }
 
   .animate-glow {
@@ -190,8 +194,8 @@
   }
 
   @keyframes glow {
-    from { box-shadow: 0 0 20px -10px hsl(250 80% 65% / 0.3); }
-    to { box-shadow: 0 0 40px -5px hsl(250 80% 65% / 0.5); }
+    from { box-shadow: 0 0 20px -10px hsl(36 55% 50% / 0.3); }
+    to { box-shadow: 0 0 40px -5px hsl(38 65% 65% / 0.5); }
   }
 
   @keyframes float {
@@ -214,23 +218,23 @@
 
   .line-glow {
     height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(250 80% 65% / 0.5), transparent);
+    background: linear-gradient(90deg, transparent, hsl(36 55% 50% / 0.6), transparent);
   }
 
   .dot-grid {
-    background-image: radial-gradient(hsl(250 80% 65% / 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(hsl(36 55% 50% / 0.07) 1px, transparent 1px);
     background-size: 30px 30px;
   }
 
-  /* Star field effect */
+  /* Subtle dust/candlelight specks instead of cosmic stars */
   .star-field {
     background-image:
-      radial-gradient(2px 2px at 20px 30px, hsl(0 0% 100% / 0.3), transparent),
-      radial-gradient(2px 2px at 40px 70px, hsl(0 0% 100% / 0.2), transparent),
-      radial-gradient(1px 1px at 90px 40px, hsl(0 0% 100% / 0.4), transparent),
-      radial-gradient(1px 1px at 130px 80px, hsl(0 0% 100% / 0.15), transparent),
-      radial-gradient(2px 2px at 160px 30px, hsl(250 80% 80% / 0.2), transparent),
-      radial-gradient(1px 1px at 200px 60px, hsl(280 70% 70% / 0.2), transparent);
+      radial-gradient(1.5px 1.5px at 20px 30px, hsl(38 60% 70% / 0.18), transparent),
+      radial-gradient(1px 1px at 40px 70px, hsl(40 30% 92% / 0.10), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsl(38 60% 70% / 0.15), transparent),
+      radial-gradient(1px 1px at 130px 80px, hsl(40 30% 92% / 0.08), transparent),
+      radial-gradient(1.5px 1.5px at 160px 30px, hsl(38 60% 70% / 0.12), transparent),
+      radial-gradient(1px 1px at 200px 60px, hsl(36 55% 50% / 0.15), transparent);
     background-size: 220px 100px;
   }
 

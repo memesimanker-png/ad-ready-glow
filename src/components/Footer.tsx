@@ -89,12 +89,12 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
           <p className="font-serif italic text-xs text-bronze-light/70 tracking-wider">
             The Other Empire ·{" "}
             <a
-              href="https://conquerself.app"
+              href="https://dayconquer.lovable.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-bronze-light underline-offset-4 hover:underline transition-colors"
             >
-              ConquerSelf
+              DayConquer
             </a>
             <span className="text-muted-foreground/60 not-italic ml-2">— Discipline is the script that runs you.</span>
           </p>
