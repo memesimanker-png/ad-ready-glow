@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 // Drops land Mon / Wed / Fri at 18:00 UTC.
+// NOTE: Pure client-side computation. Zero edge-function calls — the timer
+// runs in the browser via setInterval against a fixed schedule.
 const DROP_DAYS = [1, 3, 5]; // Mon, Wed, Fri
 const DROP_HOUR_UTC = 18;
 

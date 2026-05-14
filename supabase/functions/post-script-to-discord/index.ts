@@ -86,15 +86,21 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
 
   try {
-    const webhookUrl = Deno.env.get('DISCORD_WEBHOOK_URL')
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    // Prefer admin-editable webhook from app_settings, fall back to env secret
+    let webhookUrl = Deno.env.get('DISCORD_WEBHOOK_URL') || ''
+    try {
+      const settingsClient = createClient(supabaseUrl, serviceKey)
+      const { data: settings } = await settingsClient
+        .from('app_settings').select('discord_webhook_url').eq('id', 1).maybeSingle()
+      if (settings?.discord_webhook_url) webhookUrl = settings.discord_webhook_url
+    } catch (_) { /* ignore, env fallback used */ }
     if (!webhookUrl) {
       return new Response(JSON.stringify({ error: 'Discord webhook not configured' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const authHeader = req.headers.get('Authorization') ?? ''
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: { headers: { Authorization: authHeader } },
