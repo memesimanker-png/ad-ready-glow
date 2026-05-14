@@ -11,9 +11,10 @@ interface SEOHeadProps {
   jsonLd?: Record<string, any> | Record<string, any>[];
   breadcrumbs?: { name: string; url: string }[];
   canonical?: string;
+  ogType?: "website" | "article" | "product";
 }
 
-export function SEOHead({ title, description, jsonLd, breadcrumbs, canonical }: SEOHeadProps) {
+export function SEOHead({ title, description, jsonLd, breadcrumbs, canonical, ogType }: SEOHeadProps) {
   const location = useLocation();
   const pageUrl = canonical || `${BASE_URL}${location.pathname}`;
 
@@ -35,6 +36,10 @@ export function SEOHead({ title, description, jsonLd, breadcrumbs, canonical }: 
     if (ogDesc) ogDesc.setAttribute("content", description);
     const ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) ogUrl.setAttribute("content", pageUrl);
+    if (ogType) {
+      const ogTypeEl = document.querySelector('meta[property="og:type"]');
+      if (ogTypeEl) ogTypeEl.setAttribute("content", ogType);
+    }
 
     // Twitter
     const twTitle = document.querySelector('meta[name="twitter:title"]');
