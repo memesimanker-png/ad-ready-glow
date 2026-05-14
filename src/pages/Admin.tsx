@@ -1150,3 +1150,62 @@ function AdminRow({ row, onRevoke }: { row: { user_id: string; role: string; ema
   );
 }
 
+
+/* ─── Settings Tab (Super Admin) ─── */
+function SettingsTab() {
+  const { toast } = useToast();
+  const [webhook, setWebhook] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("app_settings").select("discord_webhook_url").eq("id", 1).maybeSingle();
+      if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
+      setWebhook(data?.discord_webhook_url || "");
+      setLoading(false);
+    })();
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ discord_webhook_url: webhook.trim() || null, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+    setSaving(false);
+    if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    else toast({ title: "Webhook saved" });
+  };
+
+  if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
+
+  return (
+    <Card className="p-6 space-y-4 max-w-2xl">
+      <div>
+        <h2 className="text-lg font-semibold">Discord Webhook</h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          Used by the "Post to Discord" button. Leaving blank falls back to the env secret.
+        </p>
+      </div>
+      <div className="flex gap-2">
+        <input
+          type={show ? "text" : "password"}
+          value={webhook}
+          onChange={(e) => setWebhook(e.target.value)}
+          placeholder="https://discord.com/api/webhooks/..."
+          className="flex-1 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+        />
+        <Button variant="outline" size="icon" onClick={() => setShow(!show)} title={show ? "Hide" : "Show"}>
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </Button>
+      </div>
+      <Button onClick={save} disabled={saving} className="w-full">
+        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+        Save Webhook
+      </Button>
+    </Card>
+  );
+}
