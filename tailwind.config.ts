@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Orbitron', 'system-ui', 'sans-serif'],
-        subheading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        heading: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
+        subheading: ['Cinzel', 'Georgia', 'serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         serif: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
       },
