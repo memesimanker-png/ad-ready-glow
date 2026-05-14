@@ -5,7 +5,7 @@
 const CHANNEL_SUFFIX = "Y-K7zQjLXzGSOz-Na7A6nQ"; // @COMBO_WICK
 const PLAYLIST_ID = `UULF${CHANNEL_SUFFIX}`;
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
-const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
+const CACHE_TTL_MS = 15 * 60 * 60 * 1000; // 15 hours
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       cache = { at: Date.now(), data: await fetchLatest() };
     }
     return new Response(JSON.stringify(cache.data), {
-      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=7200" },
+      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=54000" },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err), videos: [] }), {

@@ -64,6 +64,41 @@ export function YouTubeVideoPlayer({ step, onTimerComplete, timerSeconds = 0 }: 
 
   const shouldMute = step === "step2" || step === "step3";
 
+  // Auto-resume if user pauses: listen for YT iframe state events and force play.
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (typeof e.data !== "string") return;
+      try {
+        const msg = JSON.parse(e.data);
+        // YT player state 2 = paused
+        if (msg.event === "onStateChange" && msg.info === 2 && iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.postMessage(
+            JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+            "*"
+          );
+        }
+      } catch {}
+    };
+    window.addEventListener("message", onMsg);
+    // Subscribe to state changes once iframe loads
+    const iframe = iframeRef.current;
+    const onLoad = () => {
+      iframe?.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening" }),
+        "*"
+      );
+      iframe?.contentWindow?.postMessage(
+        JSON.stringify({ event: "command", func: "addEventListener", args: ["onStateChange"] }),
+        "*"
+      );
+    };
+    iframe?.addEventListener("load", onLoad);
+    return () => {
+      window.removeEventListener("message", onMsg);
+      iframe?.removeEventListener("load", onLoad);
+    };
+  }, [videoId]);
+
   return (
     <div className="relative w-full">
       <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg">
