@@ -21,31 +21,38 @@ export function SEOHead({ title, description, jsonLd, breadcrumbs, canonical, og
   useEffect(() => {
     document.title = title;
 
-    // Meta description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute("content", description);
+    const upsertMeta = (selector: string, attr: "name" | "property", key: string, value: string) => {
+      let el = document.querySelector(selector);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", value);
+    };
+
+    upsertMeta('meta[name="description"]', "name", "description", description);
 
     // Canonical
-    let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (canonicalEl) canonicalEl.href = pageUrl;
+    let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalEl) {
+      canonicalEl = document.createElement("link");
+      canonicalEl.rel = "canonical";
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.href = pageUrl;
 
-    // OG tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute("content", title);
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute("content", description);
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute("content", pageUrl);
+    // OG tags (upsert — index.html no longer ships static og:title/desc/url)
+    upsertMeta('meta[property="og:title"]', "property", "og:title", title);
+    upsertMeta('meta[property="og:description"]', "property", "og:description", description);
+    upsertMeta('meta[property="og:url"]', "property", "og:url", pageUrl);
     if (ogType) {
-      const ogTypeEl = document.querySelector('meta[property="og:type"]');
-      if (ogTypeEl) ogTypeEl.setAttribute("content", ogType);
+      upsertMeta('meta[property="og:type"]', "property", "og:type", ogType);
     }
 
     // Twitter
-    const twTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twTitle) twTitle.setAttribute("content", title);
-    const twDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twDesc) twDesc.setAttribute("content", description);
+    upsertMeta('meta[name="twitter:title"]', "name", "twitter:title", title);
+    upsertMeta('meta[name="twitter:description"]', "name", "twitter:description", description);
 
     // Hreflang tags
     const existingHreflangs = document.querySelectorAll('link[hreflang]');
