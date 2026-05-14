@@ -7,8 +7,8 @@ export default function About() {
   return (
     <Layout>
       <SEOHead
-        title="About Combo_WICK — The Story Behind ComboWick Roblox Scripts & Keys"
-        description="Learn how Combo_WICK (ComboWick) became a trusted Roblox community hub for free Lua scripts, premium HWID keys, executor reviews, and Lua programming tutorials."
+        title="About ComboWick — Roblox Scripts & Premium Keys Hub"
+        description="Learn how ComboWick became a trusted Roblox community hub for free Lua scripts, HWID premium keys, executor reviews and Lua tutorials."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "About", url: "/about" },
