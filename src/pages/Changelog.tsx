@@ -87,7 +87,7 @@ export default function Changelog() {
   return (
     <Layout>
       <SEOHead
-        title="Combo_WICK Changelog — Script Updates, Key System & Site Releases"
+        title="ComboWick Changelog — Script Updates & Releases"
         description="Public changelog for Combo_WICK. New script support, executor compatibility updates, premium key system improvements, and site release notes."
         breadcrumbs={[{ name: "Home", url: "/" }, { name: "Changelog", url: "/changelog" }]}
       />

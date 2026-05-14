@@ -10,6 +10,7 @@ import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, Al
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { SEOHead } from "@/components/SEOHead";
 
 type KeyPurchase = {
   id: string;
@@ -177,6 +178,10 @@ Message: ${supportForm.message || "(none)"}
 
   return (
     <Layout>
+      <SEOHead
+        title="My Dashboard — ComboWick Premium Keys & Support"
+        description="View your ComboWick premium keys, purchase history, and support messages from your account dashboard."
+      />
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">

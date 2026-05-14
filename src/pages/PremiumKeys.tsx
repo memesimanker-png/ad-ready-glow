@@ -119,7 +119,7 @@ export default function PremiumKeys() {
   return (
     <Layout>
       <SEOHead
-        title="ComboWick Premium Keys — $5 Trial, $9.99/mo, $49.99 Lifetime"
+        title="ComboWick Premium Keys — Plans from $5 to $49.99"
         description="Buy a ComboWick HWID premium key. 7-day trial $5, monthly $9.99, lifetime $49.99. Instant PayPal delivery, full premium script access."
         breadcrumbs={[{ name: "Home", url: "/" }, { name: "Premium Keys", url: "/premium-keys" }]}
       />
