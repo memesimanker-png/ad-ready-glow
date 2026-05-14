@@ -6,6 +6,24 @@ import { SEOHead } from "@/components/SEOHead";
 import { AdSlot } from "@/components/AdSlot";
 
 const blogPosts = [
+  // SEO: targets ~5,000/mo Brazilian Portuguese queries ("como usar script no roblox" + variants).
+  {
+    slug: "como-usar-script-no-roblox",
+    title: "Como Usar Script no Roblox 2026 — Guia Completo (Mobile + PC)",
+    excerpt: "Aprenda passo a passo como usar, baixar e instalar scripts no Roblox em 2026. Guia para PC e mobile, executores recomendados, segurança e dicas para evitar ban.",
+    category: "Tutoriais",
+    date: "May 14, 2026",
+    readTime: "9 min read",
+  },
+  // SEO: targets ~30,000/mo Philippines + Indonesia "how to use roblox script" queries.
+  {
+    slug: "how-to-use-roblox-scripts",
+    title: "How to Use Roblox Scripts in 2026 (Mobile + PC) — Beginner Guide",
+    excerpt: "Step-by-step beginner guide to using Roblox scripts in 2026. Best free executors for PC and mobile, how to inject loadstrings safely, and how to avoid bans.",
+    category: "Guides",
+    date: "May 14, 2026",
+    readTime: "10 min read",
+  },
   {
     slug: "roblox-account-security-guide",
     title: "Complete Roblox Account Security Guide 2026",

@@ -1126,6 +1126,155 @@ end)`}
       </>
     ),
   },
+  // SEO: aggregates ~5,000/mo Brazilian queries (como usar/baixar/instalar/colocar script no roblox).
+  "como-usar-script-no-roblox": {
+    title: "Como Usar Script no Roblox 2026 — Guia Completo (Mobile + PC)",
+    category: "Tutoriais",
+    date: "May 14, 2026",
+    readTime: "9 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Usar scripts no Roblox em 2026 ficou muito mais simples — mas existem alguns passos que você precisa seguir corretamente para evitar ban, malware e desperdício de tempo. Este guia mostra exatamente como baixar, instalar e executar scripts no Roblox tanto no PC quanto no mobile (Android), com os melhores executores gratuitos do momento.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">O Que é um Script no Roblox?</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Um script no Roblox é um pequeno código em Lua que executa funções automáticas dentro de um jogo — como auto farm, ESP, aimbot, infinite jump, ou desbloquear gamepasses. Você não cria o script direto no Roblox; ao invés disso, você usa um <strong>executor</strong> (um programa externo) que injeta o código no jogo enquanto ele roda.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Passo 1: Escolher um Executor</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          O executor é o programa que vai rodar o script. Em 2026 os mais usados e seguros são:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>PC (Windows):</strong> Wave, Solara, Xeno, Swift — todos gratuitos e com bypass funcional.</li>
+            <li>• <strong>Mobile (Android):</strong> Delta, Arceus X NEO, Hydrogen — funcionam em a maioria dos celulares com 4GB+ de RAM.</li>
+            <li>• <strong>Mac:</strong> Hydrogen-M, Macsploit — mais limitados mas funcionais.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Passo 2: Baixar o Script</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Você pode pegar scripts gratuitos confiáveis na nossa <Link to="/scripts" className="text-primary hover:underline">página de scripts</Link>. Cada script vem com uma <code className="bg-muted px-1.5 py-0.5 rounded text-xs">loadstring</code> — uma linha única que carrega o script direto do nosso servidor. Exemplo:
+        </p>
+        <Card className="p-4 bg-black/40 mb-6 font-mono text-xs overflow-x-auto">
+          <code>loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Loaders/main/SCRIPT_NAME'))()</code>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Passo 3: Como Colocar o Script no Roblox</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Depois de instalar o executor e copiar a loadstring, abra o Roblox normalmente, entre no jogo desejado, e <strong>injete o executor</strong> (botão "Inject" ou "Attach"). Quando o status virar verde, cole a loadstring no campo de texto e clique em <strong>Execute</strong>. O script vai abrir uma interface dentro do jogo automaticamente.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Como Usar Script no Roblox Mobile</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          No mobile o processo é parecido: baixe o Delta ou Arceus X NEO da página oficial (nunca de fontes desconhecidas), abra o app, escolha o jogo dentro do executor (não pelo Roblox direto), cole a loadstring no editor e toque em Execute. <strong>Importante:</strong> nunca dê permissões root ou login do Roblox para o executor — apenas permissão de overlay.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Como Evitar Ban Usando Scripts</h2>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• Use uma <strong>conta alt</strong> (alternativa) — nunca a sua conta principal.</li>
+            <li>• Evite scripts em jogos com Hyperion (anti-cheat da Roblox) como Doors, Phantom Forces e Bedwars sem bypass específico.</li>
+            <li>• Não use ESP/Aimbot em jogos competitivos com sistema de report ativo.</li>
+            <li>• Mantenha o executor atualizado — versões antigas são detectadas mais facilmente.</li>
+            <li>• Saia do jogo antes de fechar o executor para evitar logs suspeitos.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Por Que Usar a ComboWick?</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Todos os scripts da nossa <Link to="/scripts" className="text-primary hover:underline">biblioteca</Link> são testados, atualizados semanalmente e hospedados no nosso GitHub — o que significa: zero malware, zero scripts quebrados, e funcionamento garantido com os principais executores. Se quiser acesso premium sem precisar passar pelas verificações, confira nossas <Link to="/premium-keys" className="text-primary hover:underline">chaves premium</Link> a partir de $5.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Resumo Rápido</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            1) Baixe um executor (Wave/Delta). 2) Pegue uma loadstring na nossa página de scripts. 3) Injete o executor no Roblox. 4) Cole o código e clique Execute. 5) Use conta alt para segurança. Fácil assim.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  // SEO: targets ~30,000/mo PH "roblox script" + Indonesia + global "how to use roblox scripts" queries.
+  "how-to-use-roblox-scripts": {
+    title: "How to Use Roblox Scripts in 2026 (Mobile + PC) — Beginner Guide",
+    category: "Guides",
+    date: "May 14, 2026",
+    readTime: "10 min read",
+    content: (
+      <>
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Using Roblox scripts in 2026 is easier than ever — but only if you follow the right steps. This guide walks you through how to use, download, and execute Roblox scripts on both PC and mobile, which executors are safe in 2026, and how to avoid getting banned. No tech skills required.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">What Is a Roblox Script?</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          A Roblox script is a small piece of Lua code that adds extra features inside a game — like auto-farm, ESP, aimbot, infinite jump, or unlocking gamepasses for free. You don't write scripts inside Roblox itself. Instead, you use a separate program called an <strong>executor</strong> that injects the code into the game while it's running.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Step 1: Pick a Roblox Script Executor</h2>
+        <p className="text-muted-foreground mb-4 leading-relaxed">
+          The executor is what runs the script. In 2026, the most reliable free options are:
+        </p>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• <strong>PC (Windows):</strong> Wave, Solara, Xeno, Swift — all free with active bypass.</li>
+            <li>• <strong>Mobile (Android):</strong> Delta, Arceus X NEO, Hydrogen — work on most phones with 4GB+ RAM.</li>
+            <li>• <strong>Mac:</strong> Hydrogen-M, Macsploit — fewer options but functional.</li>
+            <li>• <strong>iOS:</strong> No safe public executor exists in 2026 — avoid jailbreak-required injectors.</li>
+          </ul>
+        </Card>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          See our full <Link to="/executors" className="text-primary hover:underline">executors comparison</Link> for download links and update schedules.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Step 2: Download a Script</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Get free, tested scripts from our <Link to="/scripts" className="text-primary hover:underline">script library</Link>. Each script comes with a <code className="bg-muted px-1.5 py-0.5 rounded text-xs">loadstring</code> — a single line of code that loads the script straight from our GitHub. Example:
+        </p>
+        <Card className="p-4 bg-black/40 mb-6 font-mono text-xs overflow-x-auto">
+          <code>loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Loaders/main/SCRIPT_NAME'))()</code>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Step 3: How to Run a Roblox Script</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          With the executor installed and the loadstring copied: open Roblox, join the target game, then <strong>inject the executor</strong> (click "Inject" or "Attach" — wait until it goes green). Paste the loadstring into the executor's text box and hit <strong>Execute</strong>. The script GUI will pop up inside the game automatically.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">How to Use Roblox Scripts on Mobile</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          On mobile the process is similar: install Delta or Arceus X NEO from the official site (never from random Telegram channels), open the app, launch your game from <em>inside</em> the executor (not via the Roblox app directly), paste the loadstring, and tap Execute. <strong>Never give the executor your Roblox login</strong> — only grant overlay permission. That's the most common way mobile users get accounts stolen.
+        </p>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">How to Avoid Getting Banned</h2>
+        <Card className="p-6 bg-glass mb-6">
+          <ul className="space-y-3 text-muted-foreground text-sm">
+            <li>• Use an <strong>alt account</strong> — never your main.</li>
+            <li>• Avoid scripting in Hyperion-protected games (Doors, Phantom Forces, Bedwars) without a confirmed bypass.</li>
+            <li>• Don't run aimbot/ESP in competitive games where reports are active.</li>
+            <li>• Keep your executor updated — old versions get detected within hours.</li>
+            <li>• Leave the game before closing the executor to avoid suspicious session logs.</li>
+            <li>• Don't brag about scripts in voice chat — most bans come from player reports, not Roblox detection.</li>
+          </ul>
+        </Card>
+
+        <h2 className="font-heading text-2xl font-bold mb-4">Why Get Scripts From ComboWick?</h2>
+        <p className="text-muted-foreground mb-6 leading-relaxed">
+          Every script in our <Link to="/scripts" className="text-primary hover:underline">library</Link> is tested, updated weekly, and hosted on our GitHub — meaning zero malware, zero broken scripts, and guaranteed compatibility with the major executors. Want to skip the verification steps? Our <Link to="/premium-keys" className="text-primary hover:underline">premium keys</Link> start at $5 for 7-day instant access.
+        </p>
+
+        <Card className="p-6 bg-primary/5 border-primary/30">
+          <h3 className="font-heading text-lg font-semibold mb-2">Quick Recap</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            1) Download an executor (Wave on PC / Delta on mobile). 2) Grab a loadstring from our scripts page. 3) Inject the executor into Roblox. 4) Paste the code and hit Execute. 5) Always use an alt account. That's it — you're scripting.
+          </p>
+        </Card>
+      </>
+    ),
+  },
 };
 
 // No fallback "coming soon" — every blog post has full content
