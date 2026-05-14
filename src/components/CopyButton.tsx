@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
+import { maybeFireDirectLink } from "@/lib/monetag";
 
 export function CopyButton({ text, className = "" }: { text: string; className?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
+    // Background-tab Monetag hop (rate-capped to once per 3 min).
+    // Fires BEFORE the await so the user gesture isn't lost.
+    maybeFireDirectLink();
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
