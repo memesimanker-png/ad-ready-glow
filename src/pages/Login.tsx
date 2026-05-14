@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, LogIn } from "lucide-react";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -32,6 +33,10 @@ export default function Login() {
 
   return (
     <Layout>
+      <SEOHead
+        title="Sign In — ComboWick Account Login"
+        description="Sign in to your ComboWick account to manage premium keys, view purchases, and access the dashboard."
+      />
       <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-md px-4 sm:px-6">
           <Card className="bg-glass border-border/50">
