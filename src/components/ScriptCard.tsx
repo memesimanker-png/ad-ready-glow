@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { TrendingUp, ShieldCheck, DollarSign, Calendar } from "lucide-react";
+import { ShieldCheck, DollarSign, Calendar } from "lucide-react";
 import { type Script } from "@/lib/scripts-data";
 import { GameThumbnail } from "@/components/GameThumbnail";
 
@@ -27,9 +27,8 @@ export function ScriptCard({ script }: { script: Script }) {
             </span>
           )}
           {script.trending && (
-            <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              <TrendingUp className="h-3 w-3" />
-              Trending
+            <span className="font-mono text-[10px] tracking-wider text-bronze-light/70 uppercase">
+              // active
             </span>
           )}
           {script.verified && (

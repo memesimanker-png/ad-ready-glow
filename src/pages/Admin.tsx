@@ -283,6 +283,18 @@ function ScriptsTab() {
         const { error } = await supabase.from("scripts").insert(payload);
         if (error) throw error;
         toast({ title: "Script saved" });
+        // Auto-broadcast in-app notification to every user
+        try {
+          const { data: count } = await supabase.rpc("broadcast_notification", {
+            _title: `New script: ${form.title}`,
+            _body: form.description?.slice(0, 140) || `Fresh ${form.game} script just dropped.`,
+            _link: `/scripts/${form.slug}`,
+            _type: "info",
+          });
+          toast({ title: `Notified ${count ?? 0} users` });
+        } catch (notifyErr: any) {
+          toast({ title: "Notify failed", description: notifyErr.message, variant: "destructive" });
+        }
       }
       setForm({ ...emptyScript });
       setEditingId(null);
