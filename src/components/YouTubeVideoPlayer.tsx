@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface YouTubeVideoPlayerProps {
   step: string;
@@ -6,34 +7,59 @@ interface YouTubeVideoPlayerProps {
   timerSeconds?: number;
 }
 
-const STEP_VIDEOS: Record<string, string> = {
-  "provider-select": "zGkNbPgQQx4",
-  step1: "zGkNbPgQQx4",
-  step2: "zGkNbPgQQx4",
-  step3: "zGkNbPgQQx4",
+const FALLBACK = ["srCkA0m-620", "uTzha7s7Or8", "HzD4Eg2f7G8"];
+const STEP_INDEX: Record<string, number> = {
+  "provider-select": 0,
+  step1: 0,
+  step2: 1,
+  step3: 2,
 };
 
+let cachedVideos: string[] | null = null;
+let inflight: Promise<string[]> | null = null;
+
+async function getVideos(): Promise<string[]> {
+  if (cachedVideos) return cachedVideos;
+  if (inflight) return inflight;
+  inflight = (async () => {
+    try {
+      const { data } = await supabase.functions.invoke("yt-latest");
+      const ids = (data?.videos ?? []).map((v: any) => v.id).filter(Boolean);
+      cachedVideos = ids.length ? ids : FALLBACK;
+    } catch {
+      cachedVideos = FALLBACK;
+    }
+    return cachedVideos!;
+  })();
+  return inflight;
+}
+
 export function YouTubeVideoPlayer({ step, onTimerComplete, timerSeconds = 0 }: YouTubeVideoPlayerProps) {
-  const videoId = STEP_VIDEOS[step] || "zGkNbPgQQx4";
+  const [videoId, setVideoId] = useState<string>(FALLBACK[STEP_INDEX[step] ?? 0]);
   const [timeLeft, setTimeLeft] = useState(timerSeconds);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    getVideos().then((ids) => {
+      if (cancelled) return;
+      const idx = STEP_INDEX[step] ?? 0;
+      setVideoId(ids[idx % ids.length] || FALLBACK[idx]);
+    });
+    return () => { cancelled = true; };
+  }, [step]);
+
+  useEffect(() => {
     if (timerSeconds > 0 && timeLeft > 0) {
       const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) return 0;
-          return prev - 1;
-        });
+        setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
       }, 1000);
       return () => clearInterval(timer);
     }
   }, [timerSeconds, timeLeft]);
 
   useEffect(() => {
-    if (timerSeconds > 0 && timeLeft === 0) {
-      onTimerComplete?.();
-    }
+    if (timerSeconds > 0 && timeLeft === 0) onTimerComplete?.();
   }, [timeLeft, timerSeconds, onTimerComplete]);
 
   const shouldMute = step === "step2" || step === "step3";
@@ -49,7 +75,6 @@ export function YouTubeVideoPlayer({ step, onTimerComplete, timerSeconds = 0 }: 
           allowFullScreen
           className="w-full h-full"
         />
-        {/* Countdown overlay removed — anti-bot gate runs invisibly via timerSeconds */}
       </div>
     </div>
   );
