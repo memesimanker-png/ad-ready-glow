@@ -97,7 +97,7 @@ export default function ScriptAdmin() {
         const loaderContent = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
         try {
           const res = await fetch(
-            `https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Script/files/${fileName}`,
+            `https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files/${fileName}`,
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
@@ -108,7 +108,7 @@ export default function ScriptAdmin() {
             const txt = await res.text();
             throw new Error(`GitHub API ${res.status}: ${txt.slice(0, 200)}`);
           }
-          finalCode = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/${fileName}'))();`;
+          finalCode = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Loaders/refs/heads/main/${fileName}'))();`;
           toast({ title: `GitHub loader created: ${fileName}` });
         } catch (ghErr: any) {
           toast({ title: "GitHub loader failed", description: ghErr.message, variant: "destructive" });
