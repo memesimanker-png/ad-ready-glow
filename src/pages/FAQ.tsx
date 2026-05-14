@@ -39,7 +39,7 @@ export default function FAQ() {
   return (
     <Layout>
       <SEOHead
-        title="FAQ — ComboWick | Roblox Scripts, Keys & Executor Questions Answered"
+        title="FAQ — ComboWick | Roblox Scripts & Keys Help"
         description="Find answers to common questions about ComboWick's free Roblox scripts, 24-hour key system, premium keys, executors, and how to get started instantly."
         breadcrumbs={[
           { name: "Home", url: "/" },

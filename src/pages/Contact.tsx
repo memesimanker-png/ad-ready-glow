@@ -67,8 +67,8 @@ export default function Contact() {
   return (
     <Layout>
       <SEOHead
-        title="Contact Combo_WICK — Discord Support, YouTube & Direct Message Form | ComboWick"
-        description="Reach the Combo_WICK team. Real-time Discord support, YouTube channel @COMBO_WICK, or send a tracked message via your account dashboard for premium key activation, scripts, and Lua tutorial questions."
+        title="Contact ComboWick — Discord, YouTube & Message Form"
+        description="Reach the ComboWick team via Discord support, YouTube @COMBO_WICK, or a tracked message about premium keys, scripts, and Lua tutorials."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Contact", url: "/contact" },
