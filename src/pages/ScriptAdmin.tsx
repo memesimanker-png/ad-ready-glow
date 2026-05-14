@@ -124,7 +124,7 @@ export default function ScriptAdmin() {
         game: form.game,
         category: form.category,
         tags: form.tags,
-        code: form.code,
+        code: finalCode,
         faqs: form.faqs as any,
         trending: form.trending,
         verified: form.verified,
