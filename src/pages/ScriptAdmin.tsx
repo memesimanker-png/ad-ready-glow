@@ -97,7 +97,7 @@ export default function ScriptAdmin() {
         const loaderContent = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
         try {
           const res = await fetch(
-            `https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Script/files/${fileName}`,
+            `https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files/${fileName}`,
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
