@@ -106,8 +106,8 @@ export default function Scripts() {
   return (
     <Layout>
       <SEOHead
-        title="Free Roblox Scripts 2026 — Auto Farm, ESP, Aimbot | ComboWick"
-        description="Browse 100+ verified free Roblox Lua scripts by ComboWick. Auto-farm, ESP, aimbot, fly, teleport scripts for Blox Fruits, Pet Simulator, Arsenal & more. Copy & execute instantly."
+        title="Free Roblox Scripts — Auto Farm, ESP, Aimbot | ComboWick"
+        description="100+ verified free Roblox Lua scripts. Auto-farm, ESP, aimbot, fly and teleport for Blox Fruits, Pet Sim, Arsenal and more."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Scripts", url: "/scripts" },
