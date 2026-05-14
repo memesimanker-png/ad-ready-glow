@@ -49,16 +49,7 @@ export function YouTubeVideoPlayer({ step, onTimerComplete, timerSeconds = 0 }: 
           allowFullScreen
           className="w-full h-full"
         />
-        {timerSeconds > 0 && timeLeft > 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-black/90 text-white px-8 py-6 rounded-2xl shadow-2xl border-2 border-purple-500">
-              <div className="text-center space-y-2">
-                <p className="text-sm font-medium opacity-80">Watch for</p>
-                <p className="text-6xl font-bold tabular-nums">{timeLeft}s</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Countdown overlay removed — anti-bot gate runs invisibly via timerSeconds */}
       </div>
     </div>
   );
