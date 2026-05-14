@@ -17,6 +17,7 @@ export default {
         heading: ['Orbitron', 'system-ui', 'sans-serif'],
         subheading: ['Space Grotesk', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -54,6 +55,12 @@ export default {
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
+        bronze: {
+          DEFAULT: "hsl(var(--bronze))",
+          light: "hsl(var(--bronze-light))",
+          dark: "hsl(var(--bronze-dark))",
+        },
+        ivory: "hsl(var(--ivory))",
         neon: {
           cyan: "hsl(var(--neon-cyan))",
           purple: "hsl(var(--neon-purple))",

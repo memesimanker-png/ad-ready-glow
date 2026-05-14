@@ -53,6 +53,7 @@ const Blocked = lazy(() => import("./pages/Blocked"));
 const Register = lazy(() => import("./pages/Register"));
 const ClaimAccess = lazy(() => import("./pages/ClaimAccess"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const WallOfFame = lazy(() => import("./pages/WallOfFame"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
@@ -126,6 +127,7 @@ const App = () => (
                   <Route path="/blocked" element={<Blocked />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/wall-of-fame" element={<WallOfFame />} />
                   <Route path="/claim-access" element={<ClaimAccess />} />
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="*" element={<NotFound />} />

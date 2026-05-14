@@ -56,9 +56,9 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
             {
               title: t("Community"),
               links: [
+                { to: "/wall-of-fame", label: "Wall of Fame" },
                 { href: "https://www.youtube.com/@COMBO_WICK", label: "YouTube" },
                 { href: "https://discord.com/invite/ufrz9Zaqs8", label: "Discord" },
-                { href: "https://combowick.com", label: "Website" },
                 { href: "mailto:support@combowick.com", label: "Email" },
                 { to: "/contact", label: "Contact" },
               ],
@@ -85,7 +85,22 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
           ))}
         </div>
 
-        <div className="relative border-t border-border/30 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="mt-12 pt-8 border-t border-bronze/10 text-center">
+          <p className="font-serif italic text-xs text-bronze-light/70 tracking-wider">
+            The Other Empire ·{" "}
+            <a
+              href="https://conquerself.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-bronze-light underline-offset-4 hover:underline transition-colors"
+            >
+              ConquerSelf
+            </a>
+            <span className="text-muted-foreground/60 not-italic ml-2">— Discipline is the script that runs you.</span>
+          </p>
+        </div>
+
+        <div className="relative border-t border-border/30 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
             © 2024–{new Date().getFullYear()} ComboWick. All rights reserved.
           </p>

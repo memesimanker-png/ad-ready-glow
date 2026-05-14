@@ -33,11 +33,11 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-bronze/10 border border-bronze/30 mb-6 backdrop-blur-sm"
           >
-            <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse-neon" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-[0.2em]">
-              Combo_WICK Official
+            <Sparkles className="w-3.5 h-3.5 text-bronze-light" />
+            <span className="text-[10px] font-serif tracking-[0.3em] uppercase text-bronze-light">
+              Combo_WICK — Est. MMXXIV
             </span>
           </motion.div>
 
@@ -45,11 +45,19 @@ export default function Index() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-heading text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight mb-6 max-w-3xl leading-[1.1]"
+            className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-4 max-w-3xl leading-[1.05]"
           >
-            {t("Welcome to")}{" "}
-            <span className="text-gradient-neon">Combo_WICK</span>
+            <span className="text-gradient-neon">COMBOWICK</span>
           </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="font-serif italic text-base sm:text-lg text-bronze-light/90 mb-6 tracking-wide"
+          >
+            Vincit qui se vincit. <span className="text-muted-foreground/70 not-italic text-xs ml-2">— He conquers who conquers himself.</span>
+          </motion.p>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -68,18 +76,18 @@ export default function Index() {
           >
             <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider font-bold neon-glow group">
-                {t("Browse Scripts")}
+                Enter the Codex
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link to="/premium-keys">
-              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
                 {t("Premium Keys")}
               </Button>
             </Link>
-            <Link to="/keys">
-              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
-                {t("Get Key")}
+            <Link to="/wall-of-fame">
+              <Button variant="ghost" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider text-muted-foreground hover:text-bronze-light">
+                Wall of Fame
               </Button>
             </Link>
           </motion.div>
@@ -117,8 +125,9 @@ export default function Index() {
           transition={{ duration: 0.8 }}
           className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center"
         >
+          <p className="font-serif italic text-bronze-light/80 text-sm tracking-wider mb-3">— The Gate Is Open —</p>
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
-            {t("Ready to Get Started?")}
+            Few Will Enter.
           </h2>
           <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
             {t("cta_main_desc")}
@@ -126,12 +135,12 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/scripts">
               <Button size="lg" className="text-sm px-10 py-7 uppercase tracking-wider neon-glow">
-                {t("Explore Scripts")}
+                Enter the Codex
               </Button>
             </Link>
             <Link to="/blog">
-              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-primary/20 hover:bg-primary/10">
-                {t("Read Our Guides")}
+              <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
+                Read the Archives
               </Button>
             </Link>
           </div>
