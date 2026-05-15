@@ -105,27 +105,52 @@ export default function GameLanding() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Features OR Coming-Soon block */}
       <section className="py-16 sm:py-20 border-t border-border/40">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-2 tracking-tight">
-            What the {config.game} Script Includes
-          </h2>
-          <p className="text-sm text-muted-foreground mb-10 font-serif italic">
-            // every feature — no paywalled basics
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {config.features.map((f) => (
-              <div
-                key={f}
-                className="flex items-start gap-3 p-4 rounded-lg bg-card/50 border border-border/40 hover:border-bronze/40 transition-colors"
-              >
-                <Check className="w-4 h-4 text-bronze-light mt-1 flex-shrink-0" />
-                <span className="text-sm text-foreground/90">{f}</span>
+          {config.features.length > 0 ? (
+            <>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-2 tracking-tight">
+                What the {config.game} Script Includes
+              </h2>
+              <p className="text-sm text-muted-foreground mb-10 font-serif italic">
+                // every feature — no paywalled basics
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {config.features.map((f) => (
+                  <div
+                    key={f}
+                    className="flex items-start gap-3 p-4 rounded-lg bg-card/50 border border-border/40 hover:border-bronze/40 transition-colors"
+                  >
+                    <Check className="w-4 h-4 text-bronze-light mt-1 flex-shrink-0" />
+                    <span className="text-sm text-foreground/90">{f}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-2 tracking-tight">
+                {config.game} Script — Not Live Yet
+              </h2>
+              <p className="text-sm text-muted-foreground mb-8 font-serif italic">
+                // honest update — feature voting is open in Discord
+              </p>
+              <div className="p-6 sm:p-8 rounded-xl bg-card/50 border border-bronze/30">
+                <p className="text-sm sm:text-base text-foreground/90 leading-relaxed mb-6">
+                  We don't have a live {config.game} script yet. Instead of fake feature lists, here's the real deal:
+                  the script is on the roadmap, and we're letting the Discord community vote on which features ship in v1.
+                  Drop your requests, get notified the moment it drops.
+                </p>
+                <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer">
+                  <Button className="text-xs uppercase tracking-wider neon-glow">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Suggest Features in Discord
+                  </Button>
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
