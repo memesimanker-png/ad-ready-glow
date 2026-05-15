@@ -56,6 +56,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const WallOfFame = lazy(() => import("./pages/WallOfFame"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const GameLanding = lazy(() => import("./pages/GameLanding"));
 
 // Tuned defaults to massively cut Lovable Cloud DB load on a 5K-visits/day site.
 const queryClient = new QueryClient({
@@ -106,6 +107,7 @@ const App = () => (
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/scripts" element={<Scripts />} />
                   <Route path="/scripts/:slug" element={<ScriptDetail />} />
+                  <Route path="/games/:game" element={<GameLanding />} />
                   <Route path="/admin/scripts" element={<ScriptAdmin />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/executors" element={<Executors />} />
