@@ -8,21 +8,25 @@ const corsHeaders = {
 
 const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
 
-function getTierHours(tier: string): number {
+function getTierHours(tier: string, customHours?: number): number {
+  if (tier === "custom" && customHours && customHours > 0) return Math.floor(customHours);
   if (tier === "trial-7day") return 72;
   if (tier === "monthly") return 720;
   return 876000;
 }
 
-function calculateExpiry(tier: string): string {
+function calculateExpiry(tier: string, customHours?: number): string {
   const now = new Date();
+  if (tier === "custom" && customHours && customHours > 0) {
+    return new Date(now.getTime() + Math.floor(customHours) * 60 * 60 * 1000).toISOString();
+  }
   if (tier === "trial-7day") return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
   if (tier === "monthly") return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
   return new Date(now.getTime() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString();
 }
 
-async function generateKeyFromAPI(tier: string): Promise<string> {
-  const hours = getTierHours(tier);
+async function generateKeyFromAPI(tier: string, customHours?: number): Promise<string> {
+  const hours = getTierHours(tier, customHours);
   const response = await fetch(HWID_KEY_API, {
     method: "POST",
     headers: {
@@ -86,7 +90,7 @@ serve(async (req) => {
       });
     }
 
-    const { tier, customer_email } = await req.json();
+    const { tier, customer_email, custom_hours, custom_label, custom_amount } = await req.json();
 
     if (!tier) {
       return new Response(JSON.stringify({ error: "Missing tier" }), {
@@ -95,8 +99,16 @@ serve(async (req) => {
       });
     }
 
-    const generatedKey = await generateKeyFromAPI(tier);
-    const expiresAt = calculateExpiry(tier);
+    if (tier === "custom" && (!custom_hours || Number(custom_hours) < 1)) {
+      return new Response(JSON.stringify({ error: "custom_hours required for custom tier (min 1)" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const hoursNum = tier === "custom" ? Math.floor(Number(custom_hours)) : undefined;
+    const generatedKey = await generateKeyFromAPI(tier, hoursNum);
+    const expiresAt = calculateExpiry(tier, hoursNum);
 
     const tierPrices: Record<string, number> = {
       "trial-7day": 5,
@@ -104,11 +116,16 @@ serve(async (req) => {
       "lifetime": 49.99,
     };
 
+    const storedTier = tier === "custom"
+      ? (custom_label?.trim() || `custom-${hoursNum}h`)
+      : tier;
+    const storedAmount = tier === "custom" ? (Number(custom_amount) || 0) : (tierPrices[tier] || 0);
+
     const { error: dbError } = await supabase.from("premium_key_purchases").insert({
       payment_id: `ADMIN-${Date.now()}`,
-      tier,
+      tier: storedTier,
       key_generated: generatedKey,
-      amount: tierPrices[tier] || 0,
+      amount: storedAmount,
       currency: "USD",
       status: "completed",
       customer_email: customer_email || null,
@@ -127,7 +144,7 @@ serve(async (req) => {
       success: true,
       key: generatedKey,
       expires_at: expiresAt,
-      tier,
+      tier: storedTier,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

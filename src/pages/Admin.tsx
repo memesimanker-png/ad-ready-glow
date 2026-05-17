@@ -114,15 +114,44 @@ function GenerateKeyTab() {
   const [email, setEmail] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedKey, setGeneratedKey] = useState<{ key: string; expires_at: string; tier: string } | null>(null);
+  const [customHours, setCustomHours] = useState<string>("24");
+  const [customLabel, setCustomLabel] = useState<string>("");
+  const [customAmount, setCustomAmount] = useState<string>("0");
 
   const inputCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+
+  const presets = [
+    { label: "1 Hour", hours: 1 },
+    { label: "6 Hours", hours: 6 },
+    { label: "12 Hours", hours: 12 },
+    { label: "1 Day", hours: 24 },
+    { label: "3 Days", hours: 72 },
+    { label: "7 Days", hours: 168 },
+    { label: "14 Days", hours: 336 },
+    { label: "30 Days", hours: 720 },
+    { label: "90 Days", hours: 2160 },
+    { label: "1 Year", hours: 8760 },
+  ];
 
   const handleGenerate = async () => {
     setGenerating(true);
     setGeneratedKey(null);
     try {
+      const isCustom = tier === "custom";
+      const hours = isCustom ? Math.max(1, Math.floor(Number(customHours) || 0)) : undefined;
+      if (isCustom && (!hours || hours < 1)) {
+        toast({ variant: "destructive", title: "Invalid duration", description: "Enter hours >= 1" });
+        setGenerating(false);
+        return;
+      }
       const { data, error } = await supabase.functions.invoke("admin-generate-key", {
-        body: { tier, customer_email: email.trim() || undefined },
+        body: {
+          tier,
+          customer_email: email.trim() || undefined,
+          custom_hours: hours,
+          custom_label: isCustom ? (customLabel.trim() || `Custom ${hours}h`) : undefined,
+          custom_amount: isCustom ? Number(customAmount) || 0 : undefined,
+        },
       });
       if (error) throw error;
       if (data?.success) {
@@ -155,8 +184,63 @@ function GenerateKeyTab() {
             <option value="trial-7day">3-Day Trial ($5)</option>
             <option value="monthly">Monthly Access ($9.99)</option>
             <option value="lifetime">Lifetime Key ($49.99)</option>
+            <option value="custom">⚙ Custom Duration</option>
           </select>
         </div>
+        {tier === "custom" && (
+          <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Quick presets</label>
+              <div className="flex flex-wrap gap-1.5">
+                {presets.map(p => (
+                  <button
+                    key={p.hours}
+                    type="button"
+                    onClick={() => { setCustomHours(String(p.hours)); setCustomLabel(p.label); }}
+                    className="px-2.5 py-1 text-xs rounded border border-border bg-secondary/50 hover:bg-primary/20 hover:border-primary/50 transition"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Duration (hours) *</label>
+              <input
+                type="number"
+                min="1"
+                value={customHours}
+                onChange={e => setCustomHours(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. 24 for 1 day, 168 for 7 days"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Examples: 1=1hr, 24=1day, 168=7days, 720=30days, 8760=1year
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Label (optional)</label>
+              <input
+                value={customLabel}
+                onChange={e => setCustomLabel(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. VIP Weekend Pass"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Amount USD (optional)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={customAmount}
+                onChange={e => setCustomAmount(e.target.value)}
+                className={inputCls}
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+        )}
         <div>
           <label className="text-sm font-medium mb-1 block">Customer Email (optional)</label>
           <input value={email} onChange={e => setEmail(e.target.value)} className={inputCls} placeholder="customer@example.com" />
