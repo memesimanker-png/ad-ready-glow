@@ -8,21 +8,25 @@ const corsHeaders = {
 
 const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
 
-function getTierHours(tier: string): number {
+function getTierHours(tier: string, customHours?: number): number {
+  if (tier === "custom" && customHours && customHours > 0) return Math.floor(customHours);
   if (tier === "trial-7day") return 72;
   if (tier === "monthly") return 720;
   return 876000;
 }
 
-function calculateExpiry(tier: string): string {
+function calculateExpiry(tier: string, customHours?: number): string {
   const now = new Date();
+  if (tier === "custom" && customHours && customHours > 0) {
+    return new Date(now.getTime() + Math.floor(customHours) * 60 * 60 * 1000).toISOString();
+  }
   if (tier === "trial-7day") return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
   if (tier === "monthly") return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
   return new Date(now.getTime() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString();
 }
 
-async function generateKeyFromAPI(tier: string): Promise<string> {
-  const hours = getTierHours(tier);
+async function generateKeyFromAPI(tier: string, customHours?: number): Promise<string> {
+  const hours = getTierHours(tier, customHours);
   const response = await fetch(HWID_KEY_API, {
     method: "POST",
     headers: {
