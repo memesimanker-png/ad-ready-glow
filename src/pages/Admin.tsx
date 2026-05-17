@@ -114,15 +114,44 @@ function GenerateKeyTab() {
   const [email, setEmail] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedKey, setGeneratedKey] = useState<{ key: string; expires_at: string; tier: string } | null>(null);
+  const [customHours, setCustomHours] = useState<string>("24");
+  const [customLabel, setCustomLabel] = useState<string>("");
+  const [customAmount, setCustomAmount] = useState<string>("0");
 
   const inputCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+
+  const presets = [
+    { label: "1 Hour", hours: 1 },
+    { label: "6 Hours", hours: 6 },
+    { label: "12 Hours", hours: 12 },
+    { label: "1 Day", hours: 24 },
+    { label: "3 Days", hours: 72 },
+    { label: "7 Days", hours: 168 },
+    { label: "14 Days", hours: 336 },
+    { label: "30 Days", hours: 720 },
+    { label: "90 Days", hours: 2160 },
+    { label: "1 Year", hours: 8760 },
+  ];
 
   const handleGenerate = async () => {
     setGenerating(true);
     setGeneratedKey(null);
     try {
+      const isCustom = tier === "custom";
+      const hours = isCustom ? Math.max(1, Math.floor(Number(customHours) || 0)) : undefined;
+      if (isCustom && (!hours || hours < 1)) {
+        toast({ variant: "destructive", title: "Invalid duration", description: "Enter hours >= 1" });
+        setGenerating(false);
+        return;
+      }
       const { data, error } = await supabase.functions.invoke("admin-generate-key", {
-        body: { tier, customer_email: email.trim() || undefined },
+        body: {
+          tier,
+          customer_email: email.trim() || undefined,
+          custom_hours: hours,
+          custom_label: isCustom ? (customLabel.trim() || `Custom ${hours}h`) : undefined,
+          custom_amount: isCustom ? Number(customAmount) || 0 : undefined,
+        },
       });
       if (error) throw error;
       if (data?.success) {
