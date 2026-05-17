@@ -67,7 +67,7 @@ ${code.slice(0, 8000)}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "openai/gpt-5.4",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
