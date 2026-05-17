@@ -5,6 +5,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { AdSlot } from "@/components/AdSlot";
+import { FeatureVoteCTA } from "@/components/FeatureVoteCTA";
 import { GAME_LANDINGS } from "@/lib/game-landings";
 
 const DISCORD_URL = "https://discord.gg/combowick";
@@ -134,21 +135,9 @@ export default function GameLanding() {
                 {config.game} Script — Not Live Yet
               </h2>
               <p className="text-sm text-muted-foreground mb-8 font-serif italic">
-                // honest update — feature voting is open in Discord
+                // honest update — feature voting is open below + in Discord
               </p>
-              <div className="p-6 sm:p-8 rounded-xl bg-card/50 border border-bronze/30">
-                <p className="text-sm sm:text-base text-foreground/90 leading-relaxed mb-6">
-                  We don't have a live {config.game} script yet. Instead of fake feature lists, here's the real deal:
-                  the script is on the roadmap, and we're letting the Discord community vote on which features ship in v1.
-                  Drop your requests, get notified the moment it drops.
-                </p>
-                <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer">
-                  <Button className="text-xs uppercase tracking-wider neon-glow">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Suggest Features in Discord
-                  </Button>
-                </a>
-              </div>
+              <FeatureVoteCTA slug={config.slug} game={config.game} />
             </>
           )}
         </div>
