@@ -144,7 +144,7 @@ serve(async (req) => {
       success: true,
       key: generatedKey,
       expires_at: expiresAt,
-      tier,
+      tier: storedTier,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
