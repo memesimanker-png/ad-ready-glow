@@ -14,6 +14,16 @@ import { DiscordPostDialog } from "@/components/DiscordPostDialog";
 import { compressImage } from "@/lib/image-compress";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
+const LOADER_API_BASE = "https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files";
+
+const getLoaderFileName = (game: string) => game
+  .replace(/[^a-zA-Z0-9 ]/g, "")
+  .split(/\s+/)
+  .filter(Boolean)
+  .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+  .join("");
+
+const getLoaderCode = (fileName: string) => `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Loaders/refs/heads/main/${fileName}'))();`;
 
 const emptyScript = {
   title: "", slug: "", description: "", longDescription: "",
@@ -261,6 +271,22 @@ function ScriptsTab() {
     }
     setSaving(true);
     try {
+      let finalCode = form.code;
+      const loaderFileName = getLoaderFileName(form.game);
+      if (!editingId && loaderFileName && form.code.trim() === DEFAULT_SCRIPT_CODE) {
+        const res = await fetch(`${LOADER_API_BASE}/${loaderFileName}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: DEFAULT_SCRIPT_CODE, message: `Add loader for ${form.game}` }),
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`GitHub loader failed (${res.status}): ${txt.slice(0, 180)}`);
+        }
+        finalCode = getLoaderCode(loaderFileName);
+        toast({ title: `GitHub loader created: ${loaderFileName}` });
+      }
+
       // Auto-build a Roblox URL when admin pastes just a place ID (digits only)
       const rawGameUrl = form.gameUrl.trim();
       const builtGameUrl = /^\d+$/.test(rawGameUrl)
@@ -269,7 +295,7 @@ function ScriptsTab() {
       const payload = {
         title: form.title, slug: form.slug, description: form.description,
         long_description: form.longDescription, game: form.game, category: form.category,
-        tags: form.tags, code: form.code, faqs: form.faqs as any,
+        tags: form.tags, code: finalCode, faqs: form.faqs as any,
         trending: form.trending, verified: form.verified,
         game_universe_id: form.gameUniverseId ? Number(form.gameUniverseId) : null,
         youtube_url: form.youtube_url || null,
