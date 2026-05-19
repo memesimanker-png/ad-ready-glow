@@ -33,9 +33,8 @@ export default function ScriptUnlockStep2() {
 
   useEffect(() => {
     const slug = params.get("slug");
-    const hash = params.get("hash");
 
-    if (!slug || !hash) {
+    if (!slug) {
       navigate("/blocked?reason=missing_params&redirect=/scripts", { replace: true });
       return;
     }
@@ -44,7 +43,7 @@ export default function ScriptUnlockStep2() {
     let pending: { slug: string; nonce: string; ts: number } | null = null;
     try { pending = pendingRaw ? JSON.parse(pendingRaw) : null; } catch { /* noop */ }
 
-    if (!pending || pending.slug !== slug || pending.nonce !== hash) {
+    if (!pending || pending.slug !== slug) {
       navigate(`/blocked?reason=suspicious_activity&redirect=/scripts/${slug}`, { replace: true });
       return;
     }
@@ -67,13 +66,14 @@ export default function ScriptUnlockStep2() {
       try {
         setMsg("Generating step 2 link…");
         const origin = window.location.origin;
-        const destination = `${origin}/ad-return/script?slug=${encodeURIComponent(slug)}&hash=${nonce2}`;
+        const destination = `${origin}/ad-return/script?slug=${encodeURIComponent(slug)}`;
         let lastErr: any = null;
         for (let i = 0; i < 3; i++) {
           try {
             const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
-              body: { title: `Step 2 ${slug}`.slice(0, 30), destination },
+              body: { title: `unlock-s2-${slug}`.slice(0, 30), destination },
             });
+
             if (error) throw error;
             const url = (data as any)?.loot_url;
             if (!url) throw new Error("No link returned");
