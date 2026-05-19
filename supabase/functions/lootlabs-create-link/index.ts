@@ -43,14 +43,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    const lootUrl = data?.message?.loot_url;
+    const msg = data?.message;
+    const entry = Array.isArray(msg) ? msg[0] : msg;
+    const lootUrl = entry?.loot_url;
     if (!lootUrl) {
       return new Response(JSON.stringify({ error: 'No loot_url returned', raw: data }), {
         status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    return new Response(JSON.stringify({ loot_url: lootUrl, short: data?.message?.short }), {
+    return new Response(JSON.stringify({ loot_url: lootUrl, short: entry?.short }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
