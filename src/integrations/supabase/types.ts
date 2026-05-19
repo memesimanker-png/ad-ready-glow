@@ -188,6 +188,24 @@ export type Database = {
         }
         Relationships: []
       }
+      hwid_key_ip_log: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -494,6 +512,36 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      verify_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          ip: string
+          token_hash: string
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          ip: string
+          token_hash: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip?: string
+          token_hash?: string
+          used?: boolean
+          used_at?: string | null
         }
         Relationships: []
       }
