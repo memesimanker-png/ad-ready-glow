@@ -43,12 +43,18 @@ function readBundledIndex(): string {
 export default async function handler(req: any, res: any) {
   try {
     const url = new URL(req.url, `https://${req.headers.host || "combowick.com"}`);
-    const slug = (url.pathname.split("/").filter(Boolean).pop() || "").toLowerCase();
+    const slug = (
+      (req.query && (req.query.slug as string)) ||
+      url.searchParams.get("slug") ||
+      url.pathname.split("/").filter(Boolean).pop() ||
+      ""
+    ).toLowerCase();
     if (!slug) {
       res.statusCode = 302;
       res.setHeader("Location", "/scripts");
       return res.end();
     }
+
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     const { data: script } = await supabase
