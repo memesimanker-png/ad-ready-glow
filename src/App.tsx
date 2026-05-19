@@ -49,6 +49,7 @@ const VerifyStep2 = lazy(() => import("./pages/VerifyStep2"));
 const VerifyStep3 = lazy(() => import("./pages/VerifyStep3"));
 const AdReturn = lazy(() => import("./pages/AdReturn"));
 const ScriptUnlockReturn = lazy(() => import("./pages/ScriptUnlockReturn"));
+const ScriptUnlockStep2 = lazy(() => import("./pages/ScriptUnlockStep2"));
 const AccessKey = lazy(() => import("./pages/AccessKey"));
 const Blocked = lazy(() => import("./pages/Blocked"));
 const Register = lazy(() => import("./pages/Register"));
@@ -125,7 +126,8 @@ const App = () => (
                   <Route path="/verify/step2" element={<VerifyStep2 />} />
                   <Route path="/verify/step3" element={<VerifyStep3 />} />
                   <Route path="/ad-return" element={<AdReturn />} />
-                  <Route path="/ad-return/script" element={<ScriptUnlockReturn />} />
+                 <Route path="/ad-return/script-step2" element={<ScriptUnlockStep2 />} />
+                 <Route path="/ad-return/script" element={<ScriptUnlockReturn />} />
                   <Route path="/ad-return/:step" element={<AdReturn />} />
                   <Route path="/access-key" element={<AccessKey />} />
                   <Route path="/blocked" element={<Blocked />} />
