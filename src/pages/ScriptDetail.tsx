@@ -88,12 +88,28 @@ export default function ScriptDetail() {
       {
         "@context": "https://schema.org",
         "@type": "SoftwareSourceCode",
-        name: script.title,
+        name: `${script.game} Script — ${script.title}`,
         description: script.longDescription || script.description,
         programmingLanguage: "Lua",
         runtimePlatform: "Roblox",
         codeRepository: "https://combowick.com/scripts/" + script.slug,
         author: { "@type": "Organization", name: "ComboWick" },
+        about: {
+          "@type": "VideoGame",
+          name: script.game,
+          gamePlatform: "Roblox",
+          ...((script as any).game_universe_id
+            ? { url: `https://www.roblox.com/games/${(script as any).game_universe_id}` }
+            : {}),
+        },
+        keywords: [
+          script.game,
+          `${script.game} script`,
+          `${script.game} roblox script`,
+          `${script.game} hack`,
+          `${script.game} auto farm`,
+          script.title,
+        ].join(", "),
         dateCreated: script.createdAt,
         dateModified: script.updatedAt,
       },
@@ -108,6 +124,7 @@ export default function ScriptDetail() {
       }] : []),
     ];
   }, [script]);
+
 
   if (isLoading) {
     return (
