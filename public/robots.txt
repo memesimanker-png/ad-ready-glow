@@ -59,6 +59,18 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /keys
+Disallow: /verify
+Disallow: /verify/
+Disallow: /ad-return
+Disallow: /ad-return/
+Disallow: /access-key
+Disallow: /claim-access
+Disallow: /blocked
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /register
 
 # Sitemap (project domain)
 Sitemap: https://combowick.com/sitemap.xml
