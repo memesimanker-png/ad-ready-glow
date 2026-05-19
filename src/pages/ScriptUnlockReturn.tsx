@@ -50,22 +50,22 @@ export default function ScriptUnlockReturn() {
 
   useEffect(() => {
     const slug = params.get("slug");
-    const hash = params.get("hash");
 
-    if (!slug || !hash) {
+    if (!slug) {
       navigate("/blocked?reason=missing_params&redirect=/scripts", { replace: true });
       return;
     }
 
-    // Pending session set when user clicked Unlock
+    // Pending session set when user clicked Unlock (rotated through step2)
     const pendingRaw = localStorage.getItem("lootlabs_pending");
     let pending: { slug: string; nonce: string; ts: number } | null = null;
     try { pending = pendingRaw ? JSON.parse(pendingRaw) : null; } catch { /* noop */ }
 
-    if (!pending || pending.slug !== slug || pending.nonce !== hash) {
+    if (!pending || pending.slug !== slug) {
       navigate(`/blocked?reason=suspicious_activity&redirect=/scripts/${slug}`, { replace: true });
       return;
     }
+
 
     if (Date.now() - pending.ts > NONCE_TTL_MS) {
       localStorage.removeItem("lootlabs_pending");
