@@ -73,9 +73,9 @@ export function LootlabsUnlockGate({ slug, title, thumbnail }: Props) {
       const url = await invokeWithRetry({
         title: `Step 1 ${title}`.slice(0, 30),
         destination,
-        cacheKey: `s1:${slug}`,
         thumbnail: thumbnail || undefined,
       });
+
 
 
       window.location.href = url;
