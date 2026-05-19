@@ -153,15 +153,17 @@ export default function ScriptDetail() {
   return (
     <Layout>
       <SEOHead
-        title={`${script.title} — Free Roblox Script | ComboWick`}
-        description={`${script.description} Free ${script.game} script for Roblox. Verified safe, copy & execute instantly with any executor.`}
+        title={`${script.game} Script — ${script.title} | Free Roblox | ComboWick`.slice(0, 70)}
+        description={`Free ${script.game} script for Roblox. ${script.description} Auto farm, ESP & more — copy & execute with any Roblox executor. Safe, verified, working ${new Date().getFullYear()}.`.slice(0, 160)}
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Scripts", url: "/scripts" },
+          { name: `${script.game} Scripts`, url: `/scripts?game=${encodeURIComponent(script.game)}` },
           { name: script.title, url: `/scripts/${script.slug}` },
         ]}
         jsonLd={scriptJsonLd}
       />
+
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-6">
           <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
