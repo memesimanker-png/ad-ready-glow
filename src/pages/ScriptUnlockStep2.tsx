@@ -72,7 +72,7 @@ export default function ScriptUnlockStep2() {
         for (let i = 0; i < 3; i++) {
           try {
             const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
-              body: { title: `Step 2 ${slug}`.slice(0, 30), destination, cacheKey: `s2:${slug}` },
+              body: { title: `Step 2 ${slug}`.slice(0, 30), destination },
             });
 
             if (error) throw error;
