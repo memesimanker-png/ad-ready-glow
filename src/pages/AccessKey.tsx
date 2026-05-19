@@ -165,6 +165,9 @@ export default function AccessKey() {
         return;
       }
 
+      // Token is single-use server-side; drop the cached copy regardless of outcome.
+      localStorage.removeItem("verify_token");
+
       if (data?.success) {
         const now = Date.now();
         const expiryDate = new Date(now + 10 * 60 * 1000); // 10 minutes display timer
