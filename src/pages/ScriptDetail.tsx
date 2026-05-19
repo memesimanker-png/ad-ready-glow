@@ -303,9 +303,9 @@ export default function ScriptDetail() {
                 <Link to="/premium-keys" className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
                   <DollarSign className="h-4 w-4" /> Purchase Access
                 </Link>
-              ) : (
+              ) : unlocked ? (
                 <CopyButton text={script.code} className="w-full justify-center" />
-              )}
+              ) : null}
 
               <a
                 href={
