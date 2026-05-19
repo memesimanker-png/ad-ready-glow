@@ -27,7 +27,6 @@ export const Footer = forwardRef<HTMLElement>(function Footer(_, ref) {
               title: t("Products"),
               links: [
                 { to: "/scripts", label: t("Scripts") },
-                { to: "/keys", label: t("Keys") },
                 { to: "/executors", label: t("Executors") },
                 { to: "/premium-keys", label: t("Premium") },
               ],
