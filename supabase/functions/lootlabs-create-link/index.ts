@@ -20,57 +20,34 @@ Deno.serve(async (req) => {
 
     const safeTitle = String(title).slice(0, 30);
 
-    // Decoy URL set on the locker itself (anti-bypass: real destination passed via &data=)
-    const decoyUrl = new URL(destination).origin;
-
-    // 1. Create content locker pointing at decoy
-    const lockerRes = await fetch('https://creators.lootlabs.gg/api/public/content_locker', {
+    const res = await fetch('https://creators.lootlabs.gg/api/public/content_locker', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: safeTitle,
-        url: decoyUrl,
+        url: destination,
         tier_id: 3,
         number_of_tasks: 1,
         theme: 1,
         ...(thumbnail ? { thumbnail } : {}),
       }),
     });
-    const lockerData = await lockerRes.json();
-    if (!lockerRes.ok || lockerData?.type === 'error') {
-      return new Response(JSON.stringify({ error: lockerData?.message || 'Lootlabs locker error', raw: lockerData }), {
+    const data = await res.json();
+    if (!res.ok || data?.type === 'error') {
+      return new Response(JSON.stringify({ error: data?.message || 'Lootlabs error', raw: data }), {
         status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const msg = lockerData?.message;
+    const msg = data?.message;
     const entry = Array.isArray(msg) ? msg[0] : msg;
-    const baseUrl = entry?.loot_url;
-    if (!baseUrl) {
-      return new Response(JSON.stringify({ error: 'No loot_url returned', raw: lockerData }), {
+    const lootUrl = entry?.loot_url;
+    if (!lootUrl) {
+      return new Response(JSON.stringify({ error: 'No loot_url returned', raw: data }), {
         status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // 2. Encrypt the real destination via anti-bypass endpoint
-    const encRes = await fetch('https://creators.lootlabs.gg/api/public/url_encryptor', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ destination_url: destination }),
-    });
-    const encData = await encRes.json();
-    if (!encRes.ok || encData?.type === 'error' || !encData?.message) {
-      // Fall back to plain locker URL if encryption fails
-      return new Response(JSON.stringify({ loot_url: baseUrl, short: entry?.short, anti_bypass: false }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // encData.message is already URL-encoded per Lootlabs docs
-    const encrypted = String(encData.message);
-    const sep = baseUrl.includes('?') ? '&' : '?';
-    const finalUrl = `${baseUrl}${sep}data=${encrypted}`;
-
-    return new Response(JSON.stringify({ loot_url: finalUrl, short: entry?.short, anti_bypass: true }), {
+    return new Response(JSON.stringify({ loot_url: lootUrl, short: entry?.short }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
