@@ -1,19 +1,9 @@
 import { useEffect } from "react";
 
-const GATE_PATHS = [
-  "/verify",
-  "/ad-return",
-  "/access-key",
-  "/claim-access",
-  "/blocked",
-  "/keys",
-];
-
 export function NoIndex() {
   useEffect(() => {
-    const path = window.location.pathname;
-    const isGate = GATE_PATHS.some((p) => path === p || path.startsWith(p + "/"));
-    if (!isGate) return;
+    const crawlableGatePaths = ["/verify", "/ad-return", "/access-key", "/claim-access", "/blocked", "/register"];
+    if (crawlableGatePaths.some((path) => window.location.pathname.startsWith(path))) return;
 
     const meta = document.createElement("meta");
     meta.name = "robots";
