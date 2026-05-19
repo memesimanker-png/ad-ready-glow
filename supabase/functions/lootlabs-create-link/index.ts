@@ -1,6 +1,4 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
-import { memCacheGet, memCacheSet } from '../_shared/throttle.ts';
-
 
 const ALLOWED_ORIGINS = [
   'https://shop-ready.lovable.app',
@@ -24,8 +22,6 @@ Deno.serve(async (req) => {
     });
   }
 
-
-
   try {
     const apiToken = Deno.env.get('Lootlabs_apikey');
     if (!apiToken) {
@@ -34,7 +30,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { title, destination, thumbnail, cacheKey } = await req.json();
+    const { title, destination, thumbnail } = await req.json();
     if (!title || !destination) {
       return new Response(JSON.stringify({ error: 'title and destination required' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -42,23 +38,6 @@ Deno.serve(async (req) => {
     }
 
     const safeTitle = String(title).slice(0, 30);
-
-    // Cache by explicit cacheKey (e.g. "s1:slug"). Destination keeps a per-user
-    // nonce for anti-bypass, so we can't cache by destination directly.
-    // Lootlabs redirects to whatever destination the FIRST caller registered,
-    // but our return pages validate nonce against localStorage, so a stale URL
-    // still passes for the legitimate user whose nonce is in their browser.
-    const key = cacheKey ? `loot:${cacheKey}` : null;
-    if (key) {
-      const cached = memCacheGet<{ loot_url: string; short?: string }>(key);
-      if (cached) {
-        return new Response(JSON.stringify({ ...cached, cached: true }), {
-          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-    }
-
-
 
     const res = await fetch('https://creators.lootlabs.gg/api/public/content_locker', {
       method: 'POST',
@@ -87,13 +66,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const payload = { loot_url: lootUrl, short: entry?.short };
-    memCacheSet(cacheKey, payload, 60 * 60 * 1000);
-
-    return new Response(JSON.stringify(payload), {
+    return new Response(JSON.stringify({ loot_url: lootUrl, short: entry?.short }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
