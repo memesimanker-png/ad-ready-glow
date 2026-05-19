@@ -4,6 +4,7 @@ import { Shield, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { NoIndex } from "@/components/NoIndex";
+import { supabase } from "@/integrations/supabase/client";
 
 type VerificationStep = "step1" | "step2" | "step3";
 
@@ -126,6 +127,24 @@ export default function AdReturn() {
     const message = getStepMessage(currentStep);
     toast({ title: message.title, description: message.description });
     setIsLoading(false);
+
+    // On final step, request a server-issued verify token so generate-hwid-key
+    // can confirm the request came from a real verified user (not curl/PS).
+    if (currentStep === "step3") {
+      supabase.functions
+        .invoke("issue-verify-token", { body: {} })
+        .then(({ data, error }) => {
+          if (!error && data?.success && data?.token) {
+            localStorage.setItem(
+              "verify_token",
+              JSON.stringify({ token: data.token, expires_at: data.expires_at }),
+            );
+          } else {
+            console.warn("[AdReturn] issue-verify-token failed", error || data);
+          }
+        })
+        .catch((err) => console.warn("[AdReturn] issue-verify-token error", err));
+    }
 
     timeoutId = window.setTimeout(() => {
       navigate(NEXT_ROUTE[currentStep], { replace: true });

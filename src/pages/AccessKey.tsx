@@ -129,9 +129,33 @@ export default function AccessKey() {
     setIsLoading(true);
     setError("");
 
+    // Pull the server-issued verify token saved by /ad-return/step3
+    let verifyToken: string | null = null;
+    try {
+      const raw = localStorage.getItem("verify_token");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { token?: string; expires_at?: string };
+        if (parsed?.token && parsed.expires_at && new Date(parsed.expires_at).getTime() > Date.now()) {
+          verifyToken = parsed.token;
+        } else {
+          localStorage.removeItem("verify_token");
+        }
+      }
+    } catch {
+      localStorage.removeItem("verify_token");
+    }
+
+    if (!verifyToken) {
+      setError("Your verification expired. Please verify again.");
+      toast({ variant: "destructive", title: "Verification required", description: "Please complete the verification steps again." });
+      setIsLoading(false);
+      navigate("/verify/provider-select");
+      return;
+    }
+
     try {
       const { data, error: fnError } = await supabase.functions.invoke("generate-hwid-key", {
-        body: { username: username.trim() || undefined },
+        body: { username: username.trim() || undefined, verify_token: verifyToken },
       });
 
       if (fnError) {
