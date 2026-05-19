@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Lock, Loader2, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +9,6 @@ const storageKey = (slug: string) => `lootlabs_unlock_${slug}`;
 
 export function useScriptUnlocked(slug: string | undefined) {
   const [unlocked, setUnlocked] = useState(false);
-  const [params, setParams] = useSearchParams();
 
   useEffect(() => {
     if (!slug) return;
@@ -23,15 +21,15 @@ export function useScriptUnlocked(slug: string | undefined) {
       }
       localStorage.removeItem(storageKey(slug));
     }
-    if (params.get("unlocked") === "1") {
-      localStorage.setItem(storageKey(slug), String(Date.now()));
-      setUnlocked(true);
-      params.delete("unlocked");
-      setParams(params, { replace: true });
-    }
-  }, [slug, params, setParams]);
+  }, [slug]);
 
   return unlocked;
+}
+
+function makeNonce(): string {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 interface Props {
@@ -48,7 +46,13 @@ export function LootlabsUnlockGate({ slug, title, thumbnail }: Props) {
     setLoading(true);
     try {
       const origin = window.location.origin;
-      const destination = `${origin}/scripts/${slug}?unlocked=1`;
+      const nonce = makeNonce();
+      // Store pending session BEFORE redirecting
+      localStorage.setItem(
+        "lootlabs_pending",
+        JSON.stringify({ slug, nonce, ts: Date.now() })
+      );
+      const destination = `${origin}/ad-return/script?slug=${encodeURIComponent(slug)}&hash=${nonce}`;
       const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
         body: { title: title.slice(0, 30), destination, thumbnail: thumbnail || undefined },
       });
