@@ -81,9 +81,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ loot_url: lootUrl, short: entry?.short }), {
+    const payload = { loot_url: lootUrl, short: entry?.short };
+    memCacheSet(cacheKey, payload, 60 * 60 * 1000);
+
+    return new Response(JSON.stringify(payload), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
