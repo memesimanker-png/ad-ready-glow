@@ -42,23 +42,39 @@ export function LootlabsUnlockGate({ slug, title, thumbnail }: Props) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  const invokeWithRetry = async (body: any, attempts = 3) => {
+    let lastErr: any = null;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const { data, error } = await supabase.functions.invoke("lootlabs-create-link", { body });
+        if (error) throw error;
+        const url = (data as any)?.loot_url;
+        if (!url) throw new Error("No link returned");
+        return url as string;
+      } catch (e) {
+        lastErr = e;
+        // brief backoff before retrying (handles cold-start / transient Lootlabs hiccups)
+        await new Promise((r) => setTimeout(r, 400 * (i + 1)));
+      }
+    }
+    throw lastErr ?? new Error("Unlock failed");
+  };
+
   const handleUnlock = async () => {
     setLoading(true);
     try {
       const origin = window.location.origin;
       const nonce = makeNonce();
-      // Store pending session BEFORE redirecting
       localStorage.setItem(
         "lootlabs_pending",
         JSON.stringify({ slug, nonce, ts: Date.now() })
       );
       const destination = `${origin}/ad-return/script?slug=${encodeURIComponent(slug)}&hash=${nonce}`;
-      const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
-        body: { title: title.slice(0, 30), destination, thumbnail: thumbnail || undefined },
+      const url = await invokeWithRetry({
+        title: title.slice(0, 30),
+        destination,
+        thumbnail: thumbnail || undefined,
       });
-      if (error) throw error;
-      const url = (data as any)?.loot_url;
-      if (!url) throw new Error("No link returned");
       window.location.href = url;
     } catch (e: any) {
       toast({ title: "Unlock failed", description: e?.message || "Try again", variant: "destructive" });
