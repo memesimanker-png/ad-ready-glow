@@ -1,4 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { memCacheGet, memCacheSet } from '../_shared/throttle.ts';
+
 
 const ALLOWED_ORIGINS = [
   'https://shop-ready.lovable.app',
@@ -41,6 +43,17 @@ Deno.serve(async (req) => {
 
     const safeTitle = String(title).slice(0, 30);
 
+    // Cache by title+destination so all users hitting the same unlock share one Lootlabs link.
+    // TTL 60 min — Lootlabs links remain valid much longer; this just bounds memory.
+    const cacheKey = `loot:${safeTitle}|${destination}`;
+    const cached = memCacheGet<{ loot_url: string; short?: string }>(cacheKey);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, cached: true }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+
     const res = await fetch('https://creators.lootlabs.gg/api/public/content_locker', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
@@ -68,9 +81,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ loot_url: lootUrl, short: entry?.short }), {
+    const payload = { loot_url: lootUrl, short: entry?.short };
+    memCacheSet(cacheKey, payload, 60 * 60 * 1000);
+
+    return new Response(JSON.stringify(payload), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },

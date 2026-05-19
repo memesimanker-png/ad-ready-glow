@@ -69,12 +69,13 @@ export function LootlabsUnlockGate({ slug, title, thumbnail }: Props) {
         "lootlabs_pending",
         JSON.stringify({ slug, nonce, ts: Date.now() })
       );
-      const destination = `${origin}/ad-return/script-step2?slug=${encodeURIComponent(slug)}&hash=${nonce}`;
+      const destination = `${origin}/ad-return/script-step2?slug=${encodeURIComponent(slug)}`;
       const url = await invokeWithRetry({
-        title: `Step 1 ${title}`.slice(0, 30),
+        title: `unlock-s1-${slug}`.slice(0, 30),
         destination,
         thumbnail: thumbnail || undefined,
       });
+
       window.location.href = url;
     } catch (e: any) {
       toast({ title: "Unlock failed", description: e?.message || "Try again", variant: "destructive" });
