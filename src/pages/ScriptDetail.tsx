@@ -11,9 +11,11 @@ import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
 import { AdSlot } from "@/components/AdSlot";
+import { LootlabsUnlockGate, useScriptUnlocked } from "@/components/LootlabsUnlock";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const unlocked = useScriptUnlocked(slug);
   const { data: script, isLoading } = useScriptBySlug(slug);
   const { data: related = [] } = useRelatedScripts(
     script?.id || "",
@@ -224,16 +226,26 @@ export default function ScriptDetail() {
               <section className="mb-8">
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h2 className="text-lg font-semibold">Script Code</h2>
-                  <div className="flex gap-2">
-                    <EmailScriptButton script={script} />
-                    <CopyButton text={script.code} />
+                  {unlocked && (
+                    <div className="flex gap-2">
+                      <EmailScriptButton script={script} />
+                      <CopyButton text={script.code} />
+                    </div>
+                  )}
+                </div>
+                {unlocked ? (
+                  <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
+                    <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
+                      {script.code}
+                    </pre>
                   </div>
-                </div>
-                <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
-                  <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
-                    {script.code}
-                  </pre>
-                </div>
+                ) : (
+                  <LootlabsUnlockGate
+                    slug={script.slug}
+                    title={script.title}
+                    thumbnail={(script as any).thumbnail_url}
+                  />
+                )}
               </section>
             )}
 
@@ -291,9 +303,9 @@ export default function ScriptDetail() {
                 <Link to="/premium-keys" className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
                   <DollarSign className="h-4 w-4" /> Purchase Access
                 </Link>
-              ) : (
+              ) : unlocked ? (
                 <CopyButton text={script.code} className="w-full justify-center" />
-              )}
+              ) : null}
 
               <a
                 href={
