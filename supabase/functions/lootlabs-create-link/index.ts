@@ -1,7 +1,28 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
+const ALLOWED_ORIGINS = [
+  'https://shop-ready.lovable.app',
+  'https://combowick.com',
+  'https://www.combowick.com',
+];
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  try { return /\.lovable\.app$/.test(new URL(origin).hostname); } catch { return false; }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  const origin = req.headers.get('origin');
+  if (!isAllowedOrigin(origin)) {
+    console.warn('[lootlabs-create-link] blocked origin:', origin);
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+
 
   try {
     const apiToken = Deno.env.get('Lootlabs_apikey');
