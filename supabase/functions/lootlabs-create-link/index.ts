@@ -1,4 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { memCacheGet, memCacheSet } from '../_shared/throttle.ts';
+
 
 const ALLOWED_ORIGINS = [
   'https://shop-ready.lovable.app',
