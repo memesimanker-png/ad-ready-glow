@@ -132,6 +132,7 @@ Deno.serve(async (req) => {
       });
     }
 
+    redisSet(redisKey, "1", 7 * 24 * 60 * 60).catch(() => {});
     return new Response(JSON.stringify({ url: publicUrl, cached: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
