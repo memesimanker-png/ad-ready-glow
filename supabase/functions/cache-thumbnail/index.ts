@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
+import { redisGet, redisSet } from "../_shared/redis.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,17 +54,28 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Check cache first using rawId as filename
     const filePath = `${rawId}.png`;
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${filePath}`;
 
+    // Fast-path: Redis says we've already cached this → skip Supabase storage lookup entirely.
+    const redisKey = `thumb:${rawId}`;
+    const cachedHit = await redisGet(redisKey);
+    if (cachedHit === "1") {
+      return new Response(JSON.stringify({ url: publicUrl, cached: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    // Check storage cache
     const { data: existing } = await supabase.storage
       .from(BUCKET)
       .createSignedUrl(filePath, 1);
 
     if (existing?.signedUrl) {
+      redisSet(redisKey, "1", 7 * 24 * 60 * 60).catch(() => {});
       return new Response(JSON.stringify({ url: publicUrl, cached: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -120,6 +132,7 @@ Deno.serve(async (req) => {
       });
     }
 
+    redisSet(redisKey, "1", 7 * 24 * 60 * 60).catch(() => {});
     return new Response(JSON.stringify({ url: publicUrl, cached: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
