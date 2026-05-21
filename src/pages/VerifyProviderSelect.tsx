@@ -5,7 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { FloatingYouTubePlayer } from "@/components/FloatingYouTubePlayer";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
@@ -44,13 +43,17 @@ export default function VerifyProviderSelect() {
 
     // Monetag one-click popunder — ONLY on this page
     const POPUNDER_ID = "monetag-popunder-11035708";
-    if (!document.getElementById(POPUNDER_ID)) {
+    const loadPopunder = () => {
+      if (document.getElementById(POPUNDER_ID)) return;
       const loader = document.createElement("script");
       loader.id = POPUNDER_ID;
-      loader.text =
-        "(function(s){s.dataset.zone='11035708',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))";
+      loader.dataset.zone = "11035708";
+      loader.src = "https://al5sm.com/tag.min.js";
+      loader.async = true;
       document.body.appendChild(loader);
-    }
+    };
+    loadPopunder();
+    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
 
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);
@@ -70,6 +73,8 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("direct_link_completed");
     localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
+
+    return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
   }, []);
 
   useEffect(() => {
@@ -250,7 +255,6 @@ export default function VerifyProviderSelect() {
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
-      <FloatingYouTubePlayer step="provider-select" />
 
       {showTutorialPopup && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -262,7 +266,7 @@ export default function VerifyProviderSelect() {
                   <Button variant="ghost" size="sm" onClick={handleNeverShowAgain} className="text-muted-foreground hover:text-foreground">
                     Don't show again
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={handleCloseTutorial} className="h-8 w-8">
+                  <Button variant="ghost" size="icon" aria-label="Close tutorial" onClick={handleCloseTutorial} className="h-10 w-10">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -272,10 +276,11 @@ export default function VerifyProviderSelect() {
             <CardContent className="pt-6">
               <div className="aspect-video rounded-lg overflow-hidden border border-border/50">
                 <iframe
-                  src="https://www.youtube.com/embed/zGkNbPgQQx4?rel=0"
+                  src="https://www.youtube-nocookie.com/embed/zGkNbPgQQx4?rel=0"
                   title="Free Key Tutorial"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  loading="lazy"
                   className="w-full h-full"
                 />
               </div>

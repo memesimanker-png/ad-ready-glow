@@ -8,6 +8,16 @@ declare global {
 }
 
 const PUBLISHER_ID = "ca-pub-8877213222492502";
+const ADSENSE_SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${PUBLISHER_ID}`;
+
+function ensureAdsenseScript() {
+  if (document.querySelector(`script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]`)) return;
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = ADSENSE_SRC;
+  script.crossOrigin = "anonymous";
+  document.head.appendChild(script);
+}
 
 // Routes where AdSense MUST NOT be shown.
 // AdSense flagged "Site Behavior: Navigation" — ads inside key/verify/claim flows
@@ -74,6 +84,7 @@ export function AdSlot({
   useEffect(() => {
     if (isBlocked) return;
     if (initialized.current) return;
+    ensureAdsenseScript();
 
     // Respect cookie consent — only push ads after explicit accept (or no decision yet, AdSense will use non-personalized).
     // We push regardless to satisfy review crawlers, but you can gate with consent === "accepted" if stricter.
