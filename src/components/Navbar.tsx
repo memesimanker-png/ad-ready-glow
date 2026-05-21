@@ -129,7 +129,7 @@ export function Navbar() {
             )}
           </div>
 
-          <button className="xl:hidden p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button aria-label={mobileOpen ? "Close menu" : "Open menu"} className="xl:hidden min-h-11 min-w-11 p-2 text-muted-foreground hover:text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
