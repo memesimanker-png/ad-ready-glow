@@ -34,6 +34,7 @@ const STATIC_PAGES = [
   { loc: "/refund-policy", changefreq: "yearly", priority: "0.3" },
   { loc: "/oils", changefreq: "weekly", priority: "0.7" },
   { loc: "/dashboard", changefreq: "weekly", priority: "0.5" },
+  { loc: "/wall-of-fame", changefreq: "weekly", priority: "0.6" },
   // SEO landing pages targeting high-volume game keywords
   { loc: "/games/blox-fruits", changefreq: "weekly", priority: "0.9" },
   { loc: "/games/arsenal", changefreq: "weekly", priority: "0.9" },
