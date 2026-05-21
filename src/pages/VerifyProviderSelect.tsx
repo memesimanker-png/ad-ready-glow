@@ -266,7 +266,7 @@ export default function VerifyProviderSelect() {
                   <Button variant="ghost" size="sm" onClick={handleNeverShowAgain} className="text-muted-foreground hover:text-foreground">
                     Don't show again
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={handleCloseTutorial} className="h-8 w-8">
+                  <Button variant="ghost" size="icon" aria-label="Close tutorial" onClick={handleCloseTutorial} className="h-10 w-10">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -276,10 +276,11 @@ export default function VerifyProviderSelect() {
             <CardContent className="pt-6">
               <div className="aspect-video rounded-lg overflow-hidden border border-border/50">
                 <iframe
-                  src="https://www.youtube.com/embed/zGkNbPgQQx4?rel=0"
+                  src="https://www.youtube-nocookie.com/embed/zGkNbPgQQx4?rel=0"
                   title="Free Key Tutorial"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  loading="lazy"
                   className="w-full h-full"
                 />
               </div>
