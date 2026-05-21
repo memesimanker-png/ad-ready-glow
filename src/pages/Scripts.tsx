@@ -37,7 +37,7 @@ export default function Scripts() {
 
   // Monetag Direct Link — fires on user clicks inside the page,
   // max 2 times then a 30-minute cooldown so it isn't annoying.
-  const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+  const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
   const STORAGE_KEY = "scripts_dl_state";
   const MAX_CLICKS = 2;
   const COOLDOWN_MS = 15 * 1000;

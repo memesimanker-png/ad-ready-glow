@@ -14,7 +14,7 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 const REQUIRED_DIRECT_LINK_CLICKS = 2;
 
 function makeNonce(): string {
@@ -41,6 +41,16 @@ export default function VerifyProviderSelect() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Monetag one-click popunder — ONLY on this page
+    const POPUNDER_ID = "monetag-popunder-11035708";
+    if (!document.getElementById(POPUNDER_ID)) {
+      const loader = document.createElement("script");
+      loader.id = POPUNDER_ID;
+      loader.text =
+        "(function(s){s.dataset.zone='11035708',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))";
+      document.body.appendChild(loader);
+    }
 
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);

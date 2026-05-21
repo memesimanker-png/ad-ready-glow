@@ -3,7 +3,7 @@
 // always in a background tab so the user's intended action is never interrupted.
 // Use maybeFireDirectLink() to wrap any high-intent click (copy, external link, download).
 
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 const CAP_MS = 3 * 60 * 1000; // 3 minutes between hops, site-wide
 const STORAGE_KEY = "dl_last_at";
 
