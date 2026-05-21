@@ -14,7 +14,7 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
-const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 const REQUIRED_DIRECT_LINK_CLICKS = 2;
 
 function makeNonce(): string {
