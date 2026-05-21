@@ -57,6 +57,8 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("step2_completed");
     localStorage.removeItem("step3_completed");
     localStorage.removeItem("verification_step");
+    localStorage.removeItem("direct_link_completed");
+    localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
   }, []);
 
@@ -96,6 +98,21 @@ export default function VerifyProviderSelect() {
     window.open(DISCORD_URL, "_blank");
     setDiscordTimer(WAIT_TIME_SECONDS);
     toast({ title: "Opening Discord", description: `Please join and wait ${WAIT_TIME_SECONDS} seconds...` });
+  };
+
+  const handleDirectLinkClick = () => {
+    window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
+    setDirectLinkClicks((prev) => {
+      const next = Math.min(prev + 1, REQUIRED_DIRECT_LINK_CLICKS);
+      localStorage.setItem("direct_link_clicks", String(next));
+      if (next >= REQUIRED_DIRECT_LINK_CLICKS) {
+        localStorage.setItem("direct_link_completed", "true");
+        toast({ title: "Processing Complete", description: "You can continue to unlock your key now." });
+      } else {
+        toast({ title: "One More Click", description: "Click the button one more time to process." });
+      }
+      return next;
+    });
   };
 
   const handleUnlock = async () => {
@@ -171,6 +188,29 @@ export default function VerifyProviderSelect() {
   }
 
   steps.push({
+    key: "direct-link",
+    title: "Process Free Access",
+    done: directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS,
+    icon: <MousePointerClick className="h-4 w-4" />,
+    render: () => (
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Click the button two times to process your free access.
+        </p>
+        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS}>
+          <MousePointerClick className="h-4 w-4" />
+          {directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS
+            ? "✓ Processing Complete"
+            : `Click Ad Button (${directLinkClicks}/${REQUIRED_DIRECT_LINK_CLICKS})`}
+        </Button>
+        <Progress value={(directLinkClicks / REQUIRED_DIRECT_LINK_CLICKS) * 100} className="h-1" />
+      </div>
+    ),
+  });
+
+  const directLinkDone = directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS;
+
+  steps.push({
     key: "unlock",
     title: "Get Your Free Key",
     done: false,
@@ -181,7 +221,7 @@ export default function VerifyProviderSelect() {
         <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
           Complete one short task to unlock your HWID key. No more multi-step waiting.
         </p>
-        <Button onClick={handleUnlock} disabled={unlocking || !subscriptionGateCompleted} size="lg" className="gap-2">
+        <Button onClick={handleUnlock} disabled={unlocking || !subscriptionGateCompleted || !directLinkDone} size="lg" className="gap-2">
           {unlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
           {unlocking ? "Generating link..." : "Unlock Free Key"}
         </Button>
