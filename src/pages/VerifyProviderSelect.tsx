@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Youtube, MessageCircle, X, CheckCircle2, Lock, Unlock, Loader2 } from "lucide-react";
+import { Shield, Youtube, MessageCircle, X, CheckCircle2, Lock, Unlock, Loader2, MousePointerClick } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,8 @@ const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
+const DIRECT_LINK_URL = "https://omg10.com/4/10877293";
+const REQUIRED_DIRECT_LINK_CLICKS = 2;
 
 function makeNonce(): string {
   const arr = new Uint8Array(16);
@@ -34,6 +36,7 @@ export default function VerifyProviderSelect() {
   const [youtubeTimer, setYoutubeTimer] = useState(0);
   const [discordTimer, setDiscordTimer] = useState(0);
 
+  const [directLinkClicks, setDirectLinkClicks] = useState(0);
   const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
