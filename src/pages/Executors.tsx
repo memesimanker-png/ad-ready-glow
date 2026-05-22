@@ -196,86 +196,76 @@ export default function Executors() {
             </div>
           ) : (
             groups.map(([platform, list]) => (
-              <div key={platform} className="mb-10">
-                <h2 className="font-heading text-xl font-bold flex items-center gap-2 mb-4">
+              <div key={platform} className="mb-8">
+                <h2 className="font-heading text-sm uppercase tracking-wider text-primary flex items-center gap-2 mb-3 border-b border-border/40 pb-2">
                   <PlatformIcon p={platform} /> {platform}
-                  <span className="text-sm font-normal text-muted-foreground">({list.length})</span>
+                  <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
                 </h2>
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {list.map((exec) => {
                     const working = exec.updateStatus === true;
                     const detected = exec.detected === true;
-                    const platforms = (exec.platform || "").split(",").map((p) => p.trim()).filter(Boolean);
+                    const openLink = (url?: string) => (e: React.MouseEvent) => {
+                      if (!url) return;
+                      e.preventDefault();
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    };
                     return (
-                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-4 hover:border-primary/30 transition-colors">
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              {exec.slug?.logo && (
-                                <img src={exec.slug.logo} alt="" loading="lazy" className="h-6 w-6 rounded" />
-                              )}
-                              <h3 className="font-semibold truncate">{exec.title}</h3>
+                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs">
+                        {/* Header row */}
+                        <div className="flex items-center gap-2 mb-2">
+                          {exec.slug?.logo ? (
+                            <img src={exec.slug.logo} alt="" loading="lazy" className="h-7 w-7 rounded shrink-0 object-cover" />
+                          ) : (
+                            <div className="h-7 w-7 rounded bg-muted shrink-0" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <h3 className="font-semibold text-sm truncate">{exec.title}</h3>
                               {exec.version && (
-                                <span className="text-xs text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>
-                              )}
-                              <Badge variant="outline" className={working ? "bg-success/20 text-success border-success/40" : "bg-destructive/20 text-destructive border-destructive/40"}>
-                                {working ? "Working" : "Patched / Updating"}
-                              </Badge>
-                              <Badge variant="outline" className={detected ? "bg-destructive/20 text-destructive border-destructive/40" : "bg-success/20 text-success border-success/40"}>
-                                {detected ? "Detected" : "Undetected"}
-                              </Badge>
-                              {exec.free === true && (
-                                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/40">Free</Badge>
-                              )}
-                              {exec.beta && (
-                                <Badge variant="outline" className="bg-warning/20 text-warning border-warning/40">Beta</Badge>
-                              )}
-                              {exec.keysystem && (
-                                <Badge variant="outline" className="bg-warning/20 text-warning border-warning/40">Key</Badge>
+                                <span className="text-[10px] text-muted-foreground truncate">v{exec.version.replace(/^v/i, "")}</span>
                               )}
                             </div>
-
-                            <div className="flex flex-wrap gap-1.5 mb-2">
-                              {platforms.map((p) => (
-                                <span key={p} className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                                  <PlatformIcon p={p} /> {p}
-                                </span>
-                              ))}
-                              {exec.decompiler && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Decompiler</span>}
-                              {exec.multiInject && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Multi-Inject</span>}
-                              {exec.clientmods && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Client Mods</span>}
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                              <span>Roblox: {exec.rbxversion ? exec.rbxversion : "Unknown"}</span>
-                              {exec.cost != null && exec.cost !== "" && !exec.free && (
-                                <span>· Cost: {String(exec.cost)}</span>
-                              )}
-                              {exec.updatedDate && <span>· {exec.updatedDate}</span>}
-                            </div>
-
-                            <div className="flex flex-wrap gap-2 mt-3">
-                              {exec.websitelink && (
-                                <a href={exec.websitelink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-primary/40 text-primary hover:bg-primary/10 transition">
-                                  <ExternalLink className="h-3 w-3" /> Website
-                                </a>
-                              )}
-                              {exec.discordlink && (
-                                <a href={exec.discordlink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-border hover:border-primary/40 hover:text-primary transition">
-                                  <MessageCircle className="h-3 w-3" /> Discord
-                                </a>
-                              )}
-                              {exec.purchaselink && (
-                                <a href={exec.purchaselink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-border hover:border-primary/40 hover:text-primary transition">
-                                  <ShoppingCart className="h-3 w-3" /> Purchase
-                                </a>
-                              )}
+                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${working ? "bg-success" : "bg-destructive"} animate-pulse`} />
+                              <span className={working ? "text-success" : "text-destructive"}>{working ? "Working" : "Patched"}</span>
+                              <span>·</span>
+                              <span className={detected ? "text-destructive" : "text-success"}>{detected ? "Detected" : "Undetected"}</span>
+                              {exec.free && <><span>·</span><span className="text-primary">Free</span></>}
+                              {exec.keysystem && <><span>·</span><span className="text-warning">Key</span></>}
                             </div>
                           </div>
+                        </div>
 
-                          <div className="w-full sm:w-44 shrink-0 space-y-1.5">
+                        {/* UNC/SUNC bars */}
+                        {(typeof exec.uncPercentage === "number" || typeof exec.suncPercentage === "number") && (
+                          <div className="space-y-1 mb-2">
                             {typeof exec.uncPercentage === "number" && <UncBar value={exec.uncPercentage} label="UNC" />}
                             {typeof exec.suncPercentage === "number" && <UncBar value={exec.suncPercentage} label="SUNC" />}
+                          </div>
+                        )}
+
+                        {/* Meta + links */}
+                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/30">
+                          <span className="text-[10px] text-muted-foreground truncate">
+                            RBX {exec.rbxversion ? String(exec.rbxversion).slice(0, 14) : "Unknown"}
+                          </span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {exec.websitelink && (
+                              <a href={exec.websitelink} onClick={openLink(exec.websitelink)} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex items-center justify-center h-6 w-6 rounded border border-primary/40 text-primary hover:bg-primary/10">
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            )}
+                            {exec.discordlink && (
+                              <a href={exec.discordlink} onClick={openLink(exec.discordlink)} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex items-center justify-center h-6 w-6 rounded border border-border hover:border-primary/40 hover:text-primary">
+                                <MessageCircle className="h-3 w-3" />
+                              </a>
+                            )}
+                            {exec.purchaselink && (
+                              <a href={exec.purchaselink} onClick={openLink(exec.purchaselink)} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex items-center justify-center h-6 w-6 rounded border border-border hover:border-primary/40 hover:text-primary">
+                                <ShoppingCart className="h-3 w-3" />
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -285,6 +275,7 @@ export default function Executors() {
               </div>
             ))
           )}
+
 
           <div className="mt-8 text-center text-xs text-muted-foreground">
             <Shield className="inline h-3 w-3 mr-1" />
