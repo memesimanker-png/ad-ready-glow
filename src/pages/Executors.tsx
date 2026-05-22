@@ -247,7 +247,7 @@ export default function Executors() {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                              <span>Roblox: {exec.rbxversion && exec.rbxversion !== false ? exec.rbxversion : "Unknown"}</span>
+                              <span>Roblox: {exec.rbxversion ? exec.rbxversion : "Unknown"}</span>
                               {exec.cost != null && exec.cost !== "" && !exec.free && (
                                 <span>· Cost: {String(exec.cost)}</span>
                               )}
