@@ -1,51 +1,48 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Monitor, Smartphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Shield, Monitor, Smartphone, Apple, ExternalLink, MessageCircle, ShoppingCart, RefreshCw, AlertCircle } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { supabase } from "@/integrations/supabase/client";
 
 type Executor = {
-  name: string;
-  platform: "Windows" | "Android" | "iOS" | "Mac";
-  type: "Free" | "Paid" | "Free (Key)";
-  unc?: number;
-  sunc?: number;
-  features: string[];
-  category: "Internal" | "External";
+  _id: string;
+  title: string;
+  version?: string;
+  updatedDate?: string;
+  uncStatus?: boolean;
+  free?: boolean;
+  detected?: boolean;
+  rbxversion?: string | false;
+  updateStatus?: boolean;
+  websitelink?: string;
+  discordlink?: string;
+  purchaselink?: string;
+  platform?: string;
+  uncPercentage?: number;
+  suncPercentage?: number;
+  decompiler?: boolean;
+  multiInject?: boolean;
+  clientmods?: boolean;
+  keysystem?: boolean;
+  cost?: string | number;
+  hidden?: boolean;
+  beta?: boolean;
+  slug?: { logo?: string; owner?: string };
 };
 
-const executors: Executor[] = [
-  { name: "Velocity", platform: "Windows", type: "Free", unc: 99, sunc: 94, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Xeno", platform: "Windows", type: "Free", unc: 82, sunc: 32, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Solara", platform: "Windows", type: "Free", unc: 67, sunc: 39, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Bunni.fun", platform: "Windows", type: "Free (Key)", unc: 99, sunc: 100, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "Potassium", platform: "Windows", type: "Paid", unc: 99, sunc: 100, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Wave", platform: "Windows", type: "Paid", unc: 99, sunc: 100, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Synapse Z", platform: "Windows", type: "Paid", unc: 99, sunc: 97, features: ["Decompiler", "Multi-Instance"], category: "Internal" },
-  { name: "DX9WARE V2", platform: "Windows", type: "Paid", features: [], category: "External" },
-  { name: "Photon", platform: "Windows", type: "Paid", features: [], category: "External" },
-  { name: "Matrix Hub", platform: "Windows", type: "Paid", features: [], category: "External" },
-  { name: "Codex", platform: "Android", type: "Free", unc: 98, sunc: 96, features: ["Decompiler"], category: "Internal" },
-  { name: "Cryptic", platform: "Android", type: "Free (Key)", unc: 98, sunc: 97, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "Delta", platform: "Android", type: "Free (Key)", unc: 99, sunc: 100, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "Vega X", platform: "Android", type: "Free (Key)", unc: 98, sunc: 98, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "Delta", platform: "iOS", type: "Free (Key)", unc: 99, sunc: 100, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "Hydrogen", platform: "Mac", type: "Free (Key)", unc: 99, sunc: 90, features: ["Decompiler", "Key System"], category: "Internal" },
-  { name: "MacSploit", platform: "Mac", type: "Paid", unc: 99, sunc: 100, features: ["Decompiler", "Multi-Instance", "Client Mod Bypass"], category: "Internal" },
-  { name: "Opiumware", platform: "Mac", type: "Free", unc: 99, sunc: 100, features: ["Decompiler", "Multi-Instance"], category: "Internal" },
-];
+const CACHE_KEY = "executors-online-cache-v1";
+const CACHE_TTL = 30_000; // 30s client cache
+const POLL_INTERVAL = 60_000; // never poll faster than 60s
 
-const typeColors: Record<string, string> = {
-  Free: "bg-success/20 text-success border-success/40",
-  Paid: "bg-destructive/20 text-destructive border-destructive/40",
-  "Free (Key)": "bg-warning/20 text-warning border-warning/40",
-};
-
-const categoryColors: Record<string, string> = {
-  Internal: "bg-primary/20 text-primary border-primary/40",
-  External: "bg-purple-500/20 text-purple-400 border-purple-500/40",
-};
+function PlatformIcon({ p }: { p: string }) {
+  const key = p.trim().toLowerCase();
+  if (key.includes("ios") || key.includes("mac")) return <Apple className="h-3.5 w-3.5" aria-label={p} />;
+  if (key.includes("android")) return <Smartphone className="h-3.5 w-3.5" aria-label={p} />;
+  return <Monitor className="h-3.5 w-3.5" aria-label={p} />;
+}
 
 function UncBar({ value, label }: { value: number; label: string }) {
   const color = value >= 95 ? "bg-success" : value >= 80 ? "bg-warning" : "bg-destructive";
@@ -53,139 +50,249 @@ function UncBar({ value, label }: { value: number; label: string }) {
     <div className="flex items-center gap-2 text-xs">
       <span className="text-muted-foreground w-10 shrink-0">{label}</span>
       <div className="flex-1 bg-muted rounded-full h-1.5 max-w-24">
-        <div className={`${color} h-1.5 rounded-full`} style={{ width: `${value}%` }} />
+        <div className={`${color} h-1.5 rounded-full transition-all`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
       </div>
-      <span className="text-muted-foreground w-8 text-right">{value}%</span>
+      <span className="text-muted-foreground w-9 text-right">{value}%</span>
     </div>
   );
 }
 
 export default function Executors() {
   const { t } = useTranslation();
+  const [executors, setExecutors] = useState<Executor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [fetchedAt, setFetchedAt] = useState<number | null>(null);
+  const [showHidden, setShowHidden] = useState(false);
 
-  const platformGroups = [
-    { label: "Windows", platform: "Windows" as const, icon: <Monitor className="h-4 w-4" /> },
-    { label: "Android", platform: "Android" as const, icon: <Smartphone className="h-4 w-4" /> },
-    { label: "iOS", platform: "iOS" as const, icon: <Smartphone className="h-4 w-4" /> },
-    { label: "Mac", platform: "Mac" as const, icon: <Monitor className="h-4 w-4" /> },
-  ];
+  const load = async (force = false) => {
+    // client cache
+    if (!force) {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { fetchedAt: number; data: Executor[] };
+          if (Date.now() - parsed.fetchedAt < CACHE_TTL) {
+            setExecutors(parsed.data);
+            setFetchedAt(parsed.fetchedAt);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch { /* ignore */ }
+    }
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("executors-online");
+      if (fnError) throw fnError;
+      if (!data?.ok || !Array.isArray(data.data)) {
+        throw new Error(data?.error || "Invalid response");
+      }
+      const list = data.data as Executor[];
+      setExecutors(list);
+      setFetchedAt(data.fetchedAt || Date.now());
+      setError(null);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), data: list }));
+      } catch { /* ignore */ }
+    } catch (e: any) {
+      setError(e?.message || "Failed to load executors");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const executorJsonLd = useMemo(() => ({
+  useEffect(() => {
+    load();
+    const id = setInterval(() => load(true), POLL_INTERVAL);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const visible = useMemo(
+    () => executors.filter((e) => showHidden || !e.hidden),
+    [executors, showHidden],
+  );
+
+  const groups = useMemo(() => {
+    const map = new Map<string, Executor[]>();
+    for (const e of visible) {
+      const platforms = (e.platform || "Unknown").split(",").map((p) => p.trim()).filter(Boolean);
+      const primary = platforms[0] || "Unknown";
+      if (!map.has(primary)) map.set(primary, []);
+      map.get(primary)!.push(e);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [visible]);
+
+  const jsonLd = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Best Roblox Script Executors 2026",
-    description: "Comprehensive list of trusted Roblox script executors for Windows, Android, iOS, and Mac with UNC/SUNC compatibility scores.",
-    numberOfItems: executors.length,
-    itemListElement: executors.map((exec, i) => ({
+    name: "Live Roblox Executors Status",
+    description: "Live list of Roblox script executors with working status, UNC/SUNC scores and platform support, powered by executors.online.",
+    numberOfItems: visible.length,
+    itemListElement: visible.slice(0, 50).map((exec, i) => ({
       "@type": "ListItem",
       position: i + 1,
       item: {
         "@type": "SoftwareApplication",
-        name: exec.name,
-        operatingSystem: exec.platform,
+        name: exec.title,
+        operatingSystem: exec.platform || "Unknown",
         applicationCategory: "GameApplication",
-        offers: {
-          "@type": "Offer",
-          price: exec.type === "Paid" ? "varies" : "0",
-          priceCurrency: "USD",
-        },
+        softwareVersion: exec.version || undefined,
       },
     })),
-  }), []);
+  }), [visible]);
 
   return (
     <Layout>
       <SEOHead
-        title="Best Roblox Executors 2026 — Free & Paid | UNC Scores | ComboWick"
-        description="Compare 18+ trusted Roblox script executors for Windows, Android, iOS & Mac. UNC/SUNC scores, features like Decompiler & Multi-Instance. Updated April 2026."
+        title="Live Roblox Executors Status 2026 — Working/Patched | ComboWick"
+        description="Real-time Roblox executor status: working vs patched, UNC/SUNC scores, detection state and platform support. Live data from executors.online."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Executors", url: "/executors" },
         ]}
-        jsonLd={executorJsonLd}
+        jsonLd={jsonLd}
       />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h1 className="font-heading text-4xl font-bold mb-3">{t("Roblox Executors")}</h1>
             <p className="text-muted-foreground max-w-xl mx-auto text-sm">
-              {t("executors_subtitle")}
+              Live working/patched status, UNC & SUNC scores and detection state for every major Roblox executor — updated continuously.
             </p>
-            {/* AI-retrieval paragraph for AEO/GEO */}
-            <p className="text-xs text-muted-foreground max-w-2xl mx-auto mt-3">
-              Roblox executors allow users to run custom Lua scripts inside Roblox games. As of 2026, top executors include Velocity (99% UNC), Potassium, Wave, and Delta. Free options like Codex and Solara support Android and Windows. ComboWick maintains this list with verified UNC and SUNC compatibility scores updated weekly.
-            </p>
-            <div className="flex items-center justify-center gap-6 mt-5 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><Shield className="h-3 w-3" /> {executors.length} {t("Executors")}</span>
-              <span className="flex items-center gap-1"><Monitor className="h-3 w-3" /> Windows</span>
-              <span className="flex items-center gap-1"><Smartphone className="h-3 w-3" /> Android & iOS</span>
+            <div className="flex items-center justify-center gap-3 mt-5 text-xs">
+              <Button size="sm" variant="outline" onClick={() => load(true)} disabled={loading} className="h-8">
+                <RefreshCw className={`h-3 w-3 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+              <label className="flex items-center gap-1.5 text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={showHidden} onChange={(e) => setShowHidden(e.target.checked)} className="h-3.5 w-3.5 accent-primary" />
+                Show hidden
+              </label>
+              {fetchedAt && (
+                <span className="text-muted-foreground">
+                  Updated {Math.max(0, Math.round((Date.now() - fetchedAt) / 1000))}s ago
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="bg-card border border-border/50 rounded-lg p-4 mb-8">
-            <p className="text-muted-foreground text-xs mb-3 font-semibold uppercase tracking-wider">{t("Legend")}</p>
-            <div className="flex flex-wrap gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Free"]}>{t("Free")}</Badge>
-                <span className="text-muted-foreground">{t("No cost")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Free (Key)"]}>{t("Free (Key)")}</Badge>
-                <span className="text-muted-foreground">{t("Requires key system")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={typeColors["Paid"]}>{t("Paid")}</Badge>
-                <span className="text-muted-foreground">{t("Requires purchase")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={categoryColors["Internal"]}>{t("Internal")}</Badge>
-                <span className="text-muted-foreground">{t("Injects into process")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={categoryColors["External"]}>{t("External")}</Badge>
-                <span className="text-muted-foreground">{t("Runs externally")}</span>
+          {error && (
+            <div className="mb-6 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold">Couldn't reach the live status feed.</p>
+                <p className="text-xs opacity-80">{error}</p>
               </div>
             </div>
-          </div>
+          )}
 
-          {platformGroups.map((group) => {
-            const platformExecutors = executors.filter((e) => e.platform === group.platform);
-            if (platformExecutors.length === 0) return null;
-            return (
-              <div key={group.platform} className="mb-10">
+          {loading && executors.length === 0 ? (
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-20 rounded-lg bg-card border border-border/50 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            groups.map(([platform, list]) => (
+              <div key={platform} className="mb-10">
                 <h2 className="font-heading text-xl font-bold flex items-center gap-2 mb-4">
-                  {group.icon} {group.label}
-                  <span className="text-sm font-normal text-muted-foreground">({platformExecutors.length})</span>
+                  <PlatformIcon p={platform} /> {platform}
+                  <span className="text-sm font-normal text-muted-foreground">({list.length})</span>
                 </h2>
                 <div className="space-y-2">
-                  {platformExecutors.map((exec, i) => (
-                    <div key={`${exec.name}-${i}`} className="bg-card border border-border/50 rounded-lg p-4 hover:border-primary/30 transition-colors">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold">{exec.name}</h3>
-                            <Badge variant="outline" className={typeColors[exec.type]}>{t(exec.type)}</Badge>
-                            <Badge variant="outline" className={categoryColors[exec.category]}>{t(exec.category)}</Badge>
-                          </div>
-                          {exec.features.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mb-2">
-                              {exec.features.map((f) => (
-                                <span key={f} className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">{t(f)}</span>
-                              ))}
+                  {list.map((exec) => {
+                    const working = exec.updateStatus === true;
+                    const detected = exec.detected === true;
+                    const platforms = (exec.platform || "").split(",").map((p) => p.trim()).filter(Boolean);
+                    return (
+                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-4 hover:border-primary/30 transition-colors">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              {exec.slug?.logo && (
+                                <img src={exec.slug.logo} alt="" loading="lazy" className="h-6 w-6 rounded" />
+                              )}
+                              <h3 className="font-semibold truncate">{exec.title}</h3>
+                              {exec.version && (
+                                <span className="text-xs text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>
+                              )}
+                              <Badge variant="outline" className={working ? "bg-success/20 text-success border-success/40" : "bg-destructive/20 text-destructive border-destructive/40"}>
+                                {working ? "Working" : "Patched / Updating"}
+                              </Badge>
+                              <Badge variant="outline" className={detected ? "bg-destructive/20 text-destructive border-destructive/40" : "bg-success/20 text-success border-success/40"}>
+                                {detected ? "Detected" : "Undetected"}
+                              </Badge>
+                              {exec.free === true && (
+                                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/40">Free</Badge>
+                              )}
+                              {exec.beta && (
+                                <Badge variant="outline" className="bg-warning/20 text-warning border-warning/40">Beta</Badge>
+                              )}
+                              {exec.keysystem && (
+                                <Badge variant="outline" className="bg-warning/20 text-warning border-warning/40">Key</Badge>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <div className="w-40 shrink-0 space-y-1">
-                          {exec.unc !== undefined && <UncBar value={exec.unc} label="UNC" />}
-                          {exec.sunc !== undefined && <UncBar value={exec.sunc} label="SUNC" />}
+
+                            <div className="flex flex-wrap gap-1.5 mb-2">
+                              {platforms.map((p) => (
+                                <span key={p} className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                                  <PlatformIcon p={p} /> {p}
+                                </span>
+                              ))}
+                              {exec.decompiler && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Decompiler</span>}
+                              {exec.multiInject && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Multi-Inject</span>}
+                              {exec.clientmods && <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Client Mods</span>}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              <span>Roblox: {exec.rbxversion ? exec.rbxversion : "Unknown"}</span>
+                              {exec.cost != null && exec.cost !== "" && !exec.free && (
+                                <span>· Cost: {String(exec.cost)}</span>
+                              )}
+                              {exec.updatedDate && <span>· {exec.updatedDate}</span>}
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {exec.websitelink && (
+                                <a href={exec.websitelink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-primary/40 text-primary hover:bg-primary/10 transition">
+                                  <ExternalLink className="h-3 w-3" /> Website
+                                </a>
+                              )}
+                              {exec.discordlink && (
+                                <a href={exec.discordlink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-border hover:border-primary/40 hover:text-primary transition">
+                                  <MessageCircle className="h-3 w-3" /> Discord
+                                </a>
+                              )}
+                              {exec.purchaselink && (
+                                <a href={exec.purchaselink} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-border hover:border-primary/40 hover:text-primary transition">
+                                  <ShoppingCart className="h-3 w-3" /> Purchase
+                                </a>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="w-full sm:w-44 shrink-0 space-y-1.5">
+                            {typeof exec.uncPercentage === "number" && <UncBar value={exec.uncPercentage} label="UNC" />}
+                            {typeof exec.suncPercentage === "number" && <UncBar value={exec.suncPercentage} label="SUNC" />}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
-            );
-          })}
+            ))
+          )}
+
+          <div className="mt-8 text-center text-xs text-muted-foreground">
+            <Shield className="inline h-3 w-3 mr-1" />
+            Live data powered by{" "}
+            <a href="https://executors.online" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              executors.online
+            </a>
+          </div>
         </div>
       </section>
     </Layout>
