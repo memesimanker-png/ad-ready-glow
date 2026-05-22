@@ -15,3 +15,5 @@ project_id = "iphiksvnuzpteoryrdxf"
     verify_jwt = false
   [functions.yt-latest]
     verify_jwt = false
+  [functions.executors-online]
+    verify_jwt = false
