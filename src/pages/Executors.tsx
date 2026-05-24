@@ -297,6 +297,19 @@ export default function Executors() {
                         )}
 
                         {/* Meta + links */}
+                        {/* Updated timestamp per executor */}
+                        {exec.updatedDate && (() => {
+                          const ts = new Date(exec.updatedDate).getTime();
+                          if (!ts || isNaN(ts)) return null;
+                          return (
+                            <div className="text-[10px] text-muted-foreground mb-1.5 flex flex-wrap items-center gap-x-1.5">
+                              <span>Updated <span className="text-foreground">{formatRelative(ts, Date.now())}</span></span>
+                              <span className="opacity-60">·</span>
+                              <span className="opacity-80">{formatAbsolute(ts)}</span>
+                            </div>
+                          );
+                        })()}
+
                         <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/30">
                           <span className="text-[10px] text-muted-foreground truncate">
                             RBX {exec.rbxversion ? String(exec.rbxversion).slice(0, 14) : "Unknown"}
