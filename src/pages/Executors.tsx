@@ -142,6 +142,13 @@ export default function Executors() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Tick every 20s so "Updated Xs ago" stays fresh without re-fetching.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 20_000);
+    return () => clearInterval(id);
+  }, []);
+
   const visible = useMemo(
     () => executors.filter((e) => showHidden || !e.hidden),
     [executors, showHidden],
