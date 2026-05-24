@@ -37,6 +37,40 @@ const CACHE_KEY = "executors-online-cache-v1";
 const CACHE_TTL = 30_000; // 30s client cache
 const POLL_INTERVAL = 60_000; // never poll faster than 60s
 
+// Aggressively cache executor logos through wsrv.nl CDN (WebP + resize + long cache).
+function cacheLogo(url?: string): string | undefined {
+  if (!url) return undefined;
+  if (url.includes("wsrv.nl")) return url;
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=56&h=56&output=webp&q=80&maxage=30d`;
+}
+
+function formatRelative(ts: number, now: number): string {
+  const s = Math.max(0, Math.round((now - ts) / 1000));
+  if (s < 10) return "just now";
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.round(h / 24)}d ago`;
+}
+
+function formatAbsolute(ts: number): string {
+  // e.g. "Sat, May 23, 11:37 PM"
+  try {
+    return new Date(ts).toLocaleString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } catch {
+    return new Date(ts).toString();
+  }
+}
+
 function PlatformIcon({ p }: { p: string }) {
   const key = p.trim().toLowerCase();
   if (key.includes("ios") || key.includes("mac")) return <Apple className="h-3.5 w-3.5" aria-label={p} />;
@@ -108,6 +142,13 @@ export default function Executors() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Tick every 20s so "Updated Xs ago" stays fresh without re-fetching.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 20_000);
+    return () => clearInterval(id);
+  }, []);
+
   const visible = useMemo(
     () => executors.filter((e) => showHidden || !e.hidden),
     [executors, showHidden],
@@ -171,8 +212,10 @@ export default function Executors() {
                 Show hidden
               </label>
               {fetchedAt && (
-                <span className="text-muted-foreground">
-                  Updated {Math.max(0, Math.round((Date.now() - fetchedAt) / 1000))}s ago
+                <span className="text-muted-foreground inline-flex items-center gap-1.5" title={formatAbsolute(fetchedAt)}>
+                  <span>Updated <span className="text-foreground">{formatRelative(fetchedAt, Date.now())}</span></span>
+                  <span className="hidden sm:inline opacity-60">·</span>
+                  <span className="hidden sm:inline opacity-70">{formatAbsolute(fetchedAt)}</span>
                 </span>
               )}
             </div>
@@ -211,11 +254,21 @@ export default function Executors() {
                       window.open(url, "_blank", "noopener,noreferrer");
                     };
                     return (
-                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs">
+                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs [transform:translateZ(0)] [contain:content]">
                         {/* Header row */}
                         <div className="flex items-center gap-2 mb-2">
                           {exec.slug?.logo ? (
-                            <img src={exec.slug.logo} alt="" loading="lazy" className="h-7 w-7 rounded shrink-0 object-cover" />
+                            <img
+                              src={cacheLogo(exec.slug.logo)}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              width={28}
+                              height={28}
+                              referrerPolicy="no-referrer"
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }}
+                              className="h-7 w-7 rounded shrink-0 object-cover bg-muted"
+                            />
                           ) : (
                             <div className="h-7 w-7 rounded bg-muted shrink-0" />
                           )}
