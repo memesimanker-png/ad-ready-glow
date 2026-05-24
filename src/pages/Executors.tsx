@@ -33,7 +33,7 @@ type Executor = {
   slug?: { logo?: string; owner?: string };
 };
 
-const CACHE_KEY = "executors-online-cache-v1";
+const CACHE_KEY = "executors-online-cache-v2";
 const CACHE_TTL = 30_000; // 30s client cache
 const POLL_INTERVAL = 60_000; // never poll faster than 60s
 
@@ -41,7 +41,29 @@ const POLL_INTERVAL = 60_000; // never poll faster than 60s
 function cacheLogo(url?: string): string | undefined {
   if (!url) return undefined;
   if (url.includes("wsrv.nl")) return url;
-  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=56&h=56&output=webp&q=80&maxage=30d`;
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=80&h=80&fit=cover&output=webp&q=82&maxage=1y`;
+}
+
+function parseExecutorDate(value?: string): number | null {
+  if (!value) return null;
+  const cleaned = value.replace(/\s+at\s+/i, " ").replace(/\s+UTC$/i, " UTC");
+  const direct = new Date(cleaned).getTime();
+  if (!Number.isNaN(direct)) return direct;
+
+  const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+at\s+(\d{1,2}):(\d{2})\s*(AM|PM)\s*UTC$/i);
+  if (!match) return null;
+  const [, month, day, year, hourRaw, minute, period] = match;
+  let hour = Number(hourRaw) % 12;
+  if (period.toUpperCase() === "PM") hour += 12;
+  return Date.UTC(Number(year), Number(month) - 1, Number(day), hour, Number(minute));
+}
+
+function normalizeExternalUrl(url?: string): string | undefined {
+  const trimmed = url?.trim();
+  if (!trimmed) return undefined;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(discord\.gg|www\.|[a-z0-9-]+\.)/i.test(trimmed)) return `https://${trimmed}`;
+  return trimmed;
 }
 
 function formatRelative(ts: number, now: number): string {
@@ -69,6 +91,16 @@ function formatAbsolute(ts: number): string {
   } catch {
     return new Date(ts).toString();
   }
+}
+
+function ExecutorUpdated({ value }: { value?: string }) {
+  const ts = parseExecutorDate(value);
+  if (!ts) return <span className="text-[10px] text-muted-foreground">Updated Unknown</span>;
+  return (
+    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+      Updated <span className="text-foreground">{formatRelative(ts, Date.now())}</span> <span className="opacity-80">{formatAbsolute(ts)}</span>
+    </span>
+  );
 }
 
 function PlatformIcon({ p }: { p: string }) {
