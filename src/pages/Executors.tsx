@@ -254,11 +254,21 @@ export default function Executors() {
                       window.open(url, "_blank", "noopener,noreferrer");
                     };
                     return (
-                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs">
+                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs [transform:translateZ(0)] [contain:content]">
                         {/* Header row */}
                         <div className="flex items-center gap-2 mb-2">
                           {exec.slug?.logo ? (
-                            <img src={exec.slug.logo} alt="" loading="lazy" className="h-7 w-7 rounded shrink-0 object-cover" />
+                            <img
+                              src={cacheLogo(exec.slug.logo)}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              width={28}
+                              height={28}
+                              referrerPolicy="no-referrer"
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }}
+                              className="h-7 w-7 rounded shrink-0 object-cover bg-muted"
+                            />
                           ) : (
                             <div className="h-7 w-7 rounded bg-muted shrink-0" />
                           )}
