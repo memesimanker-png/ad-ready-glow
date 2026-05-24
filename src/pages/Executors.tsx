@@ -212,10 +212,8 @@ export default function Executors() {
                 Show hidden
               </label>
               {fetchedAt && (
-                <span className="text-muted-foreground inline-flex items-center gap-1.5" title={formatAbsolute(fetchedAt)}>
-                  <span>Updated <span className="text-foreground">{formatRelative(fetchedAt, Date.now())}</span></span>
-                  <span className="hidden sm:inline opacity-60">·</span>
-                  <span className="hidden sm:inline opacity-70">{formatAbsolute(fetchedAt)}</span>
+                <span className="text-muted-foreground">
+                  Feed refreshed {formatRelative(fetchedAt, Date.now())}
                 </span>
               )}
             </div>
