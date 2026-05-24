@@ -262,9 +262,9 @@ export default function Executors() {
           )}
 
           {loading && executors.length === 0 ? (
-            <div className="space-y-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-20 rounded-lg bg-card border border-border/50 animate-pulse" />
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} className="h-[156px] rounded-md bg-card border border-border/50 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -274,97 +274,79 @@ export default function Executors() {
                   <PlatformIcon p={platform} /> {platform}
                   <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {list.map((exec) => {
                     const working = exec.updateStatus === true;
                     const detected = exec.detected === true;
-                    const openLink = (url?: string) => (e: React.MouseEvent) => {
-                      if (!url) return;
-                      e.preventDefault();
-                      window.open(url, "_blank", "noopener,noreferrer");
-                    };
+                    const website = normalizeExternalUrl(exec.websitelink);
+                    const discord = normalizeExternalUrl(exec.discordlink);
+                    const purchase = normalizeExternalUrl(exec.purchaselink);
                     return (
-                      <div key={exec._id} className="bg-card border border-border/50 rounded-lg p-3 hover:border-primary/40 transition-colors text-xs [transform:translateZ(0)] [contain:content]">
-                        {/* Header row */}
-                        <div className="flex items-center gap-2 mb-2">
+                      <article key={exec._id} className="min-w-0 rounded-md border border-border/50 bg-card p-2.5 text-xs transition-colors hover:border-primary/40 [transform:translateZ(0)]">
+                        <div className="mb-2 flex min-w-0 items-start gap-2">
                           {exec.slug?.logo ? (
                             <img
                               src={cacheLogo(exec.slug.logo)}
-                              alt=""
+                              alt={`${exec.title} logo`}
                               loading="lazy"
                               decoding="async"
-                              width={28}
-                              height={28}
+                              width={34}
+                              height={34}
                               referrerPolicy="no-referrer"
-                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }}
-                              className="h-7 w-7 rounded shrink-0 object-cover bg-muted"
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                              className="h-8 w-8 shrink-0 rounded object-cover bg-muted"
                             />
                           ) : (
-                            <div className="h-7 w-7 rounded bg-muted shrink-0" />
+                            <div className="h-8 w-8 shrink-0 rounded bg-muted" />
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <h3 className="font-semibold text-sm truncate">{exec.title}</h3>
-                              {exec.version && (
-                                <span className="text-[10px] text-muted-foreground truncate">v{exec.version.replace(/^v/i, "")}</span>
-                              )}
+                            <div className="flex min-w-0 items-center gap-1.5">
+                              <h3 className="min-w-0 truncate text-sm font-semibold leading-tight">{exec.title}</h3>
+                              {exec.version && <span className="shrink-0 text-[10px] text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>}
                             </div>
-                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                              <span className={`inline-block h-1.5 w-1.5 rounded-full ${working ? "bg-success" : "bg-destructive"} animate-pulse`} />
-                              <span className={working ? "text-success" : "text-destructive"}>{working ? "Working" : "Patched"}</span>
-                              <span>·</span>
-                              <span className={detected ? "text-destructive" : "text-success"}>{detected ? "Detected" : "Undetected"}</span>
-                              {exec.free && <><span>·</span><span className="text-primary">Free</span></>}
-                              {exec.keysystem && <><span>·</span><span className="text-warning">Key</span></>}
-                            </div>
+                            <ExecutorUpdated value={exec.updatedDate} />
                           </div>
                         </div>
 
-                        {/* UNC/SUNC bars */}
+                        <div className="mb-2 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[10px] text-muted-foreground">
+                          <span className={`inline-block h-1.5 w-1.5 rounded-full ${working ? "bg-success" : "bg-destructive"}`} />
+                          <span className={working ? "text-success" : "text-destructive"}>{working ? "Working" : "Patched"}</span>
+                          <span>·</span>
+                          <span className={detected ? "text-destructive" : "text-success"}>{detected ? "Detected" : "Undetected"}</span>
+                          {exec.free && <><span>·</span><span className="text-primary">Free</span></>}
+                          {exec.keysystem && <><span>·</span><span className="text-warning">Key</span></>}
+                        </div>
+
                         {(typeof exec.uncPercentage === "number" || typeof exec.suncPercentage === "number") && (
-                          <div className="space-y-1 mb-2">
+                          <div className="mb-2 space-y-1">
                             {typeof exec.uncPercentage === "number" && <UncBar value={exec.uncPercentage} label="UNC" />}
                             {typeof exec.suncPercentage === "number" && <UncBar value={exec.suncPercentage} label="SUNC" />}
                           </div>
                         )}
 
-                        {/* Meta + links */}
-                        {/* Updated timestamp per executor */}
-                        {exec.updatedDate && (() => {
-                          const ts = new Date(exec.updatedDate).getTime();
-                          if (!ts || isNaN(ts)) return null;
-                          return (
-                            <div className="text-[10px] text-muted-foreground mb-1.5 flex flex-wrap items-center gap-x-1.5">
-                              <span>Updated <span className="text-foreground">{formatRelative(ts, Date.now())}</span></span>
-                              <span className="opacity-60">·</span>
-                              <span className="opacity-80">{formatAbsolute(ts)}</span>
-                            </div>
-                          );
-                        })()}
-
-                        <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-border/30">
-                          <span className="text-[10px] text-muted-foreground truncate">
-                            RBX {exec.rbxversion ? String(exec.rbxversion).slice(0, 14) : "Unknown"}
+                        <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/30 pt-2">
+                          <span className="min-w-0 truncate text-[10px] text-muted-foreground">
+                            RBX {exec.rbxversion ? String(exec.rbxversion) : "Unknown"}
                           </span>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {exec.websitelink && (
-                              <a href={exec.websitelink} onClick={openLink(exec.websitelink)} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex items-center justify-center h-6 w-6 rounded border border-primary/40 text-primary hover:bg-primary/10">
+                          <div className="flex shrink-0 items-center gap-1">
+                            {website && (
+                              <a href={website} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex h-6 w-6 items-center justify-center rounded border border-primary/40 text-primary hover:bg-primary/10">
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             )}
-                            {exec.discordlink && (
-                              <a href={exec.discordlink} onClick={openLink(exec.discordlink)} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex items-center justify-center h-6 w-6 rounded border border-border hover:border-primary/40 hover:text-primary">
+                            {discord && (
+                              <a href={discord} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <MessageCircle className="h-3 w-3" />
                               </a>
                             )}
-                            {exec.purchaselink && (
-                              <a href={exec.purchaselink} onClick={openLink(exec.purchaselink)} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex items-center justify-center h-6 w-6 rounded border border-border hover:border-primary/40 hover:text-primary">
+                            {purchase && (
+                              <a href={purchase} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <ShoppingCart className="h-3 w-3" />
                               </a>
                             )}
                           </div>
                         </div>
-                      </div>
+                      </article>
                     );
                   })}
                 </div>
