@@ -26,10 +26,10 @@ export const CookieConsent = forwardRef<HTMLDivElement>(function CookieConsent(_
   if (!visible) return null;
 
   return (
-    <div ref={ref} className="fixed bottom-0 left-0 right-0 z-[100] p-4">
-      <div className="mx-auto max-w-4xl bg-card border border-border rounded-xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div ref={ref} className="fixed bottom-0 left-0 right-0 z-[100] p-2 sm:p-4">
+      <div className="mx-auto max-w-4xl bg-card border border-border rounded-lg p-3 sm:p-6 shadow-2xl backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <div className="flex-1">
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             We use cookies and similar technologies to improve your experience and serve personalized ads through Google AdSense. By clicking "Accept All," you consent to the use of cookies. Read our{" "}
             <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link> for more information.
           </p>
