@@ -37,6 +37,40 @@ const CACHE_KEY = "executors-online-cache-v1";
 const CACHE_TTL = 30_000; // 30s client cache
 const POLL_INTERVAL = 60_000; // never poll faster than 60s
 
+// Aggressively cache executor logos through wsrv.nl CDN (WebP + resize + long cache).
+function cacheLogo(url?: string): string | undefined {
+  if (!url) return undefined;
+  if (url.includes("wsrv.nl")) return url;
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=56&h=56&output=webp&q=80&maxage=30d`;
+}
+
+function formatRelative(ts: number, now: number): string {
+  const s = Math.max(0, Math.round((now - ts) / 1000));
+  if (s < 10) return "just now";
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.round(h / 24)}d ago`;
+}
+
+function formatAbsolute(ts: number): string {
+  // e.g. "Sat, May 23, 11:37 PM"
+  try {
+    return new Date(ts).toLocaleString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } catch {
+    return new Date(ts).toString();
+  }
+}
+
 function PlatformIcon({ p }: { p: string }) {
   const key = p.trim().toLowerCase();
   if (key.includes("ios") || key.includes("mac")) return <Apple className="h-3.5 w-3.5" aria-label={p} />;
