@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getExternalSupabase } from "../_shared/external-supabase.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,10 +54,8 @@ Deno.serve(async (req) => {
     const tokenHash = await sha256(token);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // Offloaded to EXTERNAL Supabase.
+    const supabase = getExternalSupabase();
 
     const { error } = await supabase.from("verify_tokens").insert({
       token_hash: tokenHash,
