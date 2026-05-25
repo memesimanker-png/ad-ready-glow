@@ -2,3 +2,6 @@ project_id = "iphiksvnuzpteoryrdxf"
 
 [functions.test-external-supabase]
 verify_jwt = false
+
+[functions.external-setup]
+verify_jwt = false
