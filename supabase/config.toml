@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.wipe-translations]
 verify_jwt = false
+
+[functions.warm-translations]
+verify_jwt = false
