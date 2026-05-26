@@ -18,7 +18,7 @@ const TranslationContext = createContext<TranslationContextType>({
 });
 
 // Load cache from localStorage on init
-const TRANSLATION_CACHE_VERSION = "v2"; // bump to invalidate bad cached entries (e.g. translated lookup-keys)
+const TRANSLATION_CACHE_VERSION = "v3-gpt52"; // bump to force re-translation with GPT-5.2
 const translationCache: Record<string, Record<string, string>> = (() => {
   try {
     const ver = localStorage.getItem("combowick-translations-ver");
