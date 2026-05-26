@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.external-setup]
 verify_jwt = false
+
+[functions.check-external-translations]
+verify_jwt = false
