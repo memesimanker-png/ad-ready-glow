@@ -202,15 +202,14 @@ export default function Executors() {
 
   const loadInject = async () => {
     try {
+      const base = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/inject-today`;
       const [v, c] = await Promise.all([
-        supabase.functions.invoke("inject-today", { body: undefined, method: "GET" as any }).then(() =>
-          fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/inject-today?part=versions`).then(r => r.json())
-        ),
-        fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/inject-today?part=cheats`).then(r => r.json()),
+        fetch(`${base}?part=versions`).then((r) => r.json()).catch(() => null),
+        fetch(`${base}?part=cheats`).then((r) => r.json()).catch(() => null),
       ]);
       if (v?.ok) setVersions(v.data as InjectVersions);
       if (c?.ok) setCheats(c.data as Record<string, InjectCheat>);
-    } catch { /* ignore — section is optional */ }
+    } catch { /* optional section */ }
   };
 
   useEffect(() => {
