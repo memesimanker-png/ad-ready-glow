@@ -25,6 +25,48 @@ const LANG_NAMES: Record<string, string> = {
   fil: "Filipino", es: "Spanish", vi: "Vietnamese",
 };
 
+// Pollinations.ai fallback — free, no quota. Used when Lovable AI returns 402/429.
+async function pollinationsTranslate(texts: string[], langName: string): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  const token = Deno.env.get("pollinations_ai");
+  const numbered = texts.map((t, i) => `${i + 1}. ${t}`).join("\n");
+  const prompt = `Translate the following numbered English texts to ${langName}. Return ONLY a JSON object mapping each original English text (exact string, no numbering) to its ${langName} translation. Keep brand names (ComboWick, Combo_WICK, PayPal, Discord, Roblox) unchanged.\n\n${numbered}`;
+  try {
+    const res = await fetch("https://text.pollinations.ai/openai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        model: "openai",
+        messages: [
+          { role: "system", content: "You are a professional translator. Return only valid JSON." },
+          { role: "user", content: prompt },
+        ],
+        response_format: { type: "json_object" },
+        private: true,
+      }),
+    });
+    if (!res.ok) {
+      console.error("pollinations fallback failed:", res.status, await res.text());
+      return out;
+    }
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content ?? "";
+    // Extract first JSON object
+    const match = content.match(/\{[\s\S]*\}/);
+    if (!match) return out;
+    const parsed = JSON.parse(match[0]);
+    for (const k of Object.keys(parsed)) {
+      if (typeof parsed[k] === "string") out[k] = parsed[k];
+    }
+  } catch (e) {
+    console.error("pollinations error:", e);
+  }
+  return out;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -116,15 +158,11 @@ serve(async (req) => {
       });
 
       if (!response.ok) {
-        if (response.status === 429) {
-          return new Response(JSON.stringify({ error: "Rate limited", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
-            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        if (response.status === 402) {
-          return new Response(JSON.stringify({ error: "AI credits exhausted", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
-            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+        if (response.status === 429 || response.status === 402) {
+          // Lovable AI exhausted/rate-limited — fall back to Pollinations.ai (free).
+          const pollinated = await pollinationsTranslate(chunk, langName);
+          Object.assign(allTranslated, pollinated);
+          continue;
         }
         throw new Error("AI gateway error");
       }

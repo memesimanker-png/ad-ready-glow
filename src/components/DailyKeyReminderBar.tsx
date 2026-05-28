@@ -67,7 +67,6 @@ export function DailyKeyReminderBar() {
   return (
     <div
       className="w-full bg-gradient-to-r from-[hsl(36_55%_18%)] via-[hsl(36_55%_28%)] to-[hsl(36_55%_18%)] border-b border-[hsl(36_55%_50%)]/40"
-      data-no-translate
     >
       <div className="container mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2 text-[hsl(40_30%_92%)]">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
@@ -75,7 +74,7 @@ export function DailyKeyReminderBar() {
           <p className="text-xs sm:text-sm font-medium truncate">
             <span className="hidden sm:inline">Your free daily key resets in </span>
             <span className="sm:hidden">Free key in </span>
-            <span className="font-bold tabular-nums text-[hsl(40_85%_75%)]">{format(remaining)}</span>
+            <span className="font-bold tabular-nums text-[hsl(40_85%_75%)]" data-no-translate>{format(remaining)}</span>
             <span className="hidden md:inline"> — claim before it expires.</span>
           </p>
         </div>
