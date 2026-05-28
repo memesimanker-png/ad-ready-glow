@@ -117,17 +117,18 @@ serve(async (req) => {
 
       if (!response.ok) {
         if (response.status === 429) {
-          return new Response(JSON.stringify({ error: "Rate limited", translations: { ...cachedMap, ...allTranslated } }), {
-            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          return new Response(JSON.stringify({ error: "Rate limited", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
+            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
         if (response.status === 402) {
-          return new Response(JSON.stringify({ error: "AI credits exhausted", translations: { ...cachedMap, ...allTranslated } }), {
-            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          return new Response(JSON.stringify({ error: "AI credits exhausted", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
+            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
         throw new Error("AI gateway error");
       }
+
 
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content;
