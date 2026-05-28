@@ -116,15 +116,11 @@ serve(async (req) => {
       });
 
       if (!response.ok) {
-        if (response.status === 429) {
-          return new Response(JSON.stringify({ error: "Rate limited", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
-            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        if (response.status === 402) {
-          return new Response(JSON.stringify({ error: "AI credits exhausted", fallback: true, translations: { ...cachedMap, ...allTranslated } }), {
-            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+        if (response.status === 429 || response.status === 402) {
+          // Lovable AI exhausted/rate-limited — fall back to Pollinations.ai (free).
+          const pollinated = await pollinationsTranslate(chunk, langName);
+          Object.assign(allTranslated, pollinated);
+          continue;
         }
         throw new Error("AI gateway error");
       }
