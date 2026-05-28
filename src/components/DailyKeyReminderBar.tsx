@@ -74,7 +74,7 @@ export function DailyKeyReminderBar() {
           <p className="text-xs sm:text-sm font-medium truncate">
             <span className="hidden sm:inline">Your free daily key resets in </span>
             <span className="sm:hidden">Free key in </span>
-            <span className="font-bold tabular-nums text-[hsl(40_85%_75%)]">{format(remaining)}</span>
+            <span className="font-bold tabular-nums text-[hsl(40_85%_75%)]" data-no-translate>{format(remaining)}</span>
             <span className="hidden md:inline"> — claim before it expires.</span>
           </p>
         </div>
