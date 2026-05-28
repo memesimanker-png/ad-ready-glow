@@ -2,6 +2,7 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { CookieConsent } from "./CookieConsent";
 import { DailyKeyReminderBar } from "./DailyKeyReminderBar";
+import TranslationIndicator from "./TranslationIndicator";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <CookieConsent />
+      <TranslationIndicator />
     </div>
   );
 }
+
