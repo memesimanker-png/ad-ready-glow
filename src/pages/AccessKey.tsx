@@ -158,9 +158,30 @@ export default function AccessKey() {
         body: { username: username.trim() || undefined, verify_token: verifyToken },
       });
 
+      // Extract real server error message (supabase wraps non-2xx in FunctionsHttpError)
+      let serverErr = "";
       if (fnError) {
-        setError("Failed to generate key. Please try again.");
-        toast({ variant: "destructive", title: "Error", description: "Failed to generate key." });
+        try {
+          const ctx = (fnError as any)?.context;
+          if (ctx && typeof ctx.json === "function") {
+            const j = await ctx.json();
+            serverErr = j?.error || j?.message || "";
+          }
+        } catch { /* noop */ }
+      }
+      if (!serverErr && data && data.success === false) serverErr = data.error || "";
+
+      if (fnError || (data && data.success === false)) {
+        const msg = serverErr || "Failed to generate key. Please try again.";
+        setError(msg);
+        toast({ variant: "destructive", title: "Error", description: msg });
+        // If verification failed/expired, clear token and bounce to verify
+        if (/verification|verify/i.test(msg)) {
+          localStorage.removeItem("verify_token");
+          setIsLoading(false);
+          navigate("/verify/provider-select");
+          return;
+        }
         setIsLoading(false);
         return;
       }
