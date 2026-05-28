@@ -67,7 +67,6 @@ export function DailyKeyReminderBar() {
   return (
     <div
       className="w-full bg-gradient-to-r from-[hsl(36_55%_18%)] via-[hsl(36_55%_28%)] to-[hsl(36_55%_18%)] border-b border-[hsl(36_55%_50%)]/40"
-      data-no-translate
     >
       <div className="container mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2 text-[hsl(40_30%_92%)]">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
