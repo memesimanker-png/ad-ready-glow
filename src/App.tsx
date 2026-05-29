@@ -11,6 +11,7 @@ import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { BackToTop } from "@/components/BackToTop";
 import { RouteProgress } from "@/components/RouteProgress";
 import { ExternalLinkMonetag } from "@/components/ExternalLinkMonetag";
+import { EngagementTracker } from "@/components/EngagementTracker";
 
 // Index is the landing page — keep it eager so first paint is instant
 // (no Suspense flash for the most-visited route).
@@ -92,6 +93,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <RouteProgress />
+              <EngagementTracker />
               <ExternalLinkMonetag />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
