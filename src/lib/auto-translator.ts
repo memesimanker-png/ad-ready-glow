@@ -35,6 +35,20 @@ let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let currentLang = "en";
 let observer: MutationObserver | null = null;
 
+// Busy reporting so the floating indicator can show "Translating…" on every
+// page navigation (not just on language switch).
+let busyCount = 0;
+let busyListener: ((busy: boolean) => void) | null = null;
+export function setAutoTranslateBusyListener(fn: ((busy: boolean) => void) | null) {
+  busyListener = fn;
+}
+function setBusy(delta: number) {
+  const prev = busyCount;
+  busyCount = Math.max(0, busyCount + delta);
+  if (prev === 0 && busyCount > 0) busyListener?.(true);
+  if (prev > 0 && busyCount === 0) busyListener?.(false);
+}
+
 // Roles whose visible label is meaningful for state machines (Radix etc.) — skip translation
 const SKIP_ROLES = new Set([
   "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio",
