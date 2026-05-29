@@ -41,7 +41,8 @@ export default function TranslationIndicator() {
       ) : (
         <div className="flex items-center gap-2 rounded-full border border-emerald-500/40 bg-background/95 px-4 py-2 text-sm text-foreground shadow-lg backdrop-blur">
           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          <span>Translation ready — refresh page to apply.</span>
+          <span>Page translated.</span>
+
         </div>
       )}
     </div>
