@@ -93,6 +93,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <RouteProgress />
+              <EngagementTracker />
               <ExternalLinkMonetag />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
