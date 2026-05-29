@@ -118,6 +118,7 @@ async function flush() {
   const needed = texts.filter(t => !cache[lang][t]);
 
   if (needed.length > 0) {
+    setBusy(1);
     try {
       // Chunk to avoid huge payloads
       for (let i = 0; i < needed.length; i += 50) {
@@ -132,6 +133,8 @@ async function flush() {
       persistCache();
     } catch (e) {
       console.error("auto-translate fetch error:", e);
+    } finally {
+      setBusy(-1);
     }
   }
 
