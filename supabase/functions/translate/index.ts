@@ -32,20 +32,23 @@ async function pollinationsTranslate(texts: string[], langName: string): Promise
   const numbered = texts.map((t, i) => `${i + 1}. ${t}`).join("\n");
   const prompt = `Translate the following numbered English texts to ${langName}. Return ONLY a JSON object mapping each original English text (exact string, no numbering) to its ${langName} translation. Keep brand names (ComboWick, Combo_WICK, PayPal, Discord, Roblox) unchanged.\n\n${numbered}`;
   try {
-    const res = await fetch("https://text.pollinations.ai/openai", {
+    // NOTE: legacy text.pollinations.ai/openai is deprecated (returns 404/502).
+    // Use the current gen.pollinations.ai OpenAI-compatible endpoint.
+    // Model "claude-fast" benchmarked fastest (~3s) with the best VI/zh quality
+    // and exact-string JSON keys vs openai/deepseek alternatives.
+    const res = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({
-        model: "openai",
+        model: "claude-fast",
         messages: [
           { role: "system", content: "You are a professional translator. Return only valid JSON." },
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
-        private: true,
       }),
     });
     if (!res.ok) {
