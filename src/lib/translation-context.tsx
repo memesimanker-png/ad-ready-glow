@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { LangCode, EN_TEXTS } from "./translations";
 import { supabase } from "@/integrations/supabase/client";
-import { startAutoTranslator, stopAutoTranslator } from "./auto-translator";
+import { startAutoTranslator, stopAutoTranslator, setAutoTranslateBusyListener } from "./auto-translator";
 
 interface TranslationContextType {
   currentLanguage: LangCode;
