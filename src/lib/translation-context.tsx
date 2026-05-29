@@ -112,6 +112,15 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
       .catch(() => { localStorage.setItem("combowick-geo-checked", "1"); });
   }, []);
 
+  // Reflect the DOM auto-translator's network activity in the floating indicator,
+  // so navigating to a new page (e.g. Blog) shows "Translating…" too.
+  const [autoBusy, setAutoBusy] = useState(false);
+  useEffect(() => {
+    setAutoTranslateBusyListener(setAutoBusy);
+    return () => setAutoTranslateBusyListener(null);
+  }, []);
+
+
   const setLanguage = useCallback((langCode: string) => {
     const code = langCode as LangCode;
     setCurrentLanguage(code);
