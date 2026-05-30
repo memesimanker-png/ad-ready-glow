@@ -209,7 +209,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   }, [flushPending]);
 
   return (
-    <TranslationContext.Provider value={{ currentLanguage, setLanguage, t, isTranslating: isTranslating || autoBusy }}>
+    <TranslationContext.Provider value={{ currentLanguage, setLanguage, t, isTranslating: isTranslating || autoBusy, translationOutage }}>
       {children}
     </TranslationContext.Provider>
   );
