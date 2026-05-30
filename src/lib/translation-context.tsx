@@ -138,9 +138,14 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   // Reflect the DOM auto-translator's network activity in the floating indicator,
   // so navigating to a new page (e.g. Blog) shows "Translating…" too.
   const [autoBusy, setAutoBusy] = useState(false);
+  const [translationOutage, setTranslationOutage] = useState(false);
   useEffect(() => {
     setAutoTranslateBusyListener(setAutoBusy);
-    return () => setAutoTranslateBusyListener(null);
+    setTranslationOutageListener(setTranslationOutage);
+    return () => {
+      setAutoTranslateBusyListener(null);
+      setTranslationOutageListener(null);
+    };
   }, []);
 
 
