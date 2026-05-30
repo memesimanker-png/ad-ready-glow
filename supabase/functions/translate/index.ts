@@ -231,7 +231,13 @@ serve(async (req) => {
       if (oldest) hot.delete(oldest);
     }
 
-    return new Response(JSON.stringify({ translations: merged }), {
+    // If some requested texts still have no translation, every AI source
+    // (Lovable AI + Pollinations fallback) is exhausted/failing. Signal the
+    // client so it can show an outage notice instead of silently failing.
+    const stillMissing = missing.filter((t: string) => !merged[t]);
+    const degraded = stillMissing.length > 0;
+
+    return new Response(JSON.stringify({ translations: merged, degraded }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
