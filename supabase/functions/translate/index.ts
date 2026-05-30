@@ -116,6 +116,16 @@ serve(async (req) => {
       });
     }
 
+    // Redis batch cache (15 min) — skips the external DB roundtrip entirely.
+    const rk = await redisBatchKey(language, texts);
+    const redisHit = await redisGetJSON<Record<string, string>>(rk);
+    if (redisHit && texts.every((t: string) => redisHit[t])) {
+      hot.set(hk, { value: redisHit, ts: Date.now() });
+      return new Response(JSON.stringify({ translations: redisHit }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Offloaded to EXTERNAL Supabase (reduces egress + storage on main project).
     const supabase = getExternalSupabase();
 
