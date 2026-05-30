@@ -12,6 +12,7 @@ import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
 import { DiscordPostDialog } from "@/components/DiscordPostDialog";
 import { compressImage } from "@/lib/image-compress";
+import { PAID_GAMES } from "@/lib/paid-games";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 const LOADER_API_BASE = "https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files";
@@ -84,6 +85,7 @@ export default function Admin() {
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
             {can("scripts") && <TabsTrigger value="scripts" className="gap-2" title="Manage all scripts (create, edit, delete, send notifications)"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="paid-scripts" className="gap-2" title="Show or hide paid game scripts on the Premium page"><EyeOff className="h-4 w-4" /> Paid Scripts</TabsTrigger>}
             {can("orders") && <TabsTrigger value="orders" className="gap-2" title="View premium key purchase orders and payments"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
             {can("generate") && <TabsTrigger value="generate" className="gap-2" title="Manually generate a premium key for a customer"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
             {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage legacy private inventory"><UserCheck className="h-4 w-4" /> Inventory</TabsTrigger>}
@@ -94,6 +96,7 @@ export default function Admin() {
           </TabsList>
 
           {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
+          {can("scripts") && <TabsContent value="paid-scripts"><PaidScriptsTab /></TabsContent>}
           {can("orders") && <TabsContent value="orders"><OrdersTab /></TabsContent>}
           {can("generate") && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
           {can("accounts") && <TabsContent value="accounts"><AccountsTab /></TabsContent>}
@@ -267,7 +270,82 @@ function GenerateKeyTab() {
   );
 }
 
-/* ─── Scripts Tab ─── */
+/* ─── Paid Scripts Visibility Tab ─── */
+function PaidScriptsTab() {
+  const { toast } = useToast();
+  const [hidden, setHidden] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+  const [savingKey, setSavingKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("paid_script_settings")
+        .select("game_key, hidden");
+      if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
+      const map: Record<string, boolean> = {};
+      (data || []).forEach((r: any) => { map[r.game_key] = r.hidden; });
+      setHidden(map);
+      setLoading(false);
+    })();
+  }, []);
+
+  const toggle = async (key: string) => {
+    const next = !hidden[key];
+    setSavingKey(key);
+    const { error } = await supabase
+      .from("paid_script_settings")
+      .upsert({ game_key: key, hidden: next, updated_at: new Date().toISOString() }, { onConflict: "game_key" });
+    setSavingKey(null);
+    if (error) {
+      toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setHidden(prev => ({ ...prev, [key]: next }));
+    toast({ title: next ? "Script hidden" : "Script visible", description: key });
+  };
+
+  if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
+
+  return (
+    <div className="max-w-2xl space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold">Paid Game Scripts</h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          Toggle to show or hide any paid game script on the Premium Keys page. Hidden scripts disappear for all visitors.
+        </p>
+      </div>
+      <div className="space-y-3">
+        {PAID_GAMES.map((g) => {
+          const isHidden = !!hidden[g.key];
+          return (
+            <Card key={g.key} className="p-4 flex items-center gap-4">
+              <img src={g.thumbnail} alt={g.title} className="h-12 w-20 object-cover rounded-md flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium truncate">{g.title}</div>
+                <div className="text-xs text-muted-foreground truncate">{g.game}</div>
+              </div>
+              <span className={`text-xs font-medium ${isHidden ? "text-destructive" : "text-green-500"}`}>
+                {isHidden ? "Hidden" : "Visible"}
+              </span>
+              <Button
+                size="sm"
+                variant={isHidden ? "default" : "outline"}
+                disabled={savingKey === g.key}
+                onClick={() => toggle(g.key)}
+                title={isHidden ? "Show this script on the site" : "Hide this script from the site"}
+              >
+                {savingKey === g.key ? <Loader2 className="h-4 w-4 animate-spin" /> : isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                <span className="ml-1.5">{isHidden ? "Show" : "Hide"}</span>
+              </Button>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ScriptsTab() {
   const { data: scripts = [], refetch } = useAllScripts();
   const [form, setForm] = useState({ ...emptyScript });

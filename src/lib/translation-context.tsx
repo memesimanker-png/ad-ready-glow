@@ -1,13 +1,31 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { LangCode, EN_TEXTS } from "./translations";
 import { supabase } from "@/integrations/supabase/client";
-import { startAutoTranslator, stopAutoTranslator, setAutoTranslateBusyListener } from "./auto-translator";
+import { startAutoTranslator, stopAutoTranslator, setAutoTranslateBusyListener, setTranslationOutageListener, reportTranslationOutage } from "./auto-translator";
+
+// Pre-translated "translation is down" notice for every supported language.
+// Hardcoded because when this shows, the translation service itself is offline.
+export const OUTAGE_MESSAGES: Record<string, string> = {
+  en: "Translation isn't working right now — try again later!",
+  fr: "La traduction ne fonctionne pas pour le moment — réessayez plus tard !",
+  th: "ระบบแปลภาษาใช้งานไม่ได้ในขณะนี้ — โปรดลองใหม่ภายหลัง!",
+  ko: "지금은 번역이 작동하지 않습니다 — 나중에 다시 시도하세요!",
+  "zh-CN": "翻译功能暂时无法使用 — 请稍后再试！",
+  de: "Die Übersetzung funktioniert gerade nicht — versuche es später erneut!",
+  ru: "Перевод сейчас не работает — попробуйте позже!",
+  id: "Terjemahan sedang tidak berfungsi — coba lagi nanti!",
+  pt: "A tradução não está funcionando agora — tente novamente mais tarde!",
+  fil: "Hindi gumagana ang pagsasalin ngayon — subukan muli mamaya!",
+  es: "La traducción no funciona en este momento — ¡inténtalo más tarde!",
+  vi: "Bản dịch hiện không hoạt động — vui lòng thử lại sau!",
+};
 
 interface TranslationContextType {
   currentLanguage: LangCode;
   setLanguage: (langCode: string) => void;
   t: (text: string) => string;
   isTranslating: boolean;
+  translationOutage: boolean;
 }
 
 const TranslationContext = createContext<TranslationContextType>({
@@ -15,6 +33,7 @@ const TranslationContext = createContext<TranslationContextType>({
   setLanguage: () => {},
   t: (text: string) => text,
   isTranslating: false,
+  translationOutage: false,
 });
 
 // Load cache from localStorage on init
@@ -60,9 +79,13 @@ async function fetchTranslations(lang: string, texts: string[]): Promise<Record<
     if (!error && data?.translations) {
       Object.assign(translationCache[lang], data.translations);
       persistCache();
+      reportTranslationOutage(!!data.degraded);
+    } else if (error) {
+      reportTranslationOutage(true);
     }
   } catch (e) {
     console.error("Translation fetch error:", e);
+    reportTranslationOutage(true);
   }
 
   return translationCache[lang];
@@ -115,9 +138,14 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   // Reflect the DOM auto-translator's network activity in the floating indicator,
   // so navigating to a new page (e.g. Blog) shows "Translating…" too.
   const [autoBusy, setAutoBusy] = useState(false);
+  const [translationOutage, setTranslationOutage] = useState(false);
   useEffect(() => {
     setAutoTranslateBusyListener(setAutoBusy);
-    return () => setAutoTranslateBusyListener(null);
+    setTranslationOutageListener(setTranslationOutage);
+    return () => {
+      setAutoTranslateBusyListener(null);
+      setTranslationOutageListener(null);
+    };
   }, []);
 
 
@@ -181,7 +209,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
   }, [flushPending]);
 
   return (
-    <TranslationContext.Provider value={{ currentLanguage, setLanguage, t, isTranslating: isTranslating || autoBusy }}>
+    <TranslationContext.Provider value={{ currentLanguage, setLanguage, t, isTranslating: isTranslating || autoBusy, translationOutage }}>
       {children}
     </TranslationContext.Provider>
   );

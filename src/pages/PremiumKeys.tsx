@@ -13,6 +13,9 @@ import { PaidGameCard } from "@/components/PaidGameCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { PAID_GAMES } from "@/lib/paid-games";
+import { useHiddenPaidGames } from "@/hooks/usePaidGames";
+import { DonateCard } from "@/components/DonateCard";
 
 
 const tiers = [
@@ -100,6 +103,7 @@ export default function PremiumKeys() {
   const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
   const [paypalClientId, setPaypalClientId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
+  const { data: hiddenGames } = useHiddenPaidGames();
 
   useEffect(() => {
     supabase.functions.invoke("paypal-config").then(({ data }) => {
@@ -219,49 +223,7 @@ export default function PremiumKeys() {
             {t("Premium scripts for popular Roblox games. Monthly or lifetime access — fixes pushed regularly.")}
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                game: "Desert War [UPDATE] 🌴",
-                title: "Desert War Script",
-                subtitle: "Combat utility suite",
-                features: ["Infinite Ammo", "Kill All", "Aimbot", "ESP", "HitBox Expander", "Invisibility"],
-                monthlyPrice: 9,
-                thumbnail: "https://tr.rbxcdn.com/180DAY-07ecdc2f6af0cebd23dc934b6bbbf614/768/432/Image/Png/noFilter",
-                badge: { text: "2.0", variant: "red" as const },
-                warning: "Use a fresh / alt account — main accounts at your own risk.",
-                changelog: [
-                  { id: 1, version: "v2.0", changes: "Rewrote aimbot for new map update.", created_at: "2026-05-01" },
-                  { id: 2, version: "v1.8", changes: "Added invisibility toggle.", created_at: "2026-04-15" },
-                ],
-              },
-              {
-                game: "Jurassic Blocky",
-                title: "Jurassic Blocky Script",
-                subtitle: "Auto farm + PvP",
-                features: ["Auto Collect Amber", "Kill All Goat", "Kill Players", "Unpatched & Working"],
-                monthlyPrice: 7,
-                lifetimePrice: 11,
-                thumbnail: "https://tr.rbxcdn.com/180DAY-72007dc11099c62685db43551189ca26/768/432/Image/Png/noFilter",
-                badge: { text: "UNPATCHED", variant: "primary" as const },
-                changelog: [
-                  { id: 1, version: "v1.4", changes: "Bypass for latest anti-cheat patch.", created_at: "2026-05-05" },
-                ],
-              },
-              {
-                game: "State of Anarchy",
-                title: "State of Anarchy Script",
-                subtitle: "Full PvP toolkit",
-                features: ["Kill All Players", "ESP / Wallhack", "Teleport to Loot", "Aim-Bot", "Hitbox Expander"],
-                monthlyPrice: 10,
-                lifetimePrice: 17,
-                thumbnail: "https://tr.rbxcdn.com/180DAY-43670f7186821eb93f47c92d53729cdd/768/432/Image/Png/noFilter",
-                badge: { text: "POPULAR", variant: "amber" as const },
-                warning: "Stay low-profile — heavy usage may flag your account.",
-                changelog: [
-                  { id: 1, version: "v3.1", changes: "Improved teleport reliability.", created_at: "2026-04-28" },
-                ],
-              },
-            ].map((g) => {
+            {PAID_GAMES.filter((g) => !hiddenGames?.has(g.key)).map((g) => {
               const pricing = [
                 { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly") },
                 ...(g.lifetimePrice
@@ -293,6 +255,14 @@ export default function PremiumKeys() {
           </div>
         </div>
       </section>
+
+      {/* Donate / Support */}
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <DonateCard paypalClientId={paypalClientId} />
+        </div>
+      </section>
+
 
       {/* What Are Premium Keys */}
       <section className="py-16 sm:py-20">

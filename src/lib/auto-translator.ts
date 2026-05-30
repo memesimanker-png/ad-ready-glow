@@ -49,6 +49,17 @@ function setBusy(delta: number) {
   if (prev > 0 && busyCount === 0) busyListener?.(false);
 }
 
+// Outage reporting: when the translate function signals `degraded` (all AI
+// sources exhausted), surface it so the UI can show a "translation unavailable"
+// notice instead of silently leaving English text.
+let outageListener: ((down: boolean) => void) | null = null;
+export function setTranslationOutageListener(fn: ((down: boolean) => void) | null) {
+  outageListener = fn;
+}
+export function reportTranslationOutage(down: boolean) {
+  outageListener?.(down);
+}
+
 // Roles whose visible label is meaningful for state machines (Radix etc.) — skip translation
 const SKIP_ROLES = new Set([
   "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio",
@@ -119,6 +130,8 @@ async function flush() {
 
   if (needed.length > 0) {
     setBusy(1);
+    let anyDegraded = false;
+    let anySuccess = false;
     try {
       // Chunk to avoid huge payloads
       for (let i = 0; i < needed.length; i += 50) {
@@ -128,11 +141,19 @@ async function flush() {
         });
         if (!error && data?.translations) {
           Object.assign(cache[lang], data.translations);
+          anySuccess = true;
+          if (data.degraded) anyDegraded = true;
+        } else if (error) {
+          anyDegraded = true;
         }
       }
       persistCache();
+      // Clear outage as soon as anything translates again; raise it when degraded.
+      if (anySuccess && !anyDegraded) reportTranslationOutage(false);
+      else if (anyDegraded) reportTranslationOutage(true);
     } catch (e) {
       console.error("auto-translate fetch error:", e);
+      reportTranslationOutage(true);
     } finally {
       setBusy(-1);
     }

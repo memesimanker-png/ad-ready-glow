@@ -239,6 +239,30 @@ export type Database = {
         }
         Relationships: []
       }
+      paid_script_settings: {
+        Row: {
+          created_at: string
+          game_key: string
+          hidden: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_key: string
+          hidden?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_key?: string
+          hidden?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       premium_key_purchases: {
         Row: {
           amount: number
