@@ -1,7 +1,24 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { LangCode, EN_TEXTS } from "./translations";
 import { supabase } from "@/integrations/supabase/client";
-import { startAutoTranslator, stopAutoTranslator, setAutoTranslateBusyListener } from "./auto-translator";
+import { startAutoTranslator, stopAutoTranslator, setAutoTranslateBusyListener, setTranslationOutageListener, reportTranslationOutage } from "./auto-translator";
+
+// Pre-translated "translation is down" notice for every supported language.
+// Hardcoded because when this shows, the translation service itself is offline.
+export const OUTAGE_MESSAGES: Record<string, string> = {
+  en: "Translation isn't working right now — try again later!",
+  fr: "La traduction ne fonctionne pas pour le moment — réessayez plus tard !",
+  th: "ระบบแปลภาษาใช้งานไม่ได้ในขณะนี้ — โปรดลองใหม่ภายหลัง!",
+  ko: "지금은 번역이 작동하지 않습니다 — 나중에 다시 시도하세요!",
+  "zh-CN": "翻译功能暂时无法使用 — 请稍后再试！",
+  de: "Die Übersetzung funktioniert gerade nicht — versuche es später erneut!",
+  ru: "Перевод сейчас не работает — попробуйте позже!",
+  id: "Terjemahan sedang tidak berfungsi — coba lagi nanti!",
+  pt: "A tradução não está funcionando agora — tente novamente mais tarde!",
+  fil: "Hindi gumagana ang pagsasalin ngayon — subukan muli mamaya!",
+  es: "La traducción no funciona en este momento — ¡inténtalo más tarde!",
+  vi: "Bản dịch hiện không hoạt động — vui lòng thử lại sau!",
+};
 
 interface TranslationContextType {
   currentLanguage: LangCode;
