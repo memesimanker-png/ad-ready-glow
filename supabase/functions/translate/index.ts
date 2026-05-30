@@ -225,6 +225,7 @@ serve(async (req) => {
     const merged = { ...cachedMap, ...allTranslated };
     // Populate hot cache & lightly bound its size so isolates don't leak memory.
     hot.set(hk, { value: merged, ts: Date.now() });
+    redisSetJSON(rk, merged, REDIS_TTL).catch(() => {});
     if (hot.size > 500) {
       const oldest = hot.keys().next().value;
       if (oldest) hot.delete(oldest);
