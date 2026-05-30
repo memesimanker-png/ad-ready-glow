@@ -1,6 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
 import { getExternalSupabase } from "../_shared/external-supabase.ts";
+import { redisGetJSON, redisSetJSON } from "../_shared/redis.ts";
+
+// Aggressive Redis cache for whole translation batches — TTL 15 min.
+// Avoids the external Supabase DB roundtrip entirely on repeated batches,
+// which is the main egress/cost driver for this function.
+const REDIS_TTL = 15 * 60; // 15 minutes
+function djb2(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function redisBatchKey(lang: string, texts: string[]) {
+  return `tr:${lang}:${djb2(texts.slice().sort().join("\u0001"))}`;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
