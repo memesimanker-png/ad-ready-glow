@@ -12,6 +12,7 @@ import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
 import { DiscordPostDialog } from "@/components/DiscordPostDialog";
 import { compressImage } from "@/lib/image-compress";
+import { PAID_GAMES } from "@/lib/paid-games";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 const LOADER_API_BASE = "https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files";
