@@ -142,6 +142,8 @@ serve(async (req) => {
     const missing = texts.filter((t: string) => !cachedMap[t]);
 
     if (missing.length === 0) {
+      hot.set(hk, { value: cachedMap, ts: Date.now() });
+      redisSetJSON(rk, cachedMap, REDIS_TTL).catch(() => {});
       return new Response(JSON.stringify({ translations: cachedMap }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
