@@ -84,6 +84,7 @@ export default function Admin() {
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
             {can("scripts") && <TabsTrigger value="scripts" className="gap-2" title="Manage all scripts (create, edit, delete, send notifications)"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="paid-scripts" className="gap-2" title="Show or hide paid game scripts on the Premium page"><EyeOff className="h-4 w-4" /> Paid Scripts</TabsTrigger>}
             {can("orders") && <TabsTrigger value="orders" className="gap-2" title="View premium key purchase orders and payments"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
             {can("generate") && <TabsTrigger value="generate" className="gap-2" title="Manually generate a premium key for a customer"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
             {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage legacy private inventory"><UserCheck className="h-4 w-4" /> Inventory</TabsTrigger>}
