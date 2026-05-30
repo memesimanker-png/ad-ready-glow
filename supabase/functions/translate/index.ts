@@ -1,6 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getClientIp, rateLimit, tooManyRequests } from "../_shared/throttle.ts";
 import { getExternalSupabase } from "../_shared/external-supabase.ts";
+import { redisGetJSON, redisSetJSON } from "../_shared/redis.ts";
+
+// Aggressive Redis cache for whole translation batches — TTL 15 min.
+// Avoids the external Supabase DB roundtrip entirely on repeated batches,
+// which is the main egress/cost driver for this function.
+const REDIS_TTL = 15 * 60; // 15 minutes
+function djb2(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function redisBatchKey(lang: string, texts: string[]) {
+  return `tr:${lang}:${djb2(texts.slice().sort().join("\u0001"))}`;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -102,6 +116,16 @@ serve(async (req) => {
       });
     }
 
+    // Redis batch cache (15 min) — skips the external DB roundtrip entirely.
+    const rk = await redisBatchKey(language, texts);
+    const redisHit = await redisGetJSON<Record<string, string>>(rk);
+    if (redisHit && texts.every((t: string) => redisHit[t])) {
+      hot.set(hk, { value: redisHit, ts: Date.now() });
+      return new Response(JSON.stringify({ translations: redisHit }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Offloaded to EXTERNAL Supabase (reduces egress + storage on main project).
     const supabase = getExternalSupabase();
 
@@ -118,6 +142,8 @@ serve(async (req) => {
     const missing = texts.filter((t: string) => !cachedMap[t]);
 
     if (missing.length === 0) {
+      hot.set(hk, { value: cachedMap, ts: Date.now() });
+      redisSetJSON(rk, cachedMap, REDIS_TTL).catch(() => {});
       return new Response(JSON.stringify({ translations: cachedMap }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -199,6 +225,7 @@ serve(async (req) => {
     const merged = { ...cachedMap, ...allTranslated };
     // Populate hot cache & lightly bound its size so isolates don't leak memory.
     hot.set(hk, { value: merged, ts: Date.now() });
+    redisSetJSON(rk, merged, REDIS_TTL).catch(() => {});
     if (hot.size > 500) {
       const oldest = hot.keys().next().value;
       if (oldest) hot.delete(oldest);
