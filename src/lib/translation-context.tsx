@@ -79,9 +79,13 @@ async function fetchTranslations(lang: string, texts: string[]): Promise<Record<
     if (!error && data?.translations) {
       Object.assign(translationCache[lang], data.translations);
       persistCache();
+      reportTranslationOutage(!!data.degraded);
+    } else if (error) {
+      reportTranslationOutage(true);
     }
   } catch (e) {
     console.error("Translation fetch error:", e);
+    reportTranslationOutage(true);
   }
 
   return translationCache[lang];
