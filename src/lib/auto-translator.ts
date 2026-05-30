@@ -49,6 +49,17 @@ function setBusy(delta: number) {
   if (prev > 0 && busyCount === 0) busyListener?.(false);
 }
 
+// Outage reporting: when the translate function signals `degraded` (all AI
+// sources exhausted), surface it so the UI can show a "translation unavailable"
+// notice instead of silently leaving English text.
+let outageListener: ((down: boolean) => void) | null = null;
+export function setTranslationOutageListener(fn: ((down: boolean) => void) | null) {
+  outageListener = fn;
+}
+export function reportTranslationOutage(down: boolean) {
+  outageListener?.(down);
+}
+
 // Roles whose visible label is meaningful for state machines (Radix etc.) — skip translation
 const SKIP_ROLES = new Set([
   "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio",
