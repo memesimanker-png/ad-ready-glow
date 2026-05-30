@@ -55,7 +55,7 @@ serve(async (req) => {
       await supabase.from("premium_key_purchases").insert({
         payment_id: order_id,
         tier: "donation",
-        key_generated: null,
+        key_generated: "DONATION",
         amount: Number(amount) || 0,
         currency: "USD",
         status: "completed",
