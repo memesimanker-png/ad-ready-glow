@@ -25,6 +25,7 @@ interface TranslationContextType {
   setLanguage: (langCode: string) => void;
   t: (text: string) => string;
   isTranslating: boolean;
+  translationOutage: boolean;
 }
 
 const TranslationContext = createContext<TranslationContextType>({
@@ -32,6 +33,7 @@ const TranslationContext = createContext<TranslationContextType>({
   setLanguage: () => {},
   t: (text: string) => text,
   isTranslating: false,
+  translationOutage: false,
 });
 
 // Load cache from localStorage on init
