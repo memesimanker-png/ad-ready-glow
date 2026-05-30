@@ -103,6 +103,7 @@ export default function PremiumKeys() {
   const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
   const [paypalClientId, setPaypalClientId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
+  const { data: hiddenGames } = useHiddenPaidGames();
 
   useEffect(() => {
     supabase.functions.invoke("paypal-config").then(({ data }) => {
