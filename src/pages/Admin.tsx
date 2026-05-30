@@ -95,6 +95,7 @@ export default function Admin() {
           </TabsList>
 
           {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
+          {can("scripts") && <TabsContent value="paid-scripts"><PaidScriptsTab /></TabsContent>}
           {can("orders") && <TabsContent value="orders"><OrdersTab /></TabsContent>}
           {can("generate") && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
           {can("accounts") && <TabsContent value="accounts"><AccountsTab /></TabsContent>}
