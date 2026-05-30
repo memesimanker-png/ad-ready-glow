@@ -130,6 +130,8 @@ async function flush() {
 
   if (needed.length > 0) {
     setBusy(1);
+    let anyDegraded = false;
+    let anySuccess = false;
     try {
       // Chunk to avoid huge payloads
       for (let i = 0; i < needed.length; i += 50) {
@@ -139,11 +141,19 @@ async function flush() {
         });
         if (!error && data?.translations) {
           Object.assign(cache[lang], data.translations);
+          anySuccess = true;
+          if (data.degraded) anyDegraded = true;
+        } else if (error) {
+          anyDegraded = true;
         }
       }
       persistCache();
+      // Clear outage as soon as anything translates again; raise it when degraded.
+      if (anySuccess && !anyDegraded) reportTranslationOutage(false);
+      else if (anyDegraded) reportTranslationOutage(true);
     } catch (e) {
       console.error("auto-translate fetch error:", e);
+      reportTranslationOutage(true);
     } finally {
       setBusy(-1);
     }
