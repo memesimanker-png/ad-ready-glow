@@ -250,10 +250,18 @@ export default function Executors() {
     return () => clearInterval(id);
   }, []);
 
-  const visible = useMemo(
-    () => executors.filter((e) => showHidden || !e.hidden),
-    [executors, showHidden],
-  );
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return executors.filter((e) => {
+      if (!showHidden && e.hidden) return false;
+      if (priceFilter === "free" && !e.free) return false;
+      if (priceFilter === "paid" && e.free) return false;
+      if (statusFilter === "working" && e.updateStatus !== true) return false;
+      if (statusFilter === "patched" && e.updateStatus === true) return false;
+      if (q && !e.title.toLowerCase().includes(q) && !(e.platform || "").toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [executors, showHidden, search, priceFilter, statusFilter]);
 
   const groups = useMemo(() => {
     const map = new Map<string, Executor[]>();
