@@ -29,7 +29,10 @@ type Executor = {
   cost?: string | number;
   hidden?: boolean;
   beta?: boolean;
-  slug?: { logo?: string; owner?: string };
+  elementCertified?: boolean;
+  longestRunning?: boolean;
+  hasIssues?: boolean;
+  slug?: { logo?: string; owner?: string } | string;
 };
 
 type InjectVersions = {
