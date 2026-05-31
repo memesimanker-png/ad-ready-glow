@@ -382,12 +382,13 @@ export default function Executors() {
                     const website = normalizeExternalUrl(exec.websitelink);
                     const discord = normalizeExternalUrl(exec.discordlink);
                     const purchase = normalizeExternalUrl(exec.purchaselink);
+                    const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
                     return (
                       <article key={exec._id} className="min-w-0 rounded-md border border-border/50 bg-card p-2.5 text-xs transition-colors hover:border-primary/40 [transform:translateZ(0)]">
                         <div className="mb-2 flex min-w-0 items-start gap-2">
-                          {exec.slug?.logo ? (
+                          {logo ? (
                             <img
-                              src={cacheLogo(exec.slug.logo)}
+                              src={cacheLogo(logo)}
                               alt={`${exec.title} Roblox executor logo`}
                               loading="lazy"
                               decoding="async"
