@@ -458,6 +458,15 @@ export default function Executors() {
                 <div key={i} className="h-[156px] rounded-md bg-card border border-border/50 animate-pulse" />
               ))}
             </div>
+          ) : groups.length === 0 ? (
+            <div className="rounded-xl border border-border/50 bg-card/40 py-16 text-center">
+              <Search className="mx-auto mb-3 h-8 w-8 text-muted-foreground/50" />
+              <p className="text-sm font-semibold text-foreground">No executors match your filters</p>
+              <p className="mt-1 text-xs text-muted-foreground">Try a different search term or reset the filters.</p>
+              <Button size="sm" variant="outline" className="mt-4 h-8" onClick={() => { setSearch(""); setPriceFilter("all"); setStatusFilter("all"); }}>
+                Reset filters
+              </Button>
+            </div>
           ) : (
             groups.map(([platform, list]) => (
               <div key={platform} className="mb-8">
