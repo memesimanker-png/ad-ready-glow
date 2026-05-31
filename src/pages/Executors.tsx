@@ -342,7 +342,7 @@ export default function Executors() {
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
               Live working/patched status, UNC & SUNC scores and detection state for every major Roblox executor —
               <strong className="text-foreground"> Delta, Solara, Xeno, Codex, Wave, Hydrogen, Severe</strong> and more.
-              Updated every minute from executors.online and inject.today.
+              Updated every minute.
             </p>
 
             {/* Current Roblox version banner */}
