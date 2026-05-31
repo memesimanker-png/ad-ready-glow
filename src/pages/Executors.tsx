@@ -122,14 +122,32 @@ function PlatformIcon({ p }: { p: string }) {
 }
 
 function UncBar({ value, label }: { value: number; label: string }) {
+  const [w, setW] = useState(0);
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    const raf0 = requestAnimationFrame(() => setW(value));
+    let raf = 0;
+    const start = performance.now();
+    const dur = 900;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      setDisplay(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(raf0); cancelAnimationFrame(raf); };
+  }, [value]);
   const color = value >= 95 ? "bg-success" : value >= 80 ? "bg-warning" : "bg-destructive";
   return (
     <div className="flex items-center gap-2 text-xs">
       <span className="text-muted-foreground w-10 shrink-0">{label}</span>
-      <div className="flex-1 bg-muted rounded-full h-1.5 max-w-24">
-        <div className={`${color} h-1.5 rounded-full transition-all`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <div className="flex-1 bg-muted rounded-full h-1.5 max-w-24 overflow-hidden">
+        <div
+          className={`${color} h-1.5 rounded-full transition-[width] duration-700 ease-out`}
+          style={{ width: `${Math.max(0, Math.min(100, w))}%`, boxShadow: `0 0 8px hsl(var(--primary) / 0.0)` }}
+        />
       </div>
-      <span className="text-muted-foreground w-9 text-right">{value}%</span>
+      <span className="text-muted-foreground w-9 text-right tabular-nums">{display}%</span>
     </div>
   );
 }
