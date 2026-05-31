@@ -381,6 +381,67 @@ export default function Executors() {
             </div>
           </div>
 
+          {/* Search + filter toolbar */}
+          <div className="sticky top-[64px] z-20 mb-6 rounded-xl border border-border/50 bg-card/70 p-3 backdrop-blur-md supports-[backdrop-filter]:bg-card/50">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search executors — Delta, Solara, Xeno…"
+                  className="h-10 w-full rounded-lg border border-border/60 bg-background/60 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/60 focus:ring-1 focus:ring-primary/30"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    aria-label="Clear search"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-lg border border-border/60 bg-background/40 p-0.5">
+                  {(["all", "free", "paid"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setPriceFilter(opt)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${priceFilter === opt ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <div className="inline-flex rounded-lg border border-border/60 bg-background/40 p-0.5">
+                  {(["all", "working", "patched"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setStatusFilter(opt)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${statusFilter === opt ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between px-0.5 text-[11px] text-muted-foreground">
+              <span>{visible.length} executor{visible.length === 1 ? "" : "s"} shown</span>
+              {(search || priceFilter !== "all" || statusFilter !== "all") && (
+                <button
+                  onClick={() => { setSearch(""); setPriceFilter("all"); setStatusFilter("all"); }}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
+          </div>
+
           {error && (
             <div className="mb-6 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
