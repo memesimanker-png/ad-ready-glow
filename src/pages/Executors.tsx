@@ -29,7 +29,10 @@ type Executor = {
   cost?: string | number;
   hidden?: boolean;
   beta?: boolean;
-  slug?: { logo?: string; owner?: string };
+  elementCertified?: boolean;
+  longestRunning?: boolean;
+  hasIssues?: boolean;
+  slug?: { logo?: string; owner?: string } | string;
 };
 
 type InjectVersions = {
@@ -379,12 +382,13 @@ export default function Executors() {
                     const website = normalizeExternalUrl(exec.websitelink);
                     const discord = normalizeExternalUrl(exec.discordlink);
                     const purchase = normalizeExternalUrl(exec.purchaselink);
+                    const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
                     return (
                       <article key={exec._id} className="min-w-0 rounded-md border border-border/50 bg-card p-2.5 text-xs transition-colors hover:border-primary/40 [transform:translateZ(0)]">
                         <div className="mb-2 flex min-w-0 items-start gap-2">
-                          {exec.slug?.logo ? (
+                          {logo ? (
                             <img
-                              src={cacheLogo(exec.slug.logo)}
+                              src={cacheLogo(logo)}
                               alt={`${exec.title} Roblox executor logo`}
                               loading="lazy"
                               decoding="async"
@@ -401,6 +405,10 @@ export default function Executors() {
                             <div className="flex min-w-0 items-center gap-1.5">
                               <h3 className="min-w-0 truncate text-sm font-semibold leading-tight">{exec.title}</h3>
                               {exec.version && <span className="shrink-0 text-[10px] text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>}
+                              {exec.elementCertified && <span className="shrink-0 rounded-sm bg-success/15 px-1 py-px text-[9px] font-semibold uppercase text-success">Certified</span>}
+                              {exec.longestRunning && <span className="shrink-0 rounded-sm bg-primary/15 px-1 py-px text-[9px] font-semibold uppercase text-primary">Veteran</span>}
+                              {exec.beta && <span className="shrink-0 rounded-sm bg-warning/15 px-1 py-px text-[9px] font-semibold uppercase text-warning">Beta</span>}
+                              {exec.hasIssues && <span className="shrink-0 rounded-sm bg-destructive/15 px-1 py-px text-[9px] font-semibold uppercase text-destructive">Issues</span>}
                             </div>
                             <ExecutorUpdated value={exec.updatedDate} />
                           </div>
@@ -411,7 +419,14 @@ export default function Executors() {
                           <span className={working ? "text-success" : "text-destructive"}>{working ? "Working" : "Patched"}</span>
                           <span>·</span>
                           <span className={detected ? "text-destructive" : "text-success"}>{detected ? "Detected" : "Undetected"}</span>
-                          {exec.free && <><span>·</span><span className="text-primary">Free</span></>}
+                          <span>·</span>
+                          {exec.free ? (
+                            <span className="rounded-sm bg-success/15 px-1.5 py-px font-semibold text-success">Free</span>
+                          ) : (
+                            <span className="rounded-sm bg-primary/15 px-1.5 py-px font-semibold text-primary">
+                              Paid{exec.cost ? ` · ${String(exec.cost)}` : ""}
+                            </span>
+                          )}
                           {exec.keysystem && <><span>·</span><span className="text-warning">Key</span></>}
                         </div>
 
