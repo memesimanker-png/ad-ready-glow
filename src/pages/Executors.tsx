@@ -411,7 +411,14 @@ export default function Executors() {
                           <span className={working ? "text-success" : "text-destructive"}>{working ? "Working" : "Patched"}</span>
                           <span>·</span>
                           <span className={detected ? "text-destructive" : "text-success"}>{detected ? "Detected" : "Undetected"}</span>
-                          {exec.free && <><span>·</span><span className="text-primary">Free</span></>}
+                          <span>·</span>
+                          {exec.free ? (
+                            <span className="rounded-sm bg-success/15 px-1.5 py-px font-semibold text-success">Free</span>
+                          ) : (
+                            <span className="rounded-sm bg-primary/15 px-1.5 py-px font-semibold text-primary">
+                              Paid{exec.cost ? ` · ${String(exec.cost)}` : ""}
+                            </span>
+                          )}
                           {exec.keysystem && <><span>·</span><span className="text-warning">Key</span></>}
                         </div>
 
