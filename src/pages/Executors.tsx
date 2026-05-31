@@ -405,6 +405,10 @@ export default function Executors() {
                             <div className="flex min-w-0 items-center gap-1.5">
                               <h3 className="min-w-0 truncate text-sm font-semibold leading-tight">{exec.title}</h3>
                               {exec.version && <span className="shrink-0 text-[10px] text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>}
+                              {exec.elementCertified && <span className="shrink-0 rounded-sm bg-success/15 px-1 py-px text-[9px] font-semibold uppercase text-success">Certified</span>}
+                              {exec.longestRunning && <span className="shrink-0 rounded-sm bg-primary/15 px-1 py-px text-[9px] font-semibold uppercase text-primary">Veteran</span>}
+                              {exec.beta && <span className="shrink-0 rounded-sm bg-warning/15 px-1 py-px text-[9px] font-semibold uppercase text-warning">Beta</span>}
+                              {exec.hasIssues && <span className="shrink-0 rounded-sm bg-destructive/15 px-1 py-px text-[9px] font-semibold uppercase text-destructive">Issues</span>}
                             </div>
                             <ExecutorUpdated value={exec.updatedDate} />
                           </div>
