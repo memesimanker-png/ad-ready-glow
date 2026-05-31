@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Shield, Monitor, Smartphone, Apple, ExternalLink, MessageCircle, ShoppingCart, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Shield, Monitor, Smartphone, Apple, ExternalLink, MessageCircle, ShoppingCart, RefreshCw, AlertCircle, CheckCircle2, Search, X } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
@@ -122,14 +122,32 @@ function PlatformIcon({ p }: { p: string }) {
 }
 
 function UncBar({ value, label }: { value: number; label: string }) {
+  const [w, setW] = useState(0);
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    const raf0 = requestAnimationFrame(() => setW(value));
+    let raf = 0;
+    const start = performance.now();
+    const dur = 900;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      setDisplay(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(raf0); cancelAnimationFrame(raf); };
+  }, [value]);
   const color = value >= 95 ? "bg-success" : value >= 80 ? "bg-warning" : "bg-destructive";
   return (
     <div className="flex items-center gap-2 text-xs">
       <span className="text-muted-foreground w-10 shrink-0">{label}</span>
-      <div className="flex-1 bg-muted rounded-full h-1.5 max-w-24">
-        <div className={`${color} h-1.5 rounded-full transition-all`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <div className="flex-1 bg-muted rounded-full h-1.5 max-w-24 overflow-hidden">
+        <div
+          className={`${color} h-1.5 rounded-full transition-[width] duration-700 ease-out`}
+          style={{ width: `${Math.max(0, Math.min(100, w))}%`, boxShadow: `0 0 8px hsl(var(--primary) / 0.0)` }}
+        />
       </div>
-      <span className="text-muted-foreground w-9 text-right">{value}%</span>
+      <span className="text-muted-foreground w-9 text-right tabular-nums">{display}%</span>
     </div>
   );
 }
@@ -168,6 +186,9 @@ export default function Executors() {
   const [error, setError] = useState<string | null>(null);
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const [showHidden, setShowHidden] = useState(false);
+  const [search, setSearch] = useState("");
+  const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "working" | "patched">("all");
 
   const [versions, setVersions] = useState<InjectVersions | null>(null);
   const [cheats, setCheats] = useState<Record<string, InjectCheat> | null>(null);
@@ -229,10 +250,18 @@ export default function Executors() {
     return () => clearInterval(id);
   }, []);
 
-  const visible = useMemo(
-    () => executors.filter((e) => showHidden || !e.hidden),
-    [executors, showHidden],
-  );
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return executors.filter((e) => {
+      if (!showHidden && e.hidden) return false;
+      if (priceFilter === "free" && !e.free) return false;
+      if (priceFilter === "paid" && e.free) return false;
+      if (statusFilter === "working" && e.updateStatus !== true) return false;
+      if (statusFilter === "patched" && e.updateStatus === true) return false;
+      if (q && !e.title.toLowerCase().includes(q) && !(e.platform || "").toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [executors, showHidden, search, priceFilter, statusFilter]);
 
   const groups = useMemo(() => {
     const map = new Map<string, Executor[]>();
@@ -313,7 +342,7 @@ export default function Executors() {
             <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
               Live working/patched status, UNC & SUNC scores and detection state for every major Roblox executor —
               <strong className="text-foreground"> Delta, Solara, Xeno, Codex, Wave, Hydrogen, Severe</strong> and more.
-              Updated every minute from executors.online and inject.today.
+              Updated every minute.
             </p>
 
             {/* Current Roblox version banner */}
@@ -352,6 +381,67 @@ export default function Executors() {
             </div>
           </div>
 
+          {/* Search + filter toolbar */}
+          <div className="sticky top-[64px] z-20 mb-6 rounded-xl border border-border/50 bg-card/70 p-3 backdrop-blur-md supports-[backdrop-filter]:bg-card/50">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search executors — Delta, Solara, Xeno…"
+                  className="h-10 w-full rounded-lg border border-border/60 bg-background/60 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/60 focus:ring-1 focus:ring-primary/30"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    aria-label="Clear search"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-lg border border-border/60 bg-background/40 p-0.5">
+                  {(["all", "free", "paid"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setPriceFilter(opt)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${priceFilter === opt ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <div className="inline-flex rounded-lg border border-border/60 bg-background/40 p-0.5">
+                  {(["all", "working", "patched"] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setStatusFilter(opt)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${statusFilter === opt ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between px-0.5 text-[11px] text-muted-foreground">
+              <span>{visible.length} executor{visible.length === 1 ? "" : "s"} shown</span>
+              {(search || priceFilter !== "all" || statusFilter !== "all") && (
+                <button
+                  onClick={() => { setSearch(""); setPriceFilter("all"); setStatusFilter("all"); }}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
+          </div>
+
           {error && (
             <div className="mb-6 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -367,6 +457,15 @@ export default function Executors() {
               {Array.from({ length: 9 }).map((_, i) => (
                 <div key={i} className="h-[156px] rounded-md bg-card border border-border/50 animate-pulse" />
               ))}
+            </div>
+          ) : groups.length === 0 ? (
+            <div className="rounded-xl border border-border/50 bg-card/40 py-16 text-center">
+              <Search className="mx-auto mb-3 h-8 w-8 text-muted-foreground/50" />
+              <p className="text-sm font-semibold text-foreground">No executors match your filters</p>
+              <p className="mt-1 text-xs text-muted-foreground">Try a different search term or reset the filters.</p>
+              <Button size="sm" variant="outline" className="mt-4 h-8" onClick={() => { setSearch(""); setPriceFilter("all"); setStatusFilter("all"); }}>
+                Reset filters
+              </Button>
             </div>
           ) : (
             groups.map(([platform, list]) => (
@@ -384,7 +483,8 @@ export default function Executors() {
                     const purchase = normalizeExternalUrl(exec.purchaselink);
                     const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
                     return (
-                      <article key={exec._id} className="min-w-0 rounded-md border border-border/50 bg-card p-2.5 text-xs transition-colors hover:border-primary/40 [transform:translateZ(0)]">
+                      <article key={exec._id} className="group/card relative min-w-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card to-card/40 p-3 text-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.35)] [transform:translateZ(0)] animate-fade-in">
+                        <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
                         <div className="mb-2 flex min-w-0 items-start gap-2">
                           {logo ? (
                             <img
