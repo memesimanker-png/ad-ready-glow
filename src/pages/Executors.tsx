@@ -483,7 +483,8 @@ export default function Executors() {
                     const purchase = normalizeExternalUrl(exec.purchaselink);
                     const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
                     return (
-                      <article key={exec._id} className="min-w-0 rounded-md border border-border/50 bg-card p-2.5 text-xs transition-colors hover:border-primary/40 [transform:translateZ(0)]">
+                      <article key={exec._id} className="group/card relative min-w-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card to-card/40 p-3 text-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.35)] [transform:translateZ(0)] animate-fade-in">
+                        <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
                         <div className="mb-2 flex min-w-0 items-start gap-2">
                           {logo ? (
                             <img
