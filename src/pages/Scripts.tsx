@@ -20,6 +20,22 @@ export default function Scripts() {
     setCategory(searchParams.get("category") ?? "All");
   }, [searchParams]);
 
+  // Monetag one-click popunder — load on this page
+  useEffect(() => {
+    const POPUNDER_ID = "monetag-popunder-11035708";
+    const loadPopunder = () => {
+      if (document.getElementById(POPUNDER_ID)) return;
+      const loader = document.createElement("script");
+      loader.id = POPUNDER_ID;
+      loader.dataset.zone = "11035708";
+      loader.src = "https://al5sm.com/tag.min.js";
+      loader.async = true;
+      document.body.appendChild(loader);
+    };
+    loadPopunder();
+    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
+  }, []);
+
   // Press "/" to focus the search box (skip when typing in another input)
   const searchRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
