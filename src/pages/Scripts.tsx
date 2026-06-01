@@ -9,6 +9,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { GameThumbnail } from "@/components/GameThumbnail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdSlot } from "@/components/AdSlot";
+import { usePopunder } from "@/hooks/usePopunder";
 
 export default function Scripts() {
   const [searchParams, setSearchParams] = useSearchParams();
