@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { Key, Clock, Shield, Zap, Crown, CheckCircle, Play } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { usePopunder } from "@/hooks/usePopunder";
+
 
 
 export default function Keys() {
