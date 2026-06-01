@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
+import { usePopunder } from "@/hooks/usePopunder";
+
 
 
 interface StoredKeyData {
@@ -28,7 +30,10 @@ export default function AccessKey() {
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [error, setError] = useState("");
-  const [adClicked, setAdClicked] = useState(false);
+  const [adClicks, setAdClicks] = useState(0);
+  const REQUIRED_AD_CLICKS = 2;
+
+  usePopunder();
 
   const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 
@@ -117,12 +122,12 @@ export default function AccessKey() {
 
   const handleAdClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
-    setAdClicked(true);
+    setAdClicks((c) => c + 1);
   };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-    if (!adClicked) {
+    if (adClicks < REQUIRED_AD_CLICKS) {
       handleAdClick();
       return;
     }
@@ -315,8 +320,8 @@ export default function AccessKey() {
                 >
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                  ) : !adClicked ? (
-                    <><Key className="mr-2 h-4 w-4" /> Continue (Step 1 of 2)</>
+                  ) : adClicks < REQUIRED_AD_CLICKS ? (
+                    <><Key className="mr-2 h-4 w-4" /> Continue (Step {adClicks + 1} of {REQUIRED_AD_CLICKS + 1})</>
                   ) : (
                     <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
                   )}

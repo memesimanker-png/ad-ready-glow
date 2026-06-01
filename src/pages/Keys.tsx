@@ -5,10 +5,14 @@ import { Link } from "react-router-dom";
 import { Key, Clock, Shield, Zap, Crown, CheckCircle, Play } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
+import { usePopunder } from "@/hooks/usePopunder";
+
 
 
 export default function Keys() {
   const { t } = useTranslation();
+  usePopunder();
+
 
   return (
     <Layout>
@@ -140,9 +144,25 @@ export default function Keys() {
               </CardContent>
             </Card>
           </div>
-          
+
+          <div className="mt-16 max-w-4xl mx-auto text-center">
+            <h2 className="font-heading text-2xl font-bold mb-3">{t("Popular Free Scripts")}</h2>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              {t("Your free key unlocks every script in the hub. Browse the most popular ones below.")}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Link to="/scripts" className="text-sm px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-colors">All Scripts</Link>
+              <Link to="/games/blox-fruits" className="text-sm px-4 py-2 rounded-full bg-bronze/10 border border-bronze/30 text-bronze-light hover:bg-bronze/20 transition-colors">Blox Fruits Script</Link>
+              <Link to="/games/arsenal" className="text-sm px-4 py-2 rounded-full bg-bronze/10 border border-bronze/30 text-bronze-light hover:bg-bronze/20 transition-colors">Arsenal Script</Link>
+              <Link to="/games/pet-simulator" className="text-sm px-4 py-2 rounded-full bg-bronze/10 border border-bronze/30 text-bronze-light hover:bg-bronze/20 transition-colors">Pet Simulator Script</Link>
+              <Link to="/games/jurassic-blocky" className="text-sm px-4 py-2 rounded-full bg-bronze/10 border border-bronze/30 text-bronze-light hover:bg-bronze/20 transition-colors">Jurassic Blocky Script</Link>
+              <Link to="/executors" className="text-sm px-4 py-2 rounded-full bg-bronze/10 border border-bronze/30 text-bronze-light hover:bg-bronze/20 transition-colors">Best Executors</Link>
+            </div>
+          </div>
+
         </div>
       </section>
     </Layout>
   );
 }
+
