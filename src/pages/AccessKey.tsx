@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
+import { usePopunder } from "@/hooks/usePopunder";
+
 
 
 interface StoredKeyData {
