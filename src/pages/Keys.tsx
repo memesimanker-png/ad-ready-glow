@@ -11,6 +11,8 @@ import { usePopunder } from "@/hooks/usePopunder";
 
 export default function Keys() {
   const { t } = useTranslation();
+  usePopunder();
+
 
   return (
     <Layout>
