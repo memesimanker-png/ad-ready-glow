@@ -30,7 +30,10 @@ export default function AccessKey() {
   const [isLoading, setIsLoading] = useState(false);
   const [canGenerate, setCanGenerate] = useState(true);
   const [error, setError] = useState("");
-  const [adClicked, setAdClicked] = useState(false);
+  const [adClicks, setAdClicks] = useState(0);
+  const REQUIRED_AD_CLICKS = 2;
+
+  usePopunder();
 
   const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 
