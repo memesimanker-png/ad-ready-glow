@@ -122,12 +122,12 @@ export default function AccessKey() {
 
   const handleAdClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
-    setAdClicked(true);
+    setAdClicks((c) => c + 1);
   };
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-    if (!adClicked) {
+    if (adClicks < REQUIRED_AD_CLICKS) {
       handleAdClick();
       return;
     }
