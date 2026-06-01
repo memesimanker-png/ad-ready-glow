@@ -320,8 +320,8 @@ export default function AccessKey() {
                 >
                   {isLoading ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                  ) : !adClicked ? (
-                    <><Key className="mr-2 h-4 w-4" /> Continue (Step 1 of 2)</>
+                  ) : adClicks < REQUIRED_AD_CLICKS ? (
+                    <><Key className="mr-2 h-4 w-4" /> Continue (Step {adClicks + 1} of {REQUIRED_AD_CLICKS + 1})</>
                   ) : (
                     <><Key className="mr-2 h-4 w-4" /> Generate HWID Key</>
                   )}
