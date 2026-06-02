@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -76,41 +76,54 @@ export default function Dashboard() {
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
 
+  const loadData = async (currentUser: any) => {
+    const email = (currentUser.email || "").toLowerCase();
+
+    // Query by user_id OR matching customer_email (covers guest checkouts that
+    // didn't capture a user_id but used the same email as the buyer's account).
+    const keysQuery = email
+      ? supabase
+          .from("premium_key_purchases")
+          .select("*")
+          .or(`user_id.eq.${currentUser.id},customer_email.eq.${email}`)
+          .order("created_at", { ascending: false })
+      : supabase
+          .from("premium_key_purchases")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+    const [keysRes, messagesRes] = await Promise.all([
+      keysQuery,
+      supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", currentUser.id).order("created_at", { ascending: false }),
+    ]);
+
+    // Dedupe by id in case a row matches both filters
+    const rawKeys = (keysRes.data as KeyPurchase[]) || [];
+    const seen = new Set<string>();
+    const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
+
+    setKeys(uniqKeys);
+    setMessages((messagesRes.data as ContactMessage[]) || []);
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { setLoading(false); return; }
       setUser(data.user);
-      const email = (data.user.email || "").toLowerCase();
-
-      // Query by user_id OR matching customer_email (covers guest checkouts that
-      // didn't capture a user_id but used the same email as the buyer's account).
-      const keysQuery = email
-        ? supabase
-            .from("premium_key_purchases")
-            .select("*")
-            .or(`user_id.eq.${data.user.id},customer_email.eq.${email}`)
-            .order("created_at", { ascending: false })
-        : supabase
-            .from("premium_key_purchases")
-            .select("*")
-            .eq("user_id", data.user.id)
-            .order("created_at", { ascending: false });
-
-      const [keysRes, messagesRes] = await Promise.all([
-        keysQuery,
-        supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
-      ]);
-
-      // Dedupe by id in case a row matches both filters
-      const rawKeys = (keysRes.data as KeyPurchase[]) || [];
-      const seen = new Set<string>();
-      const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
-
-      setKeys(uniqKeys);
-      setMessages((messagesRes.data as ContactMessage[]) || []);
+      await loadData(data.user);
       setLoading(false);
     });
   }, []);
+
+  // Auto-poll while any purchase is still clearing (eCheck pending). Once the
+  // webhook flips it to completed + issues the key, the dashboard updates itself.
+  const hasPending = keys.some((k) => k.status === "pending");
+  useEffect(() => {
+    if (!user || !hasPending) return;
+    const interval = setInterval(() => loadData(user), 12000);
+    return () => clearInterval(interval);
+  }, [user, hasPending]);
 
   const copyText = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -346,37 +359,79 @@ Message: ${supportForm.message || "(none)"}
             ) : (
               <div className="space-y-4">
                 {keys.map((purchase) => {
-                  const isExpired = new Date(purchase.expires_at) < new Date();
+                  const isPending = purchase.status === "pending";
+                  const isFailed = purchase.status === "failed";
+                  const isExpired = !isPending && !isFailed && purchase.expires_at && new Date(purchase.expires_at) < new Date();
+                  const daysLeft = !isExpired && !isPending && !isFailed && purchase.expires_at
+                    ? Math.max(0, Math.ceil((new Date(purchase.expires_at).getTime() - Date.now()) / 86400000))
+                    : null;
+
+                  // eCheck still clearing — show a distinct "Payment clearing" card.
+                  if (isPending) {
+                    return (
+                      <Card key={purchase.id} className="p-6 border-primary/30 bg-primary/5">
+                        <div className="flex items-start gap-3">
+                          <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5 animate-pulse" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h3 className="font-bold text-lg">{tierNames[purchase.tier] || purchase.tier}</h3>
+                              <span className="text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary uppercase tracking-wider font-semibold">Payment clearing</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              Your eCheck payment is still clearing (usually a few business days). Your license key will appear here automatically — this page refreshes itself — and is also emailed the moment funds clear.
+                            </p>
+                            <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                              <div className="h-3 w-3 rounded-full border-2 border-primary/40 border-t-primary animate-spin" />
+                              Checking for updates… · Ordered {new Date(purchase.created_at).toLocaleDateString()} · ${purchase.amount}
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  }
+
                   return (
-                    <Card key={purchase.id} className={`p-6 transition-all hover:shadow-lg ${isExpired ? "border-destructive/20" : "border-primary/20"}`}>
+                    <Card key={purchase.id} className={`p-6 transition-all hover:shadow-lg ${isFailed ? "border-destructive/30" : isExpired ? "border-destructive/20" : "border-primary/20"}`}>
                       <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-3">
-                            <Key className={`h-5 w-5 ${isExpired ? "text-destructive" : "text-primary"}`} />
+                            <Key className={`h-5 w-5 ${isExpired || isFailed ? "text-destructive" : "text-primary"}`} />
                             <div>
                               <h3 className="font-bold text-lg">{tierNames[purchase.tier] || purchase.tier}</h3>
                               <div className="flex items-center gap-2 text-sm">
-                                {isExpired ? (
+                                {isFailed ? (
+                                  <><XCircle className="h-4 w-4 text-destructive" /><span className="text-destructive font-medium">Payment failed / reversed</span></>
+                                ) : isExpired ? (
                                   <><XCircle className="h-4 w-4 text-destructive" /><span className="text-destructive font-medium">Expired</span></>
                                 ) : (
-                                  <><div className="w-2 h-2 bg-success rounded-full animate-pulse" /><span className="text-success font-medium">Active</span></>
+                                  <>
+                                    <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                                    <span className="text-success font-medium">Active</span>
+                                    {daysLeft !== null && daysLeft <= 365 && (
+                                      <span className="text-muted-foreground">· {daysLeft} day{daysLeft === 1 ? "" : "s"} left</span>
+                                    )}
+                                  </>
                                 )}
                               </div>
                             </div>
                           </div>
-                          <div className="bg-background/50 p-4 rounded-lg mb-3 border border-border/50">
-                            <p className="text-xs text-muted-foreground mb-1">License Key:</p>
-                            <code className="text-sm font-mono break-all font-semibold">{purchase.key_generated}</code>
-                          </div>
+                          {!isFailed && (
+                            <div className="bg-background/50 p-4 rounded-lg mb-3 border border-border/50">
+                              <p className="text-xs text-muted-foreground mb-1">License Key:</p>
+                              <code className="text-sm font-mono break-all font-semibold">{purchase.key_generated}</code>
+                            </div>
+                          )}
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span>Purchased: {new Date(purchase.created_at).toLocaleDateString()}</span>
-                            <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>
+                            {purchase.expires_at && <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>}
                             <span>${purchase.amount}</span>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm" onClick={() => copyText(purchase.key_generated, purchase.id)}>
-                          {copied === purchase.id ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
-                        </Button>
+                        {!isFailed && (
+                          <Button variant="outline" size="sm" onClick={() => copyText(purchase.key_generated, purchase.id)}>
+                            {copied === purchase.id ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+                          </Button>
+                        )}
                       </div>
                     </Card>
                   );

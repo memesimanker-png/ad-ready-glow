@@ -159,7 +159,7 @@ export function VideoBackground({ className = "", overlay = true }: VideoBackgro
           }}
           loading="eager"
           decoding="async"
-          fetchPriority={i <= 1 ? "high" : "low"}
+          {...{ fetchpriority: i <= 1 ? "high" : "low" }}
         />
       ))}
 

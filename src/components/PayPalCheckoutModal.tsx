@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons, FUNDING } from "@paypal/react-paypal-js";
-import { X, Loader2, CheckCircle, Zap, Lock, CreditCard, Clock } from "lucide-react";
+import { X, Loader2, CheckCircle, Zap, Lock, CreditCard, Clock, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 
@@ -22,6 +22,8 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [pending, setPending] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState<{ key: string; expires_at: string } | null>(null);
   // No tabs anymore — for subscription tiers we default to auto-renew (the highlighted offer)
   // and let users pick "one-time" via a card click. State drives the PayPal button rendered.
@@ -36,6 +38,8 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
       setError(null);
       setProcessing(false);
       setPending(false);
+      setPendingOrderId(null);
+      setCopied(false);
       setPlanId(null);
       setPaymentType(tier.isSubscription ? "subscription" : "onetime");
       // Restore last key for this tier if the modal was accidentally re-opened
@@ -53,6 +57,54 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
       setSuccess(null);
     }
   }, [isOpen, tier]);
+
+  // While an eCheck is clearing, poll the buyer's purchase record. The webhook
+  // flips it to completed + writes the key once funds clear, so this modal
+  // upgrades itself from "pending" to the success screen with no refresh.
+  useEffect(() => {
+    if (!pendingOrderId) return;
+    let active = true;
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from("premium_key_purchases")
+        .select("status,key_generated,expires_at")
+        .eq("payment_id", pendingOrderId)
+        .maybeSingle();
+      if (!active || !data) return;
+      if (data.status === "completed" && data.key_generated) {
+        persistKey(data.key_generated, data.expires_at as string);
+        setSuccess({ key: data.key_generated, expires_at: data.expires_at as string });
+        setPending(false);
+        setPendingOrderId(null);
+      } else if (data.status === "failed") {
+        setError(t("Payment was declined or reversed. You have not been charged."));
+        setPending(false);
+        setPendingOrderId(null);
+      }
+    }, 8000);
+    return () => { active = false; clearInterval(interval); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingOrderId]);
+
+  // Lock background scroll + allow Escape to dismiss (but never mid-payment or
+  // while a result screen is showing — guarded the same way as the overlay click).
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !processing && !success && !pending) onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen, processing, success, pending, onClose]);
+
+
+
+
 
   useEffect(() => {
     if (!isOpen || paymentType !== "subscription" || !tier.isSubscription) return;
@@ -141,6 +193,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
         // eCheck / pending payments: funds haven't cleared yet, so no key is issued.
         if (result?.pending || result?.status === "PENDING") {
           setPending(true);
+          setPendingOrderId(data.orderID);
           return;
         }
         persistKey(result.key, result.expires_at);
@@ -163,11 +216,16 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
     setSuccess(null);
     setPending(false);
+    setPendingOrderId(null);
     onClose();
   };
 
   const copyKey = () => {
-    if (success?.key) navigator.clipboard.writeText(success.key);
+    if (success?.key) {
+      navigator.clipboard.writeText(success.key);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -198,6 +256,10 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               <p className="text-sm text-muted-foreground mb-4">
                 {t("Your payment is an eCheck and is still clearing. This can take a few business days. As soon as the funds clear, your license key will be emailed to you and added to your dashboard automatically — no key is issued before then.")}
               </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-primary mb-4">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {t("Watching for your payment to clear — this screen will update on its own.")}
+              </div>
               <button onClick={dismissSuccess} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors">
                 {t("Got it")}
               </button>
@@ -213,8 +275,8 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                 <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Your License Key:")}</p>
                 <code className="text-sm font-mono break-all font-semibold text-primary select-all">{success.key}</code>
               </div>
-              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-2 hover:bg-primary/90 transition-colors">
-                {t("Copy Key")}
+              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-2 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                {copied ? <><Check className="h-4 w-4" /> {t("Copied!")}</> : t("Copy Key")}
               </button>
               <button onClick={dismissSuccess} className="w-full py-2.5 rounded-lg bg-secondary text-secondary-foreground font-medium text-sm mb-3 hover:bg-secondary/80 transition-colors">
                 {t("Done")}
