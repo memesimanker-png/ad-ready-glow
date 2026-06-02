@@ -257,8 +257,8 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                 <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Your License Key:")}</p>
                 <code className="text-sm font-mono break-all font-semibold text-primary select-all">{success.key}</code>
               </div>
-              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-2 hover:bg-primary/90 transition-colors">
-                {t("Copy Key")}
+              <button onClick={copyKey} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold mb-2 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                {copied ? <><Check className="h-4 w-4" /> {t("Copied!")}</> : t("Copy Key")}
               </button>
               <button onClick={dismissSuccess} className="w-full py-2.5 rounded-lg bg-secondary text-secondary-foreground font-medium text-sm mb-3 hover:bg-secondary/80 transition-colors">
                 {t("Done")}
