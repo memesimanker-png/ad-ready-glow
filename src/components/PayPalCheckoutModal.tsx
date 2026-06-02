@@ -86,6 +86,24 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingOrderId]);
 
+  // Lock background scroll + allow Escape to dismiss (but never mid-payment or
+  // while a result screen is showing — guarded the same way as the overlay click).
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !processing && !success && !pending) onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen, processing, success, pending, onClose]);
+
+
+
 
 
   useEffect(() => {
