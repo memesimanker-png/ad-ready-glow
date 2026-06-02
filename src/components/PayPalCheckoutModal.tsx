@@ -136,6 +136,11 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Payment capture failed");
+        // eCheck / pending payments: funds haven't cleared yet, so no key is issued.
+        if (result?.pending || result?.status === "PENDING") {
+          setPending(true);
+          return;
+        }
         persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       }
