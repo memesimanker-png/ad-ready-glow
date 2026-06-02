@@ -35,6 +35,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     if (isOpen) {
       setError(null);
       setProcessing(false);
+      setPending(false);
       setPlanId(null);
       setPaymentType(tier.isSubscription ? "subscription" : "onetime");
       // Restore last key for this tier if the modal was accidentally re-opened
