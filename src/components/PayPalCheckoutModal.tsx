@@ -189,7 +189,20 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           </button>
 
 
-          {success ? (
+          {pending ? (
+            <div className="text-center py-6">
+              <div className="h-16 w-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="font-heading text-xl font-bold mb-2">{t("Payment Processing")}</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t("Your payment is an eCheck and is still clearing. This can take a few business days. As soon as the funds clear, your license key will be emailed to you and added to your dashboard automatically — no key is issued before then.")}
+              </p>
+              <button onClick={dismissSuccess} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors">
+                {t("Got it")}
+              </button>
+            </div>
+          ) : success ? (
             <div className="text-center py-6">
               <div className="h-16 w-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="h-8 w-8 text-success" />
