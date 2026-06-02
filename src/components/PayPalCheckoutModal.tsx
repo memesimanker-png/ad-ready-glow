@@ -175,6 +175,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
         // eCheck / pending payments: funds haven't cleared yet, so no key is issued.
         if (result?.pending || result?.status === "PENDING") {
           setPending(true);
+          setPendingOrderId(data.orderID);
           return;
         }
         persistKey(result.key, result.expires_at);
