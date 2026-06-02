@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons, FUNDING } from "@paypal/react-paypal-js";
-import { X, Loader2, CheckCircle, Zap, Lock, CreditCard } from "lucide-react";
+import { X, Loader2, CheckCircle, Zap, Lock, CreditCard, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 
