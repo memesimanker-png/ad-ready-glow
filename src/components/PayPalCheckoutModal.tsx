@@ -180,13 +180,14 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
         <div className="h-1.5 bg-gradient-to-r from-primary via-accent to-primary/40" />
         <div className="p-6">
           <button
-            onClick={success ? dismissSuccess : guardedClose}
+            onClick={(success || pending) ? dismissSuccess : guardedClose}
             disabled={processing}
             className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors rounded-full p-1.5 hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
           </button>
+
 
           {success ? (
             <div className="text-center py-6">
