@@ -198,11 +198,16 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
     setSuccess(null);
     setPending(false);
+    setPendingOrderId(null);
     onClose();
   };
 
   const copyKey = () => {
-    if (success?.key) navigator.clipboard.writeText(success.key);
+    if (success?.key) {
+      navigator.clipboard.writeText(success.key);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
