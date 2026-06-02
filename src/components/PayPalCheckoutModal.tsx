@@ -22,6 +22,8 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [pending, setPending] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState<{ key: string; expires_at: string } | null>(null);
   // No tabs anymore — for subscription tiers we default to auto-renew (the highlighted offer)
   // and let users pick "one-time" via a card click. State drives the PayPal button rendered.
