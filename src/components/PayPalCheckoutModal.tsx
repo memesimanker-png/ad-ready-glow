@@ -153,16 +153,16 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     }
   };
 
-  // Block accidental close while we're mid-payment OR the success screen is up.
-  // The user must click the X explicitly to dismiss the success view.
+  // Block accidental close while we're mid-payment OR a result screen is up.
   const guardedClose = () => {
-    if (processing || success) return;
+    if (processing || success || pending) return;
     onClose();
   };
 
   const dismissSuccess = () => {
     try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
     setSuccess(null);
+    setPending(false);
     onClose();
   };
 
