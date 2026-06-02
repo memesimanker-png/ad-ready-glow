@@ -58,6 +58,36 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     }
   }, [isOpen, tier]);
 
+  // While an eCheck is clearing, poll the buyer's purchase record. The webhook
+  // flips it to completed + writes the key once funds clear, so this modal
+  // upgrades itself from "pending" to the success screen with no refresh.
+  useEffect(() => {
+    if (!pendingOrderId) return;
+    let active = true;
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from("premium_key_purchases")
+        .select("status,key_generated,expires_at")
+        .eq("payment_id", pendingOrderId)
+        .maybeSingle();
+      if (!active || !data) return;
+      if (data.status === "completed" && data.key_generated) {
+        persistKey(data.key_generated, data.expires_at as string);
+        setSuccess({ key: data.key_generated, expires_at: data.expires_at as string });
+        setPending(false);
+        setPendingOrderId(null);
+      } else if (data.status === "failed") {
+        setError(t("Payment was declined or reversed. You have not been charged."));
+        setPending(false);
+        setPendingOrderId(null);
+      }
+    }, 8000);
+    return () => { active = false; clearInterval(interval); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingOrderId]);
+
+
+
   useEffect(() => {
     if (!isOpen || paymentType !== "subscription" || !tier.isSubscription) return;
     const price = tier.subscriptionPrice || tier.price;
