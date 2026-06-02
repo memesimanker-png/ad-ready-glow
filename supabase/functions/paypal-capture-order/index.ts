@@ -88,14 +88,59 @@ serve(async (req) => {
     });
 
     const captureData = await captureRes.json();
-    if (!captureRes.ok || captureData.status !== "COMPLETED") {
+
+    const usedTier = tier || "lifetime";
+
+    // Inspect the actual capture status. eCheck (and some manual-review) payments
+    // come back as PENDING and the money has NOT landed in the account yet.
+    const captureDetail =
+      captureData?.purchase_units?.[0]?.payments?.captures?.[0] || null;
+    const captureStatus = captureDetail?.status || captureData?.status || null;
+    const pendingReason = captureDetail?.status_details?.reason || null;
+
+    const supabasePending = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const pendingEmail = customer_email || captureData.payer?.email_address || null;
+
+    // Payment not (yet) money-in-hand: do NOT generate or hand over a key.
+    if (captureStatus !== "COMPLETED") {
+      if (captureStatus === "PENDING") {
+        // Record a pending purchase so the buyer + admin can see it. The key is
+        // generated and emailed later by the PayPal webhook once the eCheck clears.
+        try {
+          await supabasePending.from("premium_key_purchases").insert({
+            payment_id: order_id,
+            tier: usedTier,
+            key_generated: "",
+            amount: Number(amount) || 0,
+            currency: "USD",
+            status: "pending",
+            customer_email: pendingEmail,
+            user_id: user_id || null,
+            expires_at: null,
+          });
+        } catch (e) {
+          console.error("[capture] pending insert failed:", e);
+        }
+
+        return new Response(JSON.stringify({
+          status: "PENDING",
+          pending: true,
+          reason: pendingReason || "ECHECK",
+          message: "Payment is still clearing (eCheck). Your key will be emailed and added to your dashboard as soon as the funds clear — usually within a few business days.",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       return new Response(JSON.stringify({ error: "Payment not completed", details: captureData }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const usedTier = tier || "lifetime";
     const generatedKey = await generateKeyFromAPI(usedTier, order_id);
     const expiresAt = calculateExpiry(usedTier);
 

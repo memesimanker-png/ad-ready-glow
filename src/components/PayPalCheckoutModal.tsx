@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons, FUNDING } from "@paypal/react-paypal-js";
-import { X, Loader2, CheckCircle, Zap, Lock, CreditCard } from "lucide-react";
+import { X, Loader2, CheckCircle, Zap, Lock, CreditCard, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 
@@ -21,6 +21,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState<{ key: string; expires_at: string } | null>(null);
   // No tabs anymore — for subscription tiers we default to auto-renew (the highlighted offer)
   // and let users pick "one-time" via a card click. State drives the PayPal button rendered.
@@ -34,6 +35,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     if (isOpen) {
       setError(null);
       setProcessing(false);
+      setPending(false);
       setPlanId(null);
       setPaymentType(tier.isSubscription ? "subscription" : "onetime");
       // Restore last key for this tier if the modal was accidentally re-opened
@@ -136,6 +138,11 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Payment capture failed");
+        // eCheck / pending payments: funds haven't cleared yet, so no key is issued.
+        if (result?.pending || result?.status === "PENDING") {
+          setPending(true);
+          return;
+        }
         persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       }
@@ -146,16 +153,16 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
     }
   };
 
-  // Block accidental close while we're mid-payment OR the success screen is up.
-  // The user must click the X explicitly to dismiss the success view.
+  // Block accidental close while we're mid-payment OR a result screen is up.
   const guardedClose = () => {
-    if (processing || success) return;
+    if (processing || success || pending) return;
     onClose();
   };
 
   const dismissSuccess = () => {
     try { localStorage.removeItem(`last_purchase_${tier.id}`); } catch {}
     setSuccess(null);
+    setPending(false);
     onClose();
   };
 
@@ -173,7 +180,7 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
         <div className="h-1.5 bg-gradient-to-r from-primary via-accent to-primary/40" />
         <div className="p-6">
           <button
-            onClick={success ? dismissSuccess : guardedClose}
+            onClick={(success || pending) ? dismissSuccess : guardedClose}
             disabled={processing}
             className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors rounded-full p-1.5 hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Close"
@@ -181,7 +188,21 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
             <X className="w-4 h-4" />
           </button>
 
-          {success ? (
+
+          {pending ? (
+            <div className="text-center py-6">
+              <div className="h-16 w-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="font-heading text-xl font-bold mb-2">{t("Payment Processing")}</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t("Your payment is an eCheck and is still clearing. This can take a few business days. As soon as the funds clear, your license key will be emailed to you and added to your dashboard automatically — no key is issued before then.")}
+              </p>
+              <button onClick={dismissSuccess} className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors">
+                {t("Got it")}
+              </button>
+            </div>
+          ) : success ? (
             <div className="text-center py-6">
               <div className="h-16 w-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="h-8 w-8 text-success" />

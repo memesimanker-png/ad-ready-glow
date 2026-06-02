@@ -93,32 +93,89 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Handle payment capture completed (one-time purchases)
+    // Handle payment capture completed (one-time purchases).
+    // This fires for instant payments AND when a slow eCheck finally clears.
     if (eventType === "PAYMENT.CAPTURE.COMPLETED") {
       const capture = event.resource;
       const orderId = capture.supplementary_data?.related_ids?.order_id || capture.id;
       const amount = parseFloat(capture.amount?.value || "0");
+      const email = capture.payer?.email_address || null;
 
-      let tier = "trial-7day";
-      let hours = 72;
-      if (amount >= 40) { tier = "lifetime"; hours = 876000; }
-      else if (amount >= 8) { tier = "monthly"; hours = 720; }
+      // Was this order already recorded (e.g. a pending eCheck)? If so, reuse its
+      // tier and don't create a duplicate / don't re-issue an already-issued key.
+      const { data: existing } = await supabase
+        .from("premium_key_purchases")
+        .select("id, tier, status, key_generated, customer_email")
+        .eq("payment_id", orderId)
+        .maybeSingle();
 
-      const key = await generateKey(`PayPal-${orderId}`, hours);
-      const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+      if (existing && existing.status === "completed" && existing.key_generated) {
+        console.log(`[webhook] Order ${orderId} already completed — skipping`);
+      } else {
+        let tier = existing?.tier || "trial-7day";
+        let hours = 72;
+        if (!existing) {
+          if (amount >= 40) { tier = "lifetime"; hours = 876000; }
+          else if (amount >= 8) { tier = "monthly"; hours = 720; }
+        } else {
+          if (tier === "lifetime") hours = 876000;
+          else if (tier === "monthly") hours = 720;
+          else hours = 72;
+        }
 
-      await supabase.from("premium_key_purchases").insert({
-        payment_id: orderId,
-        tier,
-        key_generated: key,
-        amount,
-        currency: capture.amount?.currency_code || "USD",
-        status: "completed",
-        customer_email: capture.payer?.email_address || null,
-        expires_at: expiresAt,
-      });
+        const key = await generateKey(`PayPal-${orderId}`, hours);
+        const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+        const finalEmail = email || existing?.customer_email || null;
 
-      console.log(`[webhook] Key generated for order ${orderId}: ${tier}`);
+        if (existing) {
+          await supabase.from("premium_key_purchases")
+            .update({ key_generated: key, status: "completed", expires_at: expiresAt })
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("premium_key_purchases").insert({
+            payment_id: orderId,
+            tier,
+            key_generated: key,
+            amount,
+            currency: capture.amount?.currency_code || "USD",
+            status: "completed",
+            customer_email: finalEmail,
+            expires_at: expiresAt,
+          });
+        }
+
+        // Email the key to the buyer (important for eCheck: they left long ago).
+        if (finalEmail) {
+          try {
+            await supabase.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "key-delivery",
+                recipientEmail: finalEmail,
+                templateData: {
+                  premiumKey: key,
+                  tier,
+                  expiresAt: new Date(expiresAt).toLocaleDateString(),
+                },
+              },
+            });
+          } catch (e) {
+            console.error("[webhook] key-delivery email failed:", e);
+          }
+        }
+
+        console.log(`[webhook] Key issued for order ${orderId}: ${tier}`);
+      }
+    }
+
+    // eCheck (or any capture) was denied/reversed — mark the pending row failed.
+    if (eventType === "PAYMENT.CAPTURE.DENIED" || eventType === "PAYMENT.CAPTURE.REVERSED") {
+      const capture = event.resource;
+      const orderId = capture.supplementary_data?.related_ids?.order_id || capture.id;
+      await supabase.from("premium_key_purchases")
+        .update({ status: "failed" })
+        .eq("payment_id", orderId)
+        .eq("status", "pending");
+      console.log(`[webhook] Capture ${orderId} denied/reversed`);
     }
 
     // Handle subscription activated
