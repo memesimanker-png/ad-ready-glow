@@ -76,41 +76,54 @@ export default function Dashboard() {
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
 
+  const loadData = async (currentUser: any) => {
+    const email = (currentUser.email || "").toLowerCase();
+
+    // Query by user_id OR matching customer_email (covers guest checkouts that
+    // didn't capture a user_id but used the same email as the buyer's account).
+    const keysQuery = email
+      ? supabase
+          .from("premium_key_purchases")
+          .select("*")
+          .or(`user_id.eq.${currentUser.id},customer_email.eq.${email}`)
+          .order("created_at", { ascending: false })
+      : supabase
+          .from("premium_key_purchases")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+    const [keysRes, messagesRes] = await Promise.all([
+      keysQuery,
+      supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", currentUser.id).order("created_at", { ascending: false }),
+    ]);
+
+    // Dedupe by id in case a row matches both filters
+    const rawKeys = (keysRes.data as KeyPurchase[]) || [];
+    const seen = new Set<string>();
+    const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
+
+    setKeys(uniqKeys);
+    setMessages((messagesRes.data as ContactMessage[]) || []);
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) { setLoading(false); return; }
       setUser(data.user);
-      const email = (data.user.email || "").toLowerCase();
-
-      // Query by user_id OR matching customer_email (covers guest checkouts that
-      // didn't capture a user_id but used the same email as the buyer's account).
-      const keysQuery = email
-        ? supabase
-            .from("premium_key_purchases")
-            .select("*")
-            .or(`user_id.eq.${data.user.id},customer_email.eq.${email}`)
-            .order("created_at", { ascending: false })
-        : supabase
-            .from("premium_key_purchases")
-            .select("*")
-            .eq("user_id", data.user.id)
-            .order("created_at", { ascending: false });
-
-      const [keysRes, messagesRes] = await Promise.all([
-        keysQuery,
-        supabase.from("contact_messages").select("id,subject,message,status,admin_reply,replied_at,created_at").eq("user_id", data.user.id).order("created_at", { ascending: false }),
-      ]);
-
-      // Dedupe by id in case a row matches both filters
-      const rawKeys = (keysRes.data as KeyPurchase[]) || [];
-      const seen = new Set<string>();
-      const uniqKeys = rawKeys.filter(k => (seen.has(k.id) ? false : (seen.add(k.id), true)));
-
-      setKeys(uniqKeys);
-      setMessages((messagesRes.data as ContactMessage[]) || []);
+      await loadData(data.user);
       setLoading(false);
     });
   }, []);
+
+  // Auto-poll while any purchase is still clearing (eCheck pending). Once the
+  // webhook flips it to completed + issues the key, the dashboard updates itself.
+  const hasPending = keys.some((k) => k.status === "pending");
+  useEffect(() => {
+    if (!user || !hasPending) return;
+    const interval = setInterval(() => loadData(user), 12000);
+    return () => clearInterval(interval);
+  }, [user, hasPending]);
 
   const copyText = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
