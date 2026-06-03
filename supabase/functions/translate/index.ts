@@ -228,6 +228,14 @@ serve(async (req) => {
       }
     }
 
+    // Drop any garbage translations (wrong-script junk from a degraded AI) so we
+    // never cache or serve them — the original English stays visible instead.
+    for (const key of Object.keys(allTranslated)) {
+      if (!isValidTranslation(language, key, allTranslated[key])) {
+        delete allTranslated[key];
+      }
+    }
+
     // Cache results in DB
     const rows = Object.entries(allTranslated).map(([source, translated]) => ({
       source_text: source,
