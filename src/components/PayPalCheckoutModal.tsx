@@ -415,6 +415,19 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
                 </PayPalScriptProvider>
               )}
 
+              <div className="mt-4 rounded-lg border border-border bg-secondary/40 p-3 text-[11px] leading-relaxed text-muted-foreground">
+                <p className="font-medium text-foreground mb-1">{t("Card declined or blocked?")}</p>
+                <p>{t("Some banks or countries block this type of payment. Try paying with your PayPal balance, use a different card, or connect through a VPN. Still stuck? We'll get you sorted on Discord.")}</p>
+                <a
+                  href="https://discord.com/invite/ufrz9Zaqs8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-block font-medium text-primary hover:underline"
+                >
+                  {t("Get help on Discord")} →
+                </a>
+              </div>
+
               <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-muted-foreground">
                 <Lock className="w-3 h-3" /> {t("Secure payment powered by PayPal")}
               </div>
