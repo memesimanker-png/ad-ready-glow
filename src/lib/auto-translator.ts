@@ -95,6 +95,19 @@ function collectTextNodes(root: Node, out: Text[]) {
   while ((n = walker.nextNode())) out.push(n as Text);
 }
 
+// Latin-script languages must never render CJK/Hangul/Thai junk (degraded-AI garbage).
+const LATIN_LANGS = new Set(["fr", "de", "id", "pt", "fil", "es", "vi"]);
+const NON_LATIN_RE = /[\u1100-\u11FF\u3040-\u30FF\u3130-\u318F\uAC00-\uD7AF\u4E00-\u9FFF\u0E00-\u0E7F]/g;
+function isValidTranslation(lang: string, translated: string): boolean {
+  const t = (translated || "").trim();
+  if (!t) return false;
+  if (LATIN_LANGS.has(lang)) {
+    const bad = (t.match(NON_LATIN_RE) || []).length;
+    if (bad > 0 && bad / t.length > 0.15) return false;
+  }
+  return true;
+}
+
 function applyTranslation(node: Text, lang: string) {
   const parent = node.parentElement;
   if (!parent) return;
@@ -104,6 +117,11 @@ function applyTranslation(node: Text, lang: string) {
 
   const translated = cache[lang]?.[trimmed];
   if (!translated) return;
+  // Purge garbage translations so the readable English stays instead.
+  if (!isValidTranslation(lang, translated)) {
+    delete cache[lang][trimmed];
+    return;
+  }
 
   // Save original once for restoration
   if (!parent.hasAttribute(ATTR_ORIGINAL)) {
