@@ -174,6 +174,12 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
           }
         );
         if (fnError) throw new Error("Subscription activation failed");
+        // eCheck / unfunded first cycle: no key issued until funds clear.
+        if (result?.pending || result?.status === "PENDING") {
+          setPending(true);
+          setPendingOrderId(data.subscriptionID);
+          return;
+        }
         persistKey(result.key, result.expires_at);
         setSuccess({ key: result.key, expires_at: result.expires_at });
       } else {
