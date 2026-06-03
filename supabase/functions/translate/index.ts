@@ -39,6 +39,25 @@ const LANG_NAMES: Record<string, string> = {
   fil: "Filipino", es: "Spanish", vi: "Vietnamese",
 };
 
+// Reject garbage translations whose script doesn't match the target language.
+// e.g. German ("de") output should never be Hangul/CJK/Thai — when the AI is
+// degraded it sometimes returns junk like "솜ㅅ ㅡㄷ무". Dropping it keeps the
+// original English (readable) instead of caching/showing broken characters.
+const LATIN_LANGS = new Set(["fr", "de", "id", "pt", "fil", "es", "vi"]);
+const NON_LATIN_RE = /[\u1100-\u11FF\u3040-\u30FF\u3130-\u318F\uAC00-\uD7AF\u4E00-\u9FFF\u0E00-\u0E7F]/;
+function isValidTranslation(language: string, source: string, translated: string): boolean {
+  if (typeof translated !== "string") return false;
+  const t = translated.trim();
+  if (!t) return false;
+  // Latin-script target must not be dominated by CJK/Hangul/Thai characters.
+  if (LATIN_LANGS.has(language)) {
+    const bad = (t.match(new RegExp(NON_LATIN_RE, "g")) || []).length;
+    if (bad > 0 && bad / t.length > 0.15) return false;
+  }
+  return true;
+}
+
+
 // Pollinations.ai fallback — free, no quota. Used when Lovable AI returns 402/429.
 async function pollinationsTranslate(texts: string[], langName: string): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
