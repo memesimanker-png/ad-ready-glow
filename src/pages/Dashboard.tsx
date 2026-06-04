@@ -538,6 +538,16 @@ Message: ${supportForm.message || "(none)"}
           )}
         </div>
       </section>
+
+      {topUpKey && paypalClientId && (
+        <TopUpModal
+          isOpen={!!topUpKey}
+          onClose={() => setTopUpKey(null)}
+          paypalClientId={paypalClientId}
+          keyValue={topUpKey}
+          onSuccess={() => user && loadData(user)}
+        />
+      )}
     </Layout>
   );
 }
