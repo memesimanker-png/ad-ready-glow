@@ -137,6 +137,12 @@ export default function Dashboard() {
     });
   }, []);
 
+  useEffect(() => {
+    supabase.functions.invoke("paypal-config").then(({ data }) => {
+      if (data?.client_id) setPaypalClientId(data.client_id);
+    });
+  }, []);
+
   // Auto-poll while any purchase is still clearing (eCheck pending). Once the
   // webhook flips it to completed + issues the key, the dashboard updates itself.
   const hasPending = keys.some((k) => k.status === "pending");
