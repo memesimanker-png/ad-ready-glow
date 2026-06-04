@@ -167,38 +167,84 @@ serve(async (req) => {
       }
     }
 
-    // eCheck (or any capture) was denied/reversed — mark the pending row failed.
+    // eCheck (or any capture) was denied/reversed — mark the row failed AND
+    // revoke the key on the key server if one was already issued (refund/chargeback).
     if (eventType === "PAYMENT.CAPTURE.DENIED" || eventType === "PAYMENT.CAPTURE.REVERSED") {
       const capture = event.resource;
       const orderId = capture.supplementary_data?.related_ids?.order_id || capture.id;
+
+      const { data: rows } = await supabase.from("premium_key_purchases")
+        .select("id, key_generated")
+        .eq("payment_id", orderId);
+
+      for (const row of rows || []) {
+        if (row.key_generated) {
+          try {
+            await deactivateKey(row.key_generated);
+            console.log(`[webhook] Revoked key for reversed order ${orderId}`);
+          } catch (e) {
+            console.error("[webhook] deactivateKey failed:", e);
+          }
+        }
+      }
+
       await supabase.from("premium_key_purchases")
         .update({ status: "failed" })
         .eq("payment_id", orderId)
-        .eq("status", "pending");
+        .in("status", ["pending", "completed"]);
       console.log(`[webhook] Capture ${orderId} denied/reversed`);
     }
 
-    // Handle subscription activated
+    // Handle subscription activated / renewed.
+    // First activation issues a key. RENEWALS EXTEND the existing key by 30 days
+    // instead of issuing a brand new one — one stable key for the life of the sub.
     if (eventType === "BILLING.SUBSCRIPTION.ACTIVATED" || eventType === "BILLING.SUBSCRIPTION.RENEWED") {
       const subscription = event.resource;
       const subId = subscription.id;
       const email = subscription.subscriber?.email_address || null;
 
-      const key = await generateKey(`Sub-${subId}`, 720);
-      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: existing } = await supabase.from("premium_key_purchases")
+        .select("id, key_generated, expires_at")
+        .eq("payment_id", subId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      await supabase.from("premium_key_purchases").insert({
-        payment_id: subId,
-        tier: "monthly",
-        key_generated: key,
-        amount: 8,
-        currency: "USD",
-        status: "completed",
-        customer_email: email,
-        expires_at: expiresAt,
-      });
-
-      console.log(`[webhook] Subscription key generated for ${subId}`);
+      if (existing?.key_generated) {
+        // Renewal: extend the existing key by 720 hours (30 days).
+        let newExpiry: string | null = null;
+        try {
+          const ext = await extendKey(existing.key_generated, 720);
+          newExpiry = ext.ok ? (ext.data?.new_expires_at || null) : null;
+        } catch (e) {
+          console.error("[webhook] extendKey on renewal failed:", e);
+        }
+        // Fallback: compute +30d from current expiry if API didn't return one.
+        if (!newExpiry) {
+          const base = existing.expires_at && new Date(existing.expires_at) > new Date()
+            ? new Date(existing.expires_at) : new Date();
+          newExpiry = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        }
+        await supabase.from("premium_key_purchases")
+          .update({ status: "completed", expires_at: newExpiry })
+          .eq("id", existing.id);
+        console.log(`[webhook] Subscription ${subId} renewed — key extended to ${newExpiry}`);
+      } else {
+        // First activation: issue the key.
+        const key = await generateKey(`Sub-${subId}`, 720);
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        await supabase.from("premium_key_purchases").insert({
+          payment_id: subId,
+          tier: "monthly",
+          key_generated: key,
+          amount: 8,
+          currency: "USD",
+          status: "completed",
+          customer_email: email,
+          expires_at: expiresAt,
+        });
+        console.log(`[webhook] Subscription key generated for ${subId}`);
+      }
     }
 
     // Handle subscription cancelled
