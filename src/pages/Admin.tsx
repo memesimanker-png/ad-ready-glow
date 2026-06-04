@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare, Upload, ImageIcon, X } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -92,6 +92,7 @@ export default function Admin() {
             {can("messages") && <TabsTrigger value="messages" className="gap-2" title="Read and reply to contact form messages"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
             {can("users") && <TabsTrigger value="users" className="gap-2" title="View and manage registered user accounts"><Users className="h-4 w-4" /> Users</TabsTrigger>}
             {can("admins") && <TabsTrigger value="admins" className="gap-2" title="Grant or revoke admin/moderator access"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            <TabsTrigger value="keytools" className="gap-2" title="Inspect, extend, revoke, or transfer any HWID key"><Wrench className="h-4 w-4" /> Key Tools</TabsTrigger>
             {isSuperAdmin && <TabsTrigger value="settings" className="gap-2" title="Edit Discord webhook and other site settings"><MessageSquare className="h-4 w-4" /> Settings</TabsTrigger>}
           </TabsList>
 
@@ -103,6 +104,7 @@ export default function Admin() {
           {can("messages") && <TabsContent value="messages"><MessagesTab /></TabsContent>}
           {can("users") && <TabsContent value="users"><UsersTab /></TabsContent>}
           {can("admins") && <TabsContent value="admins"><AdminsTab /></TabsContent>}
+          <TabsContent value="keytools"><KeyToolsTab /></TabsContent>
           {isSuperAdmin && <TabsContent value="settings"><SettingsTab /></TabsContent>}
         </Tabs>
       </main>
@@ -1395,5 +1397,139 @@ function SettingsTab() {
         Save Webhook
       </Button>
     </Card>
+  );
+}
+
+/* ─── Key Tools Tab (external Shop Key API) ─── */
+function KeyToolsTab() {
+  const { toast } = useToast();
+  const inputCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+  const [key, setKey] = useState("");
+  const [hours, setHours] = useState("720");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [info, setInfo] = useState<any>(null);
+
+  const presets = [
+    { label: "1 Day", hours: 24 },
+    { label: "7 Days", hours: 168 },
+    { label: "30 Days", hours: 720 },
+    { label: "1 Year", hours: 8760 },
+    { label: "Lifetime", hours: 876000 },
+  ];
+
+  const call = async (action: string, body: Record<string, unknown> = {}) => {
+    const k = key.trim();
+    if (!k) { toast({ variant: "destructive", title: "Enter a key first" }); return null; }
+    setBusy(action);
+    try {
+      const { data, error } = await supabase.functions.invoke("shop-key", {
+        body: { action, key: k, ...body },
+      });
+      if (error) {
+        // Supabase wraps non-2xx as error; try to surface server message.
+        let msg = error.message;
+        try { const ctx = await (error as any).context?.json?.(); if (ctx?.error) msg = ctx.error; } catch { /* noop */ }
+        toast({ variant: "destructive", title: "Failed", description: msg });
+        return null;
+      }
+      if (data?.success === false) {
+        toast({ variant: "destructive", title: "Failed", description: data.error });
+        return null;
+      }
+      return data;
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const doInfo = async () => {
+    const d = await call("info");
+    if (d) { setInfo(d); toast({ title: "Key info loaded" }); }
+  };
+  const doExtend = async () => {
+    const h = Number(hours);
+    if (!h || h < 1 || h > 876000) { toast({ variant: "destructive", title: "Hours must be 1–876000" }); return; }
+    const d = await call("extend", { hours: h });
+    if (d) { toast({ title: "Key extended", description: `New expiry: ${d.new_expires_at ? new Date(d.new_expires_at).toLocaleString() : "updated"}` }); doInfo(); }
+  };
+  const doDeactivate = async () => {
+    if (!confirm("Revoke/deactivate this key? The user will lose access immediately.")) return;
+    const d = await call("deactivate");
+    if (d) { toast({ title: "Key deactivated" }); doInfo(); }
+  };
+  const doTransfer = async () => {
+    if (!confirm("Reset HWID binding? The key will bind to the next device that uses it.")) return;
+    const d = await call("transfer");
+    if (d) { toast({ title: "HWID reset", description: "Key will bind to the next device." }); doInfo(); }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold">Key Tools</h2>
+        <p className="text-sm text-muted-foreground">Inspect, extend, revoke, or reset the HWID binding on any premium key.</p>
+      </div>
+
+      <Card className="p-6 space-y-4">
+        <div>
+          <label className="text-sm font-medium mb-1 block">HWID Key *</label>
+          <input value={key} onChange={e => setKey(e.target.value)} className={`${inputCls} font-mono`} placeholder="paste a key e.g. abc123-def456..." />
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={doInfo} disabled={!!busy} variant="outline" className="gap-2">
+            {busy === "info" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />} Inspect
+          </Button>
+          <Button onClick={doDeactivate} disabled={!!busy} variant="destructive" className="gap-2">
+            {busy === "deactivate" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />} Revoke
+          </Button>
+          <Button onClick={doTransfer} disabled={!!busy} variant="outline" className="gap-2">
+            {busy === "transfer" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowLeftRight className="h-4 w-4" />} Reset HWID
+          </Button>
+        </div>
+
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-3">
+          <label className="text-sm font-medium block flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> Extend key</label>
+          <div className="flex flex-wrap gap-1.5">
+            {presets.map(p => (
+              <button key={p.hours} type="button" onClick={() => setHours(String(p.hours))}
+                className="px-2.5 py-1 text-xs rounded border border-border bg-secondary/50 hover:bg-primary/20 hover:border-primary/50 transition">
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input type="number" min="1" max="876000" value={hours} onChange={e => setHours(e.target.value)} className={inputCls} placeholder="hours" />
+            <Button onClick={doExtend} disabled={!!busy} className="gap-2 shrink-0">
+              {busy === "extend" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Add Hours
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {info && (
+        <Card className="p-6 space-y-2 text-sm">
+          <h3 className="font-semibold mb-2">Key Details</h3>
+          <Row label="Username" value={info.username} />
+          <Row label="Type" value={info.key_type} />
+          <Row label="Active" value={info.is_active ? "Yes" : "No"} />
+          <Row label="Expired" value={info.is_expired ? "Yes" : "No"} />
+          <Row label="HWID bound" value={info.hwid_bound ? "Yes" : "No"} />
+          <Row label="Expires at" value={info.expires_at ? new Date(info.expires_at).toLocaleString() : "—"} />
+          {info.time_remaining && (
+            <Row label="Time left" value={`${info.time_remaining.days}d ${info.time_remaining.hours % 24 || info.time_remaining.hours}h`} />
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: any }) {
+  return (
+    <div className="flex justify-between gap-4 border-b border-border/40 py-1.5">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-right break-all">{String(value ?? "—")}</span>
+    </div>
   );
 }

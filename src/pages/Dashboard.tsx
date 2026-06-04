@@ -6,11 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare, Clock } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare, Clock, Plus, RefreshCw, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
+import { TopUpModal } from "@/components/TopUpModal";
 
 type KeyPurchase = {
   id: string;
@@ -75,6 +76,26 @@ export default function Dashboard() {
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
+  const [paypalClientId, setPaypalClientId] = useState("");
+  const [topUpKey, setTopUpKey] = useState<string | null>(null);
+  const [liveStatus, setLiveStatus] = useState<Record<string, any>>({});
+  const [checkingKey, setCheckingKey] = useState<string | null>(null);
+
+  const checkLiveStatus = async (keyValue: string) => {
+    setCheckingKey(keyValue);
+    try {
+      const { data, error } = await supabase.functions.invoke("shop-key", {
+        body: { action: "info", key: keyValue },
+      });
+      if (error || data?.success === false) {
+        toast({ variant: "destructive", title: "Couldn't load status", description: data?.error || error?.message });
+        return;
+      }
+      setLiveStatus((s) => ({ ...s, [keyValue]: data }));
+    } finally {
+      setCheckingKey(null);
+    }
+  };
 
   const loadData = async (currentUser: any) => {
     const email = (currentUser.email || "").toLowerCase();
@@ -113,6 +134,12 @@ export default function Dashboard() {
       setUser(data.user);
       await loadData(data.user);
       setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    supabase.functions.invoke("paypal-config").then(({ data }) => {
+      if (data?.client_id) setPaypalClientId(data.client_id);
     });
   }, []);
 
@@ -426,7 +453,38 @@ Message: ${supportForm.message || "(none)"}
                             {purchase.expires_at && <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>}
                             <span>${purchase.amount}</span>
                           </div>
+
+                          {!isFailed && purchase.key_generated && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {!isExpired && (
+                                <Button size="sm" variant="default" className="gap-1.5" onClick={() => setTopUpKey(purchase.key_generated)}>
+                                  <Plus className="h-3.5 w-3.5" /> Add More Hours
+                                </Button>
+                              )}
+                              <Button size="sm" variant="outline" className="gap-1.5" disabled={checkingKey === purchase.key_generated} onClick={() => checkLiveStatus(purchase.key_generated)}>
+                                {checkingKey === purchase.key_generated ? <div className="h-3.5 w-3.5 rounded-full border-2 border-primary/40 border-t-primary animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                                Check live status
+                              </Button>
+                            </div>
+                          )}
+
+                          {liveStatus[purchase.key_generated] && (() => {
+                            const li = liveStatus[purchase.key_generated];
+                            const tr = li.time_remaining;
+                            return (
+                              <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs space-y-1.5">
+                                <p className="font-semibold text-foreground flex items-center gap-1.5"><Smartphone className="h-3.5 w-3.5 text-primary" /> Live key status</p>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+                                  <span>{li.is_active && !li.is_expired ? <span className="text-success font-medium">● Active</span> : <span className="text-destructive font-medium">● Inactive</span>}</span>
+                                  <span>HWID: {li.hwid_bound ? "Bound to a device" : "Not bound yet"}</span>
+                                  {tr && <span>{tr.days}d {tr.hours % 24}h left</span>}
+                                  {li.expires_at && <span>Expires {new Date(li.expires_at).toLocaleDateString()}</span>}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
+
                         {!isFailed && (
                           <Button variant="outline" size="sm" onClick={() => copyText(purchase.key_generated, purchase.id)}>
                             {copied === purchase.id ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
@@ -480,6 +538,16 @@ Message: ${supportForm.message || "(none)"}
           )}
         </div>
       </section>
+
+      {topUpKey && paypalClientId && (
+        <TopUpModal
+          isOpen={!!topUpKey}
+          onClose={() => setTopUpKey(null)}
+          paypalClientId={paypalClientId}
+          keyValue={topUpKey}
+          onSuccess={() => user && loadData(user)}
+        />
+      )}
     </Layout>
   );
 }
