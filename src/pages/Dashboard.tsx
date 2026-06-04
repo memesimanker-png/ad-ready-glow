@@ -453,7 +453,38 @@ Message: ${supportForm.message || "(none)"}
                             {purchase.expires_at && <span>Expires: {new Date(purchase.expires_at).toLocaleDateString()}</span>}
                             <span>${purchase.amount}</span>
                           </div>
+
+                          {!isFailed && purchase.key_generated && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {!isExpired && (
+                                <Button size="sm" variant="default" className="gap-1.5" onClick={() => setTopUpKey(purchase.key_generated)}>
+                                  <Plus className="h-3.5 w-3.5" /> Add More Hours
+                                </Button>
+                              )}
+                              <Button size="sm" variant="outline" className="gap-1.5" disabled={checkingKey === purchase.key_generated} onClick={() => checkLiveStatus(purchase.key_generated)}>
+                                {checkingKey === purchase.key_generated ? <div className="h-3.5 w-3.5 rounded-full border-2 border-primary/40 border-t-primary animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                                Check live status
+                              </Button>
+                            </div>
+                          )}
+
+                          {liveStatus[purchase.key_generated] && (() => {
+                            const li = liveStatus[purchase.key_generated];
+                            const tr = li.time_remaining;
+                            return (
+                              <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs space-y-1.5">
+                                <p className="font-semibold text-foreground flex items-center gap-1.5"><Smartphone className="h-3.5 w-3.5 text-primary" /> Live key status</p>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+                                  <span>{li.is_active && !li.is_expired ? <span className="text-success font-medium">● Active</span> : <span className="text-destructive font-medium">● Inactive</span>}</span>
+                                  <span>HWID: {li.hwid_bound ? "Bound to a device" : "Not bound yet"}</span>
+                                  {tr && <span>{tr.days}d {tr.hours % 24}h left</span>}
+                                  {li.expires_at && <span>Expires {new Date(li.expires_at).toLocaleDateString()}</span>}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
+
                         {!isFailed && (
                           <Button variant="outline" size="sm" onClick={() => copyText(purchase.key_generated, purchase.id)}>
                             {copied === purchase.id ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
