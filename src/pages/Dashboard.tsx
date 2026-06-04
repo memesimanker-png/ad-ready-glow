@@ -6,11 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare, Clock } from "lucide-react";
+import { Key, XCircle, Copy, Check, LogIn, Crown, Sparkles, Zap, Mail, Link2, AlertCircle, LifeBuoy, Send, MessageSquare, Clock, Plus, RefreshCw, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
+import { TopUpModal } from "@/components/TopUpModal";
 
 type KeyPurchase = {
   id: string;
