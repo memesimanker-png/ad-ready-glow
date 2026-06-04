@@ -92,6 +92,7 @@ export default function Admin() {
             {can("messages") && <TabsTrigger value="messages" className="gap-2" title="Read and reply to contact form messages"><Mail className="h-4 w-4" /> Messages</TabsTrigger>}
             {can("users") && <TabsTrigger value="users" className="gap-2" title="View and manage registered user accounts"><Users className="h-4 w-4" /> Users</TabsTrigger>}
             {can("admins") && <TabsTrigger value="admins" className="gap-2" title="Grant or revoke admin/moderator access"><ShieldAlert className="h-4 w-4" /> Admins</TabsTrigger>}
+            <TabsTrigger value="keytools" className="gap-2" title="Inspect, extend, revoke, or transfer any HWID key"><Wrench className="h-4 w-4" /> Key Tools</TabsTrigger>
             {isSuperAdmin && <TabsTrigger value="settings" className="gap-2" title="Edit Discord webhook and other site settings"><MessageSquare className="h-4 w-4" /> Settings</TabsTrigger>}
           </TabsList>
 
