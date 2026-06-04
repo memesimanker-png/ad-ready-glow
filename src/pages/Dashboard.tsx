@@ -76,6 +76,26 @@ export default function Dashboard() {
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportForm, setSupportForm] = useState({ paypalEmail: "", orderId: "", message: "" });
   const [supportSubmitting, setSupportSubmitting] = useState(false);
+  const [paypalClientId, setPaypalClientId] = useState("");
+  const [topUpKey, setTopUpKey] = useState<string | null>(null);
+  const [liveStatus, setLiveStatus] = useState<Record<string, any>>({});
+  const [checkingKey, setCheckingKey] = useState<string | null>(null);
+
+  const checkLiveStatus = async (keyValue: string) => {
+    setCheckingKey(keyValue);
+    try {
+      const { data, error } = await supabase.functions.invoke("shop-key", {
+        body: { action: "info", key: keyValue },
+      });
+      if (error || data?.success === false) {
+        toast({ variant: "destructive", title: "Couldn't load status", description: data?.error || error?.message });
+        return;
+      }
+      setLiveStatus((s) => ({ ...s, [keyValue]: data }));
+    } finally {
+      setCheckingKey(null);
+    }
+  };
 
   const loadData = async (currentUser: any) => {
     const email = (currentUser.email || "").toLowerCase();
