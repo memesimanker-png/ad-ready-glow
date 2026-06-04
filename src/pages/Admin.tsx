@@ -104,6 +104,7 @@ export default function Admin() {
           {can("messages") && <TabsContent value="messages"><MessagesTab /></TabsContent>}
           {can("users") && <TabsContent value="users"><UsersTab /></TabsContent>}
           {can("admins") && <TabsContent value="admins"><AdminsTab /></TabsContent>}
+          <TabsContent value="keytools"><KeyToolsTab /></TabsContent>
           {isSuperAdmin && <TabsContent value="settings"><SettingsTab /></TabsContent>}
         </Tabs>
       </main>
