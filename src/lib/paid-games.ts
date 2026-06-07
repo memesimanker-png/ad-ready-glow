@@ -43,9 +43,12 @@ export const PAID_GAMES: PaidGame[] = [
     subtitle: "Auto farm + PvP",
     features: ["Auto Collect Amber", "Kill All Goat", "Kill Players", "Unpatched & Working"],
     monthlyPrice: 7,
-    lifetimePrice: 11,
+    lifetimePrice: 11.99,
     thumbnail: "https://tr.rbxcdn.com/180DAY-72007dc11099c62685db43551189ca26/768/432/Image/Png/noFilter",
     badge: { text: "UNPATCHED", variant: "primary" },
+    script: 'loadstring(game:HttpGet("https://project--99e78c61-02dc-4bac-bdf3-0501b0b864dc-dev.lovable.app/api/public/script-loader?id=14961600056"))()',
+    monthlyNote: "Monthly gets instant updates",
+    lifetimeNote: "If patched, updates come 1-2 weeks later",
     changelog: [
       { id: 1, version: "v1.4", changes: "Bypass for latest anti-cheat patch.", created_at: "2026-05-05" },
     ],
