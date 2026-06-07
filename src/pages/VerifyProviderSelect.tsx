@@ -36,6 +36,7 @@ export default function VerifyProviderSelect() {
   const [discordTimer, setDiscordTimer] = useState(0);
 
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
+  const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
   const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
