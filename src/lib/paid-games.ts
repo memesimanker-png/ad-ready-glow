@@ -42,7 +42,7 @@ export const PAID_GAMES: PaidGame[] = [
     title: "Jurassic Blocky Script",
     subtitle: "Auto farm + PvP",
     features: ["Auto Collect Amber", "Kill All Goat", "Kill Players", "Unpatched & Working"],
-    monthlyPrice: 7,
+    monthlyPrice: 7.99,
     lifetimePrice: 11.99,
     thumbnail: "https://tr.rbxcdn.com/180DAY-72007dc11099c62685db43551189ca26/768/432/Image/Png/noFilter",
     badge: { text: "UNPATCHED", variant: "primary" },
