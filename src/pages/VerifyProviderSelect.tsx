@@ -75,6 +75,15 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
 
+    supabase
+      .from("verify_settings")
+      .select("direct_link_clicks")
+      .eq("id", 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.direct_link_clicks) setRequiredClicks(data.direct_link_clicks);
+      });
+
     return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
   }, []);
 
