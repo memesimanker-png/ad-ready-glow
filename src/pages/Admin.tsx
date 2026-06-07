@@ -1528,6 +1528,55 @@ function KeyToolsTab() {
   );
 }
 
+/* ─── Verify Steps Control (free key ad-step count) ─── */
+function VerifyStepsControl() {
+  const { toast } = useToast();
+  const [clicks, setClicks] = useState<number>(2);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase.from("verify_settings").select("direct_link_clicks").eq("id", 1).maybeSingle()
+      .then(({ data }) => {
+        if (data?.direct_link_clicks) setClicks(data.direct_link_clicks);
+        setLoading(false);
+      });
+  }, []);
+
+  const save = async () => {
+    if (clicks < 1 || clicks > 10) { toast({ variant: "destructive", title: "Steps must be 1–10" }); return; }
+    setSaving(true);
+    const { error } = await supabase.from("verify_settings")
+      .update({ direct_link_clicks: clicks, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+    setSaving(false);
+    if (error) { toast({ variant: "destructive", title: "Failed to save", description: error.message }); return; }
+    toast({ title: "Saved", description: `Free key now requires ${clicks} ad ${clicks === 1 ? "step" : "steps"}.` });
+  };
+
+  return (
+    <Card className="p-6 space-y-4">
+      <div>
+        <h3 className="font-semibold flex items-center gap-2"><MousePointerClick className="h-4 w-4 text-primary" /> Free Key Ad Steps</h3>
+        <p className="text-sm text-muted-foreground">How many times users must click the ad button on the verify page before they can unlock a free key.</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="number" min="1" max="10" disabled={loading}
+          value={clicks}
+          onChange={(e) => setClicks(Number(e.target.value))}
+          className="w-24 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+        />
+        <Button onClick={save} disabled={saving || loading} className="gap-2 shrink-0">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Save
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+
+
 function Row({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex justify-between gap-4 border-b border-border/40 py-1.5">
