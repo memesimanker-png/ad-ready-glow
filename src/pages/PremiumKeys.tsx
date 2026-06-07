@@ -225,9 +225,9 @@ export default function PremiumKeys() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PAID_GAMES.filter((g) => !hiddenGames?.has(g.key)).map((g) => {
               const pricing = [
-                { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly") },
+                { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: g.monthlyNote },
                 ...(g.lifetimePrice
-                  ? [{ price: g.lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment") }]
+                  ? [{ price: g.lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment"), note: g.lifetimeNote }]
                   : []),
               ];
               return (
@@ -246,6 +246,7 @@ export default function PremiumKeys() {
                     id: plan.period === "month" ? "monthly" : "lifetime",
                     nameKey: `${g.title} — ${plan.label}`,
                     price: plan.price,
+                    script: g.script,
                     color: "", borderColor: "", featureKeys: [],
                     buttonTextKey: "", buttonStyle: "", isSubscription: false,
                   } as any)}
