@@ -220,7 +220,7 @@ export default function VerifyProviderSelect() {
     render: () => (
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          Click the button two times to process your free access.
+          Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
         </p>
         <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
           <MousePointerClick className="h-4 w-4" />
