@@ -13,6 +13,7 @@ interface PayPalCheckoutModalProps {
     price: number;
     isSubscription?: boolean;
     subscriptionPrice?: number;
+    script?: string;
   };
   paypalClientId: string;
 }
