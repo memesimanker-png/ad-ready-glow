@@ -8,6 +8,7 @@ export interface PaidPricingTier {
   label: string;
   period: "month" | "lifetime";
   description?: string;
+  note?: string;
 }
 
 export interface ChangelogEntry {
