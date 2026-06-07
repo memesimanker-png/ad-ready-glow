@@ -1470,6 +1470,9 @@ function KeyToolsTab() {
         <p className="text-sm text-muted-foreground">Inspect, extend, revoke, or reset the HWID binding on any premium key.</p>
       </div>
 
+      <VerifyStepsControl />
+
+
       <Card className="p-6 space-y-4">
         <div>
           <label className="text-sm font-medium mb-1 block">HWID Key *</label>
