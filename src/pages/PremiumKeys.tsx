@@ -359,6 +359,7 @@ export default function PremiumKeys() {
             price: selectedTier.price,
             isSubscription: selectedTier.isSubscription,
             subscriptionPrice: selectedTier.subscriptionPrice,
+            script: (selectedTier as any).script,
           }}
           paypalClientId={paypalClientId}
         />
