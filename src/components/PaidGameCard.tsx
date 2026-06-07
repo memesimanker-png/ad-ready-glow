@@ -196,6 +196,9 @@ export function PaidGameCard({
                   {t("Get Access")}
                   <ArrowRight className="w-3 h-3" />
                 </div>
+                {tier.note && (
+                  <p className="mt-2 text-[9px] leading-tight text-muted-foreground">{t(tier.note)}</p>
+                )}
               </button>
             );
           })}
