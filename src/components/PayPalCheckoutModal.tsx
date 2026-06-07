@@ -13,6 +13,7 @@ interface PayPalCheckoutModalProps {
     price: number;
     isSubscription?: boolean;
     subscriptionPrice?: number;
+    script?: string;
   };
   paypalClientId: string;
 }
@@ -289,6 +290,18 @@ export function PayPalCheckoutModal({ isOpen, onClose, tier, paypalClientId }: P
               </button>
               <p className="text-xs text-muted-foreground">{t("Expires:")} {new Date(success.expires_at).toLocaleDateString()}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("modal_key_saved_dashboard")}</p>
+              {tier.script && (
+                <div className="mt-5 text-left bg-background/50 backdrop-blur-sm p-4 rounded-lg border border-primary/30">
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">{t("Your Script (run with your key):")}</p>
+                  <code className="block text-[11px] font-mono break-all text-primary select-all mb-3">{tier.script}</code>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(tier.script!); }}
+                    className="w-full py-2.5 rounded-lg bg-secondary text-secondary-foreground font-medium text-sm hover:bg-secondary/80 transition-colors"
+                  >
+                    {t("Copy Script")}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <>
