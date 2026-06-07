@@ -14,7 +14,7 @@ const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
 const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
-const REQUIRED_DIRECT_LINK_CLICKS = 2;
+const DEFAULT_DIRECT_LINK_CLICKS = 2;
 
 function makeNonce(): string {
   const arr = new Uint8Array(16);
@@ -36,6 +36,7 @@ export default function VerifyProviderSelect() {
   const [discordTimer, setDiscordTimer] = useState(0);
 
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
+  const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
   const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
@@ -73,6 +74,15 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("direct_link_completed");
     localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
+
+    supabase
+      .from("verify_settings")
+      .select("direct_link_clicks")
+      .eq("id", 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.direct_link_clicks) setRequiredClicks(data.direct_link_clicks);
+      });
 
     return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
   }, []);
@@ -118,9 +128,9 @@ export default function VerifyProviderSelect() {
   const handleDirectLinkClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
     setDirectLinkClicks((prev) => {
-      const next = Math.min(prev + 1, REQUIRED_DIRECT_LINK_CLICKS);
+      const next = Math.min(prev + 1, requiredClicks);
       localStorage.setItem("direct_link_clicks", String(next));
-      if (next >= REQUIRED_DIRECT_LINK_CLICKS) {
+      if (next >= requiredClicks) {
         localStorage.setItem("direct_link_completed", "true");
         toast({ title: "Processing Complete", description: "You can continue to unlock your key now." });
       } else {
@@ -205,25 +215,25 @@ export default function VerifyProviderSelect() {
   steps.push({
     key: "direct-link",
     title: "Process Free Access",
-    done: directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS,
+    done: directLinkClicks >= requiredClicks,
     icon: <MousePointerClick className="h-4 w-4" />,
     render: () => (
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          Click the button two times to process your free access.
+          Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
         </p>
-        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS}>
+        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
           <MousePointerClick className="h-4 w-4" />
-          {directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS
+          {directLinkClicks >= requiredClicks
             ? "✓ Processing Complete"
-            : `Click Ad Button (${directLinkClicks}/${REQUIRED_DIRECT_LINK_CLICKS})`}
+            : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
         </Button>
-        <Progress value={(directLinkClicks / REQUIRED_DIRECT_LINK_CLICKS) * 100} className="h-1" />
+        <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
       </div>
     ),
   });
 
-  const directLinkDone = directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS;
+  const directLinkDone = directLinkClicks >= requiredClicks;
 
   steps.push({
     key: "unlock",

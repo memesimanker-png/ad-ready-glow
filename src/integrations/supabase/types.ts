@@ -539,6 +539,27 @@ export type Database = {
         }
         Relationships: []
       }
+      verify_settings: {
+        Row: {
+          direct_link_clicks: number
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          direct_link_clicks?: number
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          direct_link_clicks?: number
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       verify_tokens: {
         Row: {
           created_at: string
