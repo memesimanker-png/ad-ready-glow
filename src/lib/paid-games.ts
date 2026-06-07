@@ -11,6 +11,12 @@ export type PaidGame = {
   thumbnail: string;
   badge: { text: string; variant: "red" | "primary" | "amber" };
   warning?: string;
+  /** Lua loader delivered to the buyer on a successful purchase. */
+  script?: string;
+  /** Small note shown under the monthly price option. */
+  monthlyNote?: string;
+  /** Small note shown under the lifetime price option. */
+  lifetimeNote?: string;
   changelog: { id: number; version: string; changes: string; created_at: string }[];
 };
 
