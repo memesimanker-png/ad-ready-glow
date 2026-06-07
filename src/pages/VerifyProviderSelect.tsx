@@ -128,9 +128,9 @@ export default function VerifyProviderSelect() {
   const handleDirectLinkClick = () => {
     window.open(DIRECT_LINK_URL, "_blank", "noopener,noreferrer");
     setDirectLinkClicks((prev) => {
-      const next = Math.min(prev + 1, REQUIRED_DIRECT_LINK_CLICKS);
+      const next = Math.min(prev + 1, requiredClicks);
       localStorage.setItem("direct_link_clicks", String(next));
-      if (next >= REQUIRED_DIRECT_LINK_CLICKS) {
+      if (next >= requiredClicks) {
         localStorage.setItem("direct_link_completed", "true");
         toast({ title: "Processing Complete", description: "You can continue to unlock your key now." });
       } else {
@@ -215,25 +215,25 @@ export default function VerifyProviderSelect() {
   steps.push({
     key: "direct-link",
     title: "Process Free Access",
-    done: directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS,
+    done: directLinkClicks >= requiredClicks,
     icon: <MousePointerClick className="h-4 w-4" />,
     render: () => (
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
           Click the button two times to process your free access.
         </p>
-        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS}>
+        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
           <MousePointerClick className="h-4 w-4" />
-          {directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS
+          {directLinkClicks >= requiredClicks
             ? "✓ Processing Complete"
-            : `Click Ad Button (${directLinkClicks}/${REQUIRED_DIRECT_LINK_CLICKS})`}
+            : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
         </Button>
-        <Progress value={(directLinkClicks / REQUIRED_DIRECT_LINK_CLICKS) * 100} className="h-1" />
+        <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
       </div>
     ),
   });
 
-  const directLinkDone = directLinkClicks >= REQUIRED_DIRECT_LINK_CLICKS;
+  const directLinkDone = directLinkClicks >= requiredClicks;
 
   steps.push({
     key: "unlock",
