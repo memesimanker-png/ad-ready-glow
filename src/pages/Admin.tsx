@@ -275,7 +275,8 @@ function GenerateKeyTab() {
 /* ─── Paid Scripts Visibility Tab ─── */
 function PaidScriptsTab() {
   const { toast } = useToast();
-  const [hidden, setHidden] = useState<Record<string, boolean>>({});
+  const [settings, setSettings] = useState<Record<string, { hidden: boolean; paused: boolean; pause_message: string | null }>>({});
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
 
@@ -283,28 +284,34 @@ function PaidScriptsTab() {
     (async () => {
       const { data, error } = await supabase
         .from("paid_script_settings")
-        .select("game_key, hidden");
+        .select("game_key, hidden, paused, pause_message");
       if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
-      const map: Record<string, boolean> = {};
-      (data || []).forEach((r: any) => { map[r.game_key] = r.hidden; });
-      setHidden(map);
+      const map: Record<string, { hidden: boolean; paused: boolean; pause_message: string | null }> = {};
+      const d: Record<string, string> = {};
+      (data || []).forEach((r: any) => {
+        map[r.game_key] = { hidden: !!r.hidden, paused: !!r.paused, pause_message: r.pause_message ?? null };
+        d[r.game_key] = r.pause_message ?? "";
+      });
+      setSettings(map);
+      setDrafts(d);
       setLoading(false);
     })();
   }, []);
 
-  const toggle = async (key: string) => {
-    const next = !hidden[key];
+  const persist = async (key: string, patch: { hidden?: boolean; paused?: boolean; pause_message?: string | null }) => {
+    const current = settings[key] || { hidden: false, paused: false, pause_message: null };
+    const next = { ...current, ...patch };
     setSavingKey(key);
     const { error } = await supabase
       .from("paid_script_settings")
-      .upsert({ game_key: key, hidden: next, updated_at: new Date().toISOString() }, { onConflict: "game_key" });
+      .upsert({ game_key: key, hidden: next.hidden, paused: next.paused, pause_message: next.pause_message, updated_at: new Date().toISOString() }, { onConflict: "game_key" });
     setSavingKey(null);
     if (error) {
       toast({ title: "Update failed", description: error.message, variant: "destructive" });
       return;
     }
-    setHidden(prev => ({ ...prev, [key]: next }));
-    toast({ title: next ? "Script hidden" : "Script visible", description: key });
+    setSettings(prev => ({ ...prev, [key]: next }));
+    toast({ title: "Saved", description: key });
   };
 
   if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
@@ -314,32 +321,60 @@ function PaidScriptsTab() {
       <div>
         <h2 className="text-lg font-semibold">Paid Game Scripts</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Toggle to show or hide any paid game script on the Premium Keys page. Hidden scripts disappear for all visitors.
+          Hide a script entirely, or pause purchases (keeps it visible but disables buying and shows a message).
         </p>
       </div>
       <div className="space-y-3">
         {PAID_GAMES.map((g) => {
-          const isHidden = !!hidden[g.key];
+          const s = settings[g.key] || { hidden: false, paused: false, pause_message: null };
           return (
-            <Card key={g.key} className="p-4 flex items-center gap-4">
-              <img src={g.thumbnail} alt={g.title} className="h-12 w-20 object-cover rounded-md flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">{g.title}</div>
-                <div className="text-xs text-muted-foreground truncate">{g.game}</div>
+            <Card key={g.key} className="p-4 space-y-3">
+              <div className="flex items-center gap-4">
+                <img src={g.thumbnail} alt={g.title} className="h-12 w-20 object-cover rounded-md flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">{g.title}</div>
+                  <div className="text-xs text-muted-foreground truncate">{g.game}</div>
+                </div>
+                <span className={`text-xs font-medium ${s.hidden ? "text-destructive" : s.paused ? "text-yellow-500" : "text-green-500"}`}>
+                  {s.hidden ? "Hidden" : s.paused ? "Paused" : "Live"}
+                </span>
               </div>
-              <span className={`text-xs font-medium ${isHidden ? "text-destructive" : "text-green-500"}`}>
-                {isHidden ? "Hidden" : "Visible"}
-              </span>
-              <Button
-                size="sm"
-                variant={isHidden ? "default" : "outline"}
-                disabled={savingKey === g.key}
-                onClick={() => toggle(g.key)}
-                title={isHidden ? "Show this script on the site" : "Hide this script from the site"}
-              >
-                {savingKey === g.key ? <Loader2 className="h-4 w-4 animate-spin" /> : isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                <span className="ml-1.5">{isHidden ? "Show" : "Hide"}</span>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant={s.hidden ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { hidden: !s.hidden })}
+                >
+                  {s.hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  <span className="ml-1.5">{s.hidden ? "Show" : "Hide"}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant={s.paused ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { paused: !s.paused })}
+                >
+                  {savingKey === g.key ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
+                  <span className="ml-1.5">{s.paused ? "Resume Buying" : "Pause Buying"}</span>
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={drafts[g.key] ?? ""}
+                  onChange={(e) => setDrafts(prev => ({ ...prev, [g.key]: e.target.value }))}
+                  placeholder="Pause message e.g. In progress, come back later"
+                  className="flex-1 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { pause_message: (drafts[g.key] ?? "").trim() || null })}
+                >
+                  <Save className="h-4 w-4" /><span className="ml-1.5">Save Msg</span>
+                </Button>
+              </div>
             </Card>
           );
         })}
@@ -347,6 +382,7 @@ function PaidScriptsTab() {
     </div>
   );
 }
+
 
 function ScriptsTab() {
   const { data: scripts = [], refetch } = useAllScripts();
