@@ -29,6 +29,8 @@ interface PaidGameCardProps {
   videoUrl?: string;
   changelog?: ChangelogEntry[];
   pricing: PaidPricingTier[];
+  paused?: boolean;
+  pauseMessage?: string | null;
   onSelectPlan: (plan: PaidPricingTier) => void;
 }
 
@@ -46,7 +48,7 @@ function extractYouTubeId(url: string): string | null {
 
 export function PaidGameCard({
   game, title, subtitle, thumbnail, badge, features, warning,
-  videoUrl, changelog, pricing, onSelectPlan,
+  videoUrl, changelog, pricing, paused, pauseMessage, onSelectPlan,
 }: PaidGameCardProps) {
   const { t } = useTranslation();
   const [showVideo, setShowVideo] = useState(false);
@@ -157,6 +159,14 @@ export function PaidGameCard({
           </div>
         )}
 
+        {paused ? (
+          <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-center mb-2">
+            <p className="text-sm font-semibold text-yellow-300 mb-1">{t("Purchases Paused")}</p>
+            <p className="text-xs text-muted-foreground">
+              {pauseMessage ? t(pauseMessage) : t("This script is being updated. Please check back later.")}
+            </p>
+          </div>
+        ) : (
         <div className="flex gap-3 mb-2">
           {pricing.map((tier) => {
             const isLifetime = tier.period === "lifetime";
@@ -203,6 +213,7 @@ export function PaidGameCard({
             );
           })}
         </div>
+        )}
 
         <div className="flex items-center justify-center gap-1.5 mt-3 pt-3 border-t border-border text-[10px] text-muted-foreground">
           <Zap className="w-3 h-3 text-primary" />

@@ -57,27 +57,49 @@ export default function VerifyLootlabsReturn() {
     }
 
     localStorage.removeItem("verify_lootlabs_pending");
-    localStorage.setItem("step1_completed", "true");
-    localStorage.setItem("step2_completed", "true");
-    localStorage.setItem("step3_completed", "true");
-    localStorage.removeItem("verification_step");
 
-    setDone(true);
-    setMsg("Verification complete. Issuing token…");
-    toast({ title: "Verification Successful", description: "Redirecting to access key…" });
+    (async () => {
+      // How many LootLabs hops are required (admin-configurable).
+      let required = 1;
+      try {
+        const { data } = await supabase.from("verify_settings").select("lootlabs_clicks").eq("id", 1).maybeSingle();
+        if (data?.lootlabs_clicks) required = data.lootlabs_clicks;
+      } catch { /* default 1 */ }
 
-    supabase.functions.invoke("issue-verify-token", { body: {} })
-      .then(({ data, error }) => {
+      const done = Number(localStorage.getItem("lootlabs_done_count") || "0") + 1;
+      localStorage.setItem("lootlabs_done_count", String(done));
+
+      if (done < required) {
+        setDone(true);
+        setMsg(`Step ${done} of ${required} complete. Continuing…`);
+        toast({ title: "Step Complete", description: `Step ${done} of ${required} done.` });
+        setTimeout(() => navigate("/verify/provider-select?ll=1", { replace: true }), 800);
+        return;
+      }
+
+      localStorage.removeItem("lootlabs_done_count");
+      localStorage.setItem("step1_completed", "true");
+      localStorage.setItem("step2_completed", "true");
+      localStorage.setItem("step3_completed", "true");
+      localStorage.removeItem("verification_step");
+
+      setDone(true);
+      setMsg("Verification complete. Issuing token…");
+      toast({ title: "Verification Successful", description: "Redirecting to access key…" });
+
+      try {
+        const { data, error } = await supabase.functions.invoke("issue-verify-token", { body: {} });
         if (!error && data?.success && data?.token) {
           localStorage.setItem("verify_token", JSON.stringify({ token: data.token, expires_at: data.expires_at }));
         } else {
           console.warn("[VerifyLootlabsReturn] issue-verify-token failed", error || data);
         }
-      })
-      .catch((e) => console.warn("[VerifyLootlabsReturn] issue-verify-token error", e))
-      .finally(() => {
+      } catch (e) {
+        console.warn("[VerifyLootlabsReturn] issue-verify-token error", e);
+      } finally {
         setTimeout(() => navigate("/access-key", { replace: true }), 800);
-      });
+      }
+    })();
   }, [params, navigate, toast]);
 
   return (

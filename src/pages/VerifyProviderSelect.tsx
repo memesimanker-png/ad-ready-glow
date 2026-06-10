@@ -39,8 +39,18 @@ export default function VerifyProviderSelect() {
   const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
   const [unlocking, setUnlocking] = useState(false);
 
+  const [lootlabsRequired, setLootlabsRequired] = useState(1);
+  const [lootlabsDone, setLootlabsDone] = useState(0);
+
   useEffect(() => {
     setMounted(true);
+
+    // Returning from a LootLabs hop (multi-step): keep prior progress.
+    const llReturn = new URLSearchParams(window.location.search).get("ll") === "1";
+    if (llReturn) {
+      setLootlabsDone(Number(localStorage.getItem("lootlabs_done_count") || "0"));
+      setDirectLinkClicks(DEFAULT_DIRECT_LINK_CLICKS); // monetag step already passed
+    }
 
     // Monetag one-click popunder — ONLY on this page
     const POPUNDER_ID = "monetag-popunder-11035708";
@@ -74,14 +84,16 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("direct_link_completed");
     localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
+    if (!llReturn) localStorage.removeItem("lootlabs_done_count");
 
     supabase
       .from("verify_settings")
-      .select("direct_link_clicks")
+      .select("direct_link_clicks, lootlabs_clicks")
       .eq("id", 1)
       .maybeSingle()
       .then(({ data }) => {
         if (data?.direct_link_clicks) setRequiredClicks(data.direct_link_clicks);
+        if (data?.lootlabs_clicks) setLootlabsRequired(data.lootlabs_clicks);
       });
 
     return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
@@ -242,13 +254,21 @@ export default function VerifyProviderSelect() {
     icon: <CheckCircle2 className="h-4 w-4" />,
     render: () => (
       <div className="rounded-lg border border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-6 text-center">
-        <p className="text-base font-semibold mb-2">One quick step to your key</p>
-        <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-          Complete one short task to unlock your HWID key. No more multi-step waiting.
+        <p className="text-base font-semibold mb-2">
+          {lootlabsRequired > 1 ? `Complete ${lootlabsRequired} quick steps to your key` : "One quick step to your key"}
         </p>
+        <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
+          Complete {lootlabsRequired > 1 ? "a short task" : "one short task"} to unlock your HWID key.
+        </p>
+        {lootlabsRequired > 1 && (
+          <div className="mb-4">
+            <Progress value={(lootlabsDone / lootlabsRequired) * 100} className="h-1.5 max-w-xs mx-auto" />
+            <p className="mt-2 text-xs text-muted-foreground">Step {Math.min(lootlabsDone + 1, lootlabsRequired)} of {lootlabsRequired}</p>
+          </div>
+        )}
         <Button onClick={handleUnlock} disabled={unlocking || !subscriptionGateCompleted || !directLinkDone} size="lg" className="gap-2">
           {unlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
-          {unlocking ? "Generating link..." : "Unlock Free Key"}
+          {unlocking ? "Generating link..." : lootlabsRequired > 1 ? `Unlock Step ${lootlabsDone + 1}/${lootlabsRequired}` : "Unlock Free Key"}
         </Button>
         <p className="mt-4 text-[11px] text-muted-foreground">
           Want to skip the task entirely? <a href="/premium-keys" className="text-primary underline">Premium Keys</a>.

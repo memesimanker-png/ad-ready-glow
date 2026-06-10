@@ -245,6 +245,8 @@ export type Database = {
           game_key: string
           hidden: boolean
           id: string
+          pause_message: string | null
+          paused: boolean
           updated_at: string
         }
         Insert: {
@@ -252,6 +254,8 @@ export type Database = {
           game_key: string
           hidden?: boolean
           id?: string
+          pause_message?: string | null
+          paused?: boolean
           updated_at?: string
         }
         Update: {
@@ -259,6 +263,8 @@ export type Database = {
           game_key?: string
           hidden?: boolean
           id?: string
+          pause_message?: string | null
+          paused?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -543,18 +549,21 @@ export type Database = {
         Row: {
           direct_link_clicks: number
           id: number
+          lootlabs_clicks: number
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           direct_link_clicks?: number
           id?: number
+          lootlabs_clicks?: number
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           direct_link_clicks?: number
           id?: number
+          lootlabs_clicks?: number
           updated_at?: string
           updated_by?: string | null
         }
