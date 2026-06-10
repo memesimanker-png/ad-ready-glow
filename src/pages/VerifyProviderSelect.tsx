@@ -84,14 +84,16 @@ export default function VerifyProviderSelect() {
     localStorage.removeItem("direct_link_completed");
     localStorage.removeItem("direct_link_clicks");
     localStorage.setItem("selected_ad_provider", "lootlabs");
+    if (!llReturn) localStorage.removeItem("lootlabs_done_count");
 
     supabase
       .from("verify_settings")
-      .select("direct_link_clicks")
+      .select("direct_link_clicks, lootlabs_clicks")
       .eq("id", 1)
       .maybeSingle()
       .then(({ data }) => {
         if (data?.direct_link_clicks) setRequiredClicks(data.direct_link_clicks);
+        if (data?.lootlabs_clicks) setLootlabsRequired(data.lootlabs_clicks);
       });
 
     return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
