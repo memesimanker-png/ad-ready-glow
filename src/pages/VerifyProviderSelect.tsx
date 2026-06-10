@@ -254,13 +254,21 @@ export default function VerifyProviderSelect() {
     icon: <CheckCircle2 className="h-4 w-4" />,
     render: () => (
       <div className="rounded-lg border border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-6 text-center">
-        <p className="text-base font-semibold mb-2">One quick step to your key</p>
-        <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-          Complete one short task to unlock your HWID key. No more multi-step waiting.
+        <p className="text-base font-semibold mb-2">
+          {lootlabsRequired > 1 ? `Complete ${lootlabsRequired} quick steps to your key` : "One quick step to your key"}
         </p>
+        <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
+          Complete {lootlabsRequired > 1 ? "a short task" : "one short task"} to unlock your HWID key.
+        </p>
+        {lootlabsRequired > 1 && (
+          <div className="mb-4">
+            <Progress value={(lootlabsDone / lootlabsRequired) * 100} className="h-1.5 max-w-xs mx-auto" />
+            <p className="mt-2 text-xs text-muted-foreground">Step {Math.min(lootlabsDone + 1, lootlabsRequired)} of {lootlabsRequired}</p>
+          </div>
+        )}
         <Button onClick={handleUnlock} disabled={unlocking || !subscriptionGateCompleted || !directLinkDone} size="lg" className="gap-2">
           {unlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
-          {unlocking ? "Generating link..." : "Unlock Free Key"}
+          {unlocking ? "Generating link..." : lootlabsRequired > 1 ? `Unlock Step ${lootlabsDone + 1}/${lootlabsRequired}` : "Unlock Free Key"}
         </Button>
         <p className="mt-4 text-[11px] text-muted-foreground">
           Want to skip the task entirely? <a href="/premium-keys" className="text-primary underline">Premium Keys</a>.
