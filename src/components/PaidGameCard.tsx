@@ -48,7 +48,7 @@ function extractYouTubeId(url: string): string | null {
 
 export function PaidGameCard({
   game, title, subtitle, thumbnail, badge, features, warning,
-  videoUrl, changelog, pricing, onSelectPlan,
+  videoUrl, changelog, pricing, paused, pauseMessage, onSelectPlan,
 }: PaidGameCardProps) {
   const { t } = useTranslation();
   const [showVideo, setShowVideo] = useState(false);
