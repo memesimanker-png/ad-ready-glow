@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { PAID_GAMES } from "@/lib/paid-games";
-import { useHiddenPaidGames } from "@/hooks/usePaidGames";
+import { usePaidGameSettings } from "@/hooks/usePaidGames";
 import { DonateCard } from "@/components/DonateCard";
 
 
