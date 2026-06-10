@@ -29,6 +29,8 @@ interface PaidGameCardProps {
   videoUrl?: string;
   changelog?: ChangelogEntry[];
   pricing: PaidPricingTier[];
+  paused?: boolean;
+  pauseMessage?: string | null;
   onSelectPlan: (plan: PaidPricingTier) => void;
 }
 
