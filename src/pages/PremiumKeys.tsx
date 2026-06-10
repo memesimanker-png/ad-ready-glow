@@ -223,7 +223,8 @@ export default function PremiumKeys() {
             {t("Premium scripts for popular Roblox games. Monthly or lifetime access — fixes pushed regularly.")}
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PAID_GAMES.filter((g) => !hiddenGames?.has(g.key)).map((g) => {
+            {PAID_GAMES.filter((g) => !gameSettings?.get(g.key)?.hidden).map((g) => {
+              const setting = gameSettings?.get(g.key);
               const pricing = [
                 { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: g.monthlyNote },
                 ...(g.lifetimePrice
@@ -242,6 +243,8 @@ export default function PremiumKeys() {
                   warning={g.warning}
                   changelog={g.changelog}
                   pricing={pricing}
+                  paused={setting?.paused}
+                  pauseMessage={setting?.pause_message}
                   onSelectPlan={(plan) => handlePurchase({
                     id: plan.period === "month" ? "monthly" : "lifetime",
                     nameKey: `${g.title} — ${plan.label}`,
