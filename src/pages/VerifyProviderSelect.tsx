@@ -39,8 +39,18 @@ export default function VerifyProviderSelect() {
   const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
   const [unlocking, setUnlocking] = useState(false);
 
+  const [lootlabsRequired, setLootlabsRequired] = useState(1);
+  const [lootlabsDone, setLootlabsDone] = useState(0);
+
   useEffect(() => {
     setMounted(true);
+
+    // Returning from a LootLabs hop (multi-step): keep prior progress.
+    const llReturn = new URLSearchParams(window.location.search).get("ll") === "1";
+    if (llReturn) {
+      setLootlabsDone(Number(localStorage.getItem("lootlabs_done_count") || "0"));
+      setDirectLinkClicks(DEFAULT_DIRECT_LINK_CLICKS); // monetag step already passed
+    }
 
     // Monetag one-click popunder — ONLY on this page
     const POPUNDER_ID = "monetag-popunder-11035708";
