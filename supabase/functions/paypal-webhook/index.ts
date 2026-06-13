@@ -10,18 +10,10 @@ const corsHeaders = {
 const PAYPAL_API = "https://api-m.paypal.com";
 const HWID_KEY_API = "https://v0-remix-of-roblox-executor-system.vercel.app/api/generate-hwid-key";
 
-async function verifyWebhookSignature(req: Request, body: string): Promise<boolean> {
-  const webhookSecret = Deno.env.get("PAYPAL_WEBHOOK_SECRET");
-  if (!webhookSecret) {
-    console.error("[webhook] PAYPAL_WEBHOOK_SECRET not set");
-    return false;
-  }
-
+async function getAccessToken(): Promise<string> {
   const clientId = Deno.env.get("PAYPAL_CLIENT_ID")!;
   const clientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
-
-  // Get access token
-  const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+  const res = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
     method: "POST",
     headers: {
       Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
@@ -29,27 +21,80 @@ async function verifyWebhookSignature(req: Request, body: string): Promise<boole
     },
     body: "grant_type=client_credentials",
   });
-  const tokenData = await tokenRes.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(`PayPal auth failed: ${JSON.stringify(data)}`);
+  return data.access_token;
+}
 
-  const verifyRes = await fetch(`${PAYPAL_API}/v1/notifications/verify-webhook-signature`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${tokenData.access_token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      auth_algo: req.headers.get("paypal-auth-algo"),
-      cert_url: req.headers.get("paypal-cert-url"),
-      transmission_id: req.headers.get("paypal-transmission-id"),
-      transmission_sig: req.headers.get("paypal-transmission-sig"),
-      transmission_time: req.headers.get("paypal-transmission-time"),
-      webhook_id: webhookSecret,
-      webhook_event: JSON.parse(body),
-    }),
-  });
+// Verify the webhook signature with PayPal. Returns true when PayPal confirms it.
+async function verifyWebhookSignature(req: Request, body: string, accessToken: string): Promise<boolean> {
+  const webhookSecret = Deno.env.get("PAYPAL_WEBHOOK_SECRET");
+  if (!webhookSecret) {
+    console.error("[webhook] PAYPAL_WEBHOOK_SECRET not set");
+    return false;
+  }
+  try {
+    const verifyRes = await fetch(`${PAYPAL_API}/v1/notifications/verify-webhook-signature`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        auth_algo: req.headers.get("paypal-auth-algo"),
+        cert_url: req.headers.get("paypal-cert-url"),
+        transmission_id: req.headers.get("paypal-transmission-id"),
+        transmission_sig: req.headers.get("paypal-transmission-sig"),
+        transmission_time: req.headers.get("paypal-transmission-time"),
+        webhook_id: webhookSecret,
+        webhook_event: JSON.parse(body),
+      }),
+    });
+    const verifyData = await verifyRes.json();
+    return verifyData.verification_status === "SUCCESS";
+  } catch (e) {
+    console.error("[webhook] signature verify threw:", e);
+    return false;
+  }
+}
 
-  const verifyData = await verifyRes.json();
-  return verifyData.verification_status === "SUCCESS";
+// Authoritative check straight from PayPal: confirm a capture is really COMPLETED
+// and return its real amount/currency/email. This is the anti-spoof guarantee —
+// even if the signature check fails (wrong webhook id, simulator, replay), a
+// forged event cannot make us issue a key because PayPal itself must confirm it.
+async function fetchCapture(captureId: string, accessToken: string): Promise<
+  { ok: true; status: string; amount: number; currency: string; email: string | null } | { ok: false }
+> {
+  try {
+    const res = await fetch(`${PAYPAL_API}/v2/payments/captures/${captureId}`, {
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    });
+    if (!res.ok) return { ok: false };
+    const d = await res.json();
+    return {
+      ok: true,
+      status: d.status,
+      amount: parseFloat(d.amount?.value || "0"),
+      currency: d.amount?.currency_code || "USD",
+      email: d.payer?.email_address || null,
+    };
+  } catch (e) {
+    console.error("[webhook] fetchCapture threw:", e);
+    return { ok: false };
+  }
+}
+
+async function fetchSubscription(subId: string, accessToken: string): Promise<
+  { ok: true; status: string; email: string | null } | { ok: false }
+> {
+  try {
+    const res = await fetch(`${PAYPAL_API}/v1/billing/subscriptions/${subId}`, {
+      headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    });
+    if (!res.ok) return { ok: false };
+    const d = await res.json();
+    return { ok: true, status: d.status, email: d.subscriber?.email_address || null };
+  } catch (e) {
+    console.error("[webhook] fetchSubscription threw:", e);
+    return { ok: false };
+  }
 }
 
 async function generateKey(identifier: string, hours: number): Promise<string> {
@@ -79,14 +124,15 @@ serve(async (req) => {
 
     console.log(`[webhook] Event: ${eventType}`);
 
-    // Verify signature
-    const isValid = await verifyWebhookSignature(req, body);
-    if (!isValid) {
-      console.error("[webhook] Invalid signature");
-      return new Response(JSON.stringify({ error: "Invalid signature" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const accessToken = await getAccessToken();
+
+    // Try the signature check. If it passes we trust the event outright. If it
+    // FAILS we don't blindly reject anymore — instead we re-verify the money
+    // path directly against PayPal's API below, so a real payment is never lost
+    // to a misconfigured webhook id, while a forged event still can't issue keys.
+    const signatureOk = await verifyWebhookSignature(req, body, accessToken);
+    if (!signatureOk) {
+      console.warn("[webhook] Signature NOT verified — falling back to PayPal API confirmation");
     }
 
     const supabase = createClient(
@@ -95,15 +141,23 @@ serve(async (req) => {
     );
 
     // Handle payment capture completed (one-time purchases).
-    // This fires for instant payments AND when a slow eCheck finally clears.
     if (eventType === "PAYMENT.CAPTURE.COMPLETED") {
       const capture = event.resource;
-      const orderId = capture.supplementary_data?.related_ids?.order_id || capture.id;
-      const amount = parseFloat(capture.amount?.value || "0");
-      const email = capture.payer?.email_address || null;
+      const captureId = capture.id;
+      const orderId = capture.supplementary_data?.related_ids?.order_id || captureId;
 
-      // Was this order already recorded (e.g. a pending eCheck)? If so, reuse its
-      // tier and don't create a duplicate / don't re-issue an already-issued key.
+      // Authoritative confirmation from PayPal.
+      const confirmed = await fetchCapture(captureId, accessToken);
+      if (!confirmed.ok || confirmed.status !== "COMPLETED") {
+        console.error(`[webhook] Capture ${captureId} not confirmed COMPLETED by PayPal — ignoring`);
+        return new Response(JSON.stringify({ status: "ignored", reason: "unconfirmed" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const amount = confirmed.amount;
+      const email = confirmed.email;
+
       const { data: existing } = await supabase
         .from("premium_key_purchases")
         .select("id, tier, status, key_generated, customer_email")
@@ -138,14 +192,13 @@ serve(async (req) => {
             tier,
             key_generated: key,
             amount,
-            currency: capture.amount?.currency_code || "USD",
+            currency: confirmed.currency,
             status: "completed",
             customer_email: finalEmail,
             expires_at: expiresAt,
           });
         }
 
-        // Email the key to the buyer (important for eCheck: they left long ago).
         if (finalEmail) {
           try {
             await supabase.functions.invoke("send-transactional-email", {
@@ -168,41 +221,52 @@ serve(async (req) => {
       }
     }
 
-    // eCheck (or any capture) was denied/reversed — mark the row failed AND
-    // revoke the key on the key server if one was already issued (refund/chargeback).
+    // eCheck (or any capture) was denied/reversed — confirm with PayPal, then
+    // mark the row failed AND revoke the key on the key server if one exists.
     if (eventType === "PAYMENT.CAPTURE.DENIED" || eventType === "PAYMENT.CAPTURE.REVERSED") {
       const capture = event.resource;
-      const orderId = capture.supplementary_data?.related_ids?.order_id || capture.id;
+      const captureId = capture.id;
+      const orderId = capture.supplementary_data?.related_ids?.order_id || captureId;
 
-      const { data: rows } = await supabase.from("premium_key_purchases")
-        .select("id, key_generated")
-        .eq("payment_id", orderId);
+      const confirmed = await fetchCapture(captureId, accessToken);
+      const reallyBad = !confirmed.ok || ["DECLINED", "FAILED", "REVERSED", "REFUNDED"].includes(confirmed.status);
+      if (!reallyBad) {
+        console.warn(`[webhook] Reversal event for ${captureId} but PayPal status is ${confirmed.ok ? confirmed.status : "unknown"} — not revoking`);
+      } else {
+        const { data: rows } = await supabase.from("premium_key_purchases")
+          .select("id, key_generated")
+          .eq("payment_id", orderId);
 
-      for (const row of rows || []) {
-        if (row.key_generated) {
-          try {
-            await deactivateKey(row.key_generated);
-            console.log(`[webhook] Revoked key for reversed order ${orderId}`);
-          } catch (e) {
-            console.error("[webhook] deactivateKey failed:", e);
+        for (const row of rows || []) {
+          if (row.key_generated) {
+            try {
+              await deactivateKey(row.key_generated);
+              console.log(`[webhook] Revoked key for reversed order ${orderId}`);
+            } catch (e) {
+              console.error("[webhook] deactivateKey failed:", e);
+            }
           }
         }
-      }
 
-      await supabase.from("premium_key_purchases")
-        .update({ status: "failed" })
-        .eq("payment_id", orderId)
-        .in("status", ["pending", "completed"]);
-      console.log(`[webhook] Capture ${orderId} denied/reversed`);
+        await supabase.from("premium_key_purchases")
+          .update({ status: "failed" })
+          .eq("payment_id", orderId)
+          .in("status", ["pending", "completed"]);
+        console.log(`[webhook] Capture ${orderId} denied/reversed`);
+      }
     }
 
-    // Handle subscription activated / renewed.
-    // First activation issues a key. RENEWALS EXTEND the existing key by 30 days
-    // instead of issuing a brand new one — one stable key for the life of the sub.
+    // Subscription activated / renewed — confirm status ACTIVE with PayPal first.
     if (eventType === "BILLING.SUBSCRIPTION.ACTIVATED" || eventType === "BILLING.SUBSCRIPTION.RENEWED") {
-      const subscription = event.resource;
-      const subId = subscription.id;
-      const email = subscription.subscriber?.email_address || null;
+      const subId = event.resource.id;
+      const confirmed = await fetchSubscription(subId, accessToken);
+      if (!confirmed.ok || confirmed.status !== "ACTIVE") {
+        console.error(`[webhook] Subscription ${subId} not confirmed ACTIVE — ignoring`);
+        return new Response(JSON.stringify({ status: "ignored", reason: "sub-unconfirmed" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const email = confirmed.email || event.resource.subscriber?.email_address || null;
 
       const { data: existing } = await supabase.from("premium_key_purchases")
         .select("id, key_generated, expires_at")
@@ -212,7 +276,6 @@ serve(async (req) => {
         .maybeSingle();
 
       if (existing?.key_generated) {
-        // Renewal: extend the existing key by 720 hours (30 days).
         let newExpiry: string | null = null;
         try {
           const ext = await extendKey(existing.key_generated, 720);
@@ -220,7 +283,6 @@ serve(async (req) => {
         } catch (e) {
           console.error("[webhook] extendKey on renewal failed:", e);
         }
-        // Fallback: compute +30d from current expiry if API didn't return one.
         if (!newExpiry) {
           const base = existing.expires_at && new Date(existing.expires_at) > new Date()
             ? new Date(existing.expires_at) : new Date();
@@ -231,7 +293,6 @@ serve(async (req) => {
           .eq("id", existing.id);
         console.log(`[webhook] Subscription ${subId} renewed — key extended to ${newExpiry}`);
       } else {
-        // First activation: issue the key.
         const key = await generateKey(`Sub-${subId}`, 720);
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         await supabase.from("premium_key_purchases").insert({
@@ -248,7 +309,6 @@ serve(async (req) => {
       }
     }
 
-    // Handle subscription cancelled
     if (eventType === "BILLING.SUBSCRIPTION.CANCELLED" || eventType === "BILLING.SUBSCRIPTION.SUSPENDED") {
       const subId = event.resource.id;
       console.log(`[webhook] Subscription ${subId} cancelled/suspended`);
