@@ -206,6 +206,33 @@ export type Database = {
         }
         Relationships: []
       }
+      key_discounts: {
+        Row: {
+          active: boolean
+          label: string | null
+          percent_off: number
+          tier_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          label?: string | null
+          percent_off?: number
+          tier_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          label?: string | null
+          percent_off?: number
+          tier_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
