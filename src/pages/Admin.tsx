@@ -1409,29 +1409,131 @@ function SettingsTab() {
   if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
 
   return (
-    <Card className="p-6 space-y-4 max-w-2xl">
+    <div className="space-y-6 max-w-2xl">
+      <Card className="p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Discord Webhook</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Used by the "Post to Discord" button. Leaving blank falls back to the env secret.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type={show ? "text" : "password"}
+            value={webhook}
+            onChange={(e) => setWebhook(e.target.value)}
+            placeholder="https://discord.com/api/webhooks/..."
+            className="flex-1 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+          <Button variant="outline" size="icon" onClick={() => setShow(!show)} title={show ? "Hide" : "Show"}>
+            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+        </div>
+        <Button onClick={save} disabled={saving} className="w-full">
+          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+          Save Webhook
+        </Button>
+      </Card>
+
+      <KeyDiscountsCard />
+    </div>
+  );
+}
+
+/* ─── Key Discounts (Super Admin) ─── */
+function KeyDiscountsCard() {
+  const { toast } = useToast();
+  const TIERS = [
+    { id: "monthly", name: "Monthly Access", base: 9.99 },
+    { id: "lifetime", name: "Lifetime Key", base: 49.99 },
+  ];
+  const [rows, setRows] = useState<Record<string, { percent_off: number; active: boolean; label: string }>>({});
+  const [loading, setLoading] = useState(true);
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("key_discounts").select("tier_id, percent_off, active, label");
+      const map: Record<string, { percent_off: number; active: boolean; label: string }> = {};
+      (data || []).forEach((r: any) => {
+        map[r.tier_id] = { percent_off: Number(r.percent_off) || 0, active: !!r.active, label: r.label ?? "" };
+      });
+      setRows(map);
+      setLoading(false);
+    })();
+  }, []);
+
+  const save = async (tierId: string) => {
+    const r = rows[tierId] || { percent_off: 0, active: false, label: "" };
+    const pct = Math.max(0, Math.min(90, Math.round(r.percent_off)));
+    setSavingId(tierId);
+    const { error } = await supabase.from("key_discounts").upsert({
+      tier_id: tierId,
+      percent_off: pct,
+      active: r.active,
+      label: r.label.trim() || null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "tier_id" });
+    setSavingId(null);
+    if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    else toast({ title: "Discount saved" });
+  };
+
+  if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
+
+  return (
+    <Card className="p-6 space-y-5">
       <div>
-        <h2 className="text-lg font-semibold">Discord Webhook</h2>
+        <h2 className="text-lg font-semibold">Key Discounts (Sales)</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Used by the "Post to Discord" button. Leaving blank falls back to the env secret.
+          Run occasional sales on premium keys. The $5 trial key is never discounted.
         </p>
       </div>
-      <div className="flex gap-2">
-        <input
-          type={show ? "text" : "password"}
-          value={webhook}
-          onChange={(e) => setWebhook(e.target.value)}
-          placeholder="https://discord.com/api/webhooks/..."
-          className="flex-1 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-        />
-        <Button variant="outline" size="icon" onClick={() => setShow(!show)} title={show ? "Hide" : "Show"}>
-          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        </Button>
-      </div>
-      <Button onClick={save} disabled={saving} className="w-full">
-        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-        Save Webhook
-      </Button>
+      {TIERS.map((tier) => {
+        const r = rows[tier.id] || { percent_off: 0, active: false, label: "" };
+        const final = Math.round(tier.base * (1 - Math.max(0, Math.min(90, r.percent_off)) / 100) * 100) / 100;
+        const upd = (patch: Partial<typeof r>) => setRows((s) => ({ ...s, [tier.id]: { ...r, ...patch } }));
+        return (
+          <div key={tier.id} className="rounded-lg border border-border p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">{tier.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  Base ${tier.base} → {r.active && r.percent_off > 0 ? <span className="text-green-500 font-semibold">${final} ({r.percent_off}% OFF)</span> : "no discount"}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant={r.active ? "default" : "outline"}
+                onClick={() => upd({ active: !r.active })}
+              >
+                {r.active ? "Sale ON" : "Sale OFF"}
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min={0}
+                max={90}
+                value={r.percent_off}
+                onChange={(e) => upd({ percent_off: Number(e.target.value) })}
+                placeholder="% off"
+                className="w-24 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              <input
+                type="text"
+                value={r.label}
+                onChange={(e) => upd({ label: e.target.value })}
+                placeholder="Banner text (e.g. Weekend Sale)"
+                className="flex-1 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              <Button size="sm" onClick={() => save(tier.id)} disabled={savingId === tier.id}>
+                {savingId === tier.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+        );
+      })}
     </Card>
   );
 }
