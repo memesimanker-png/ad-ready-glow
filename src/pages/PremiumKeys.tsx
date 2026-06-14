@@ -224,7 +224,8 @@ export default function PremiumKeys() {
                   </Button>
                 </Card>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
