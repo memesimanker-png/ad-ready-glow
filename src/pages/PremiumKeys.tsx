@@ -105,6 +105,7 @@ export default function PremiumKeys() {
   const [paypalClientId, setPaypalClientId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const { data: gameSettings } = usePaidGameSettings();
+  const { data: keyDiscounts } = useKeyDiscounts();
 
   useEffect(() => {
     supabase.functions.invoke("paypal-config").then(({ data }) => {
