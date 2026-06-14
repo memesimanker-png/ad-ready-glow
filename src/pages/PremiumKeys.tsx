@@ -15,6 +15,7 @@ import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { PAID_GAMES } from "@/lib/paid-games";
 import { usePaidGameSettings } from "@/hooks/usePaidGames";
+import { useKeyDiscounts, applyDiscount } from "@/hooks/useKeyDiscounts";
 import { DonateCard } from "@/components/DonateCard";
 
 
