@@ -118,7 +118,8 @@ export default function PremiumKeys() {
       window.open("https://discord.com/invite/ufrz9Zaqs8", "_blank");
       return;
     }
-    setSelectedTier(tier);
+    const disc = applyDiscount(tier.price, keyDiscounts?.get(tier.id));
+    setSelectedTier(disc ? { ...tier, price: disc.final } : tier);
     setModalOpen(true);
   };
 
