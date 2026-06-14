@@ -153,7 +153,9 @@ export default function PremiumKeys() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tiers.map((tier, i) => (
+            {tiers.map((tier, i) => {
+              const disc = applyDiscount(tier.price, keyDiscounts?.get(tier.id));
+              return (
               <motion.div
                 key={tier.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -161,9 +163,13 @@ export default function PremiumKeys() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <Card className={`p-6 h-full flex flex-col card-neon ${tier.borderColor}`}>
+                <Card className={`p-6 h-full flex flex-col card-neon ${disc ? "border-green-500/50" : tier.borderColor}`}>
                   <div className="text-center mb-6">
-                    {tier.popular && (
+                    {disc ? (
+                      <div className="inline-flex items-center rounded-full border border-green-500/40 bg-green-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-green-300 mb-4">
+                        {disc.label || t("Limited-Time Sale")}
+                      </div>
+                    ) : tier.popular && (
                       <div className="inline-flex items-center rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-green-300 mb-4">
                         {t("Best Value")}
                       </div>
@@ -173,13 +179,18 @@ export default function PremiumKeys() {
                     </h3>
                     {tier.price > 0 ? (
                       <>
-                        {tier.originalPrice && (
+                        {disc ? (
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <span className="text-lg text-muted-foreground line-through">${tier.price}</span>
+                            <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-400">{disc.percent}% OFF</span>
+                          </div>
+                        ) : tier.originalPrice && (
                           <div className="flex items-center justify-center gap-2 mb-1">
                             <span className="text-lg text-muted-foreground line-through">{tier.originalPrice}</span>
                             <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-400">{tier.discount}</span>
                           </div>
                         )}
-                        <div className="text-4xl font-bold mb-1">${tier.price}</div>
+                        <div className="text-4xl font-bold mb-1">${disc ? disc.final : tier.price}</div>
                         <p className="text-sm text-muted-foreground">{t("Premium Key")}</p>
                         {tier.subtitleKey && <p className="text-xs text-muted-foreground mt-2">{t(tier.subtitleKey)}</p>}
                       </>
