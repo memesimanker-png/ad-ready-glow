@@ -1310,7 +1310,16 @@ export default function BlogPost() {
     headline: post.title,
     datePublished: isoDate,
     dateModified: isoDate,
-    author: { "@type": "Organization", name: "ComboWick" },
+    author: {
+      "@type": "Person",
+      name: "Combo_WICK Team",
+      url: "https://combowick.com/about",
+      sameAs: [
+        "https://www.youtube.com/@COMBO_WICK",
+        "https://discord.com/invite/ufrz9Zaqs8",
+        "https://rscripts.net/u/Combo_WICK",
+      ],
+    },
     publisher: {
       "@type": "Organization",
       name: "ComboWick",
