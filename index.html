@@ -230,7 +230,40 @@
     }
     </script>
 
+    <!-- E-E-A-T: Author / Creator identity (real, verifiable entity) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Combo_WICK",
+      "alternateName": ["ComboWick", "COMBO_WICK"],
+      "url": "https://combowick.com/about",
+      "image": "https://combowick.com/images/combo-wick-logo.png",
+      "jobTitle": "Roblox Script Developer & Verified Mythic Creator",
+      "knowsAbout": ["Roblox Lua scripting", "Roblox executors", "Roblox anti-cheat", "Game automation"],
+      "worksFor": {"@type": "Organization", "name": "ComboWick", "url": "https://combowick.com"},
+      "sameAs": [
+        "https://www.youtube.com/@COMBO_WICK",
+        "https://discord.com/invite/ufrz9Zaqs8",
+        "https://rscripts.net/u/Combo_WICK"
+      ]
+    }
+    </script>
+
+    <!-- Real, verifiable third-party reputation anchor: Rscripts Verified Mythic Creator -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Review",
+      "itemReviewed": {"@type": "Organization", "name": "ComboWick", "url": "https://combowick.com"},
+      "author": {"@type": "Organization", "name": "Rscripts.net", "url": "https://rscripts.net"},
+      "reviewBody": "ComboWick (Combo_WICK) is listed on Rscripts.net as a Verified Mythic Creator with over 6.7 million script views — a verifiable, independent reputation signal in the Roblox scripting community.",
+      "publisher": {"@type": "Organization", "name": "Rscripts.net"}
+    }
+    </script>
+
     <!-- FAQPage schema lives on the /faq route via SEOHead, not here, so it only appears on the page that displays those questions. -->
+
 
     <!-- Hide Lovable badge (covers <a>, custom elements, iframes, and any bottom-right pinned widget) -->
     <style>
