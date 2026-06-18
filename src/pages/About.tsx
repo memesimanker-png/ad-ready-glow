@@ -72,6 +72,26 @@ export default function About() {
             </p>
           </Card>
 
+          <Card className="p-8 bg-glass mb-8 border-primary/30">
+            <div className="flex items-start gap-4">
+              <Award className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h2 className="font-heading text-2xl font-bold mb-4">Verified, Checkable Reputation</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Combo_WICK is an independently <strong className="text-foreground">Verified Mythic Creator on Rscripts.net</strong>, the largest public Roblox script directory, with over <strong className="text-foreground">6.7 million script views</strong>. This is a real, third-party trust signal — you can verify it yourself rather than taking our word for it.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  We deliberately do not post fake testimonials or invented review scores. Our proof is our public track record:{" "}
+                  <a href="https://rscripts.net/u/Combo_WICK" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Rscripts profile</a>,{" "}
+                  <a href="https://www.youtube.com/@COMBO_WICK" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">YouTube channel</a>, and a 50k+ member{" "}
+                  <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Discord community</a>.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+
+
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {[
               { icon: Code, title: "Curated Script Hub", desc: "Every script in the hub is hand-picked, tested in real game sessions, and tagged by category (auto-farm, ESP, utility, hub). We pull thumbnails directly from Roblox so you always know what game you're looking at." },
