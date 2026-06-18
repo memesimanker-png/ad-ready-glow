@@ -8,6 +8,7 @@ import { FAQSection } from "@/components/home/FAQSection";
 import { BlogPreviewSection } from "@/components/home/BlogPreviewSection";
 import { GallerySection } from "@/components/home/GallerySection";
 import { FeaturedScriptsSection } from "@/components/home/FeaturedScriptsSection";
+import { TrustSection } from "@/components/home/TrustSection";
 import { VideoBackground } from "@/components/VideoBackground";
 import { DropCadenceTicker } from "@/components/DropCadenceTicker";
 import { AdSlot } from "@/components/AdSlot";
@@ -115,6 +116,7 @@ export default function Index() {
       </div>
 
       <BlogPreviewSection />
+      <TrustSection />
       <FAQSection />
 
       {/* CTA */}

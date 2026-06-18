@@ -33,6 +33,9 @@
     <link rel="alternate" hreflang="id" href="https://combowick.com/?lang=id" />
     <link rel="alternate" hreflang="tl" href="https://combowick.com/?lang=tl" />
 
+    <!-- Self-referencing canonical (per-route value injected by SEOHead; homepage fallback here) -->
+    <link rel="canonical" href="https://combowick.com/" />
+
     <!-- E-E-A-T: Author/Publisher identity -->
     <meta name="publisher" content="ComboWick" />
     <link rel="me" href="https://discord.com/invite/ufrz9Zaqs8" />
@@ -66,8 +69,10 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Combo_WICK Official Website | Roblox Scripts, Keys & Resources">
-    <meta name="twitter:description" content="Combo_WICK — Your trusted source for Roblox scripts, premium keys, executors, and gaming resources. Instant delivery & secure payments.">
+    <meta name="twitter:title" content="ComboWick — Roblox Scripts, Premium Keys & Executors">
+    <meta name="twitter:description" content="ComboWick — your trusted source for Roblox scripts, premium keys, executors, and Lua tutorials. Instant delivery & secure payments.">
+    <meta name="twitter:site" content="@COMBO_WICK">
+    <meta name="twitter:creator" content="@COMBO_WICK">
     <meta name="twitter:image" content="https://combowick.com/images/combo-wick-logo.png">
 
     <!-- Geo SEO — global reach, not US-only. ComboWick ships digital goods worldwide. -->
@@ -157,16 +162,8 @@
               "availability": "https://schema.org/InStock",
               "url": "https://combowick.com/premium-keys",
               "priceValidUntil": "2027-12-31",
-              "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": {"@type": "MonetaryAmount", "value": "0.00", "currency": "USD"},
-                "shippingDestination": {"@type": "DefinedRegion", "geoMidpoint": {"@type": "GeoCoordinates", "latitude": 0, "longitude": 0}},
-                "deliveryTime": {
-                  "@type": "ShippingDeliveryTime",
-                  "handlingTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"},
-                  "transitTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"}
-                }
-              },
+              "itemCondition": "https://schema.org/NewCondition",
+              "category": "Digital license key",
               "hasMerchantReturnPolicy": {
                 "@type": "MerchantReturnPolicy",
                 "applicableCountry": "US",
@@ -192,16 +189,8 @@
               "availability": "https://schema.org/InStock",
               "url": "https://combowick.com/premium-keys",
               "priceValidUntil": "2027-12-31",
-              "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": {"@type": "MonetaryAmount", "value": "0.00", "currency": "USD"},
-                "shippingDestination": {"@type": "DefinedRegion", "geoMidpoint": {"@type": "GeoCoordinates", "latitude": 0, "longitude": 0}},
-                "deliveryTime": {
-                  "@type": "ShippingDeliveryTime",
-                  "handlingTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"},
-                  "transitTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"}
-                }
-              },
+              "itemCondition": "https://schema.org/NewCondition",
+              "category": "Digital license key",
               "hasMerchantReturnPolicy": {
                 "@type": "MerchantReturnPolicy",
                 "applicableCountry": "US",
@@ -227,16 +216,8 @@
               "availability": "https://schema.org/InStock",
               "url": "https://combowick.com/premium-keys",
               "priceValidUntil": "2027-12-31",
-              "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": {"@type": "MonetaryAmount", "value": "0.00", "currency": "USD"},
-                "shippingDestination": {"@type": "DefinedRegion", "geoMidpoint": {"@type": "GeoCoordinates", "latitude": 0, "longitude": 0}},
-                "deliveryTime": {
-                  "@type": "ShippingDeliveryTime",
-                  "handlingTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"},
-                  "transitTime": {"@type": "QuantitativeValue", "minValue": 0, "maxValue": 0, "unitCode": "DAY"}
-                }
-              },
+              "itemCondition": "https://schema.org/NewCondition",
+              "category": "Digital license key",
               "hasMerchantReturnPolicy": {
                 "@type": "MerchantReturnPolicy",
                 "applicableCountry": "US",
@@ -249,7 +230,40 @@
     }
     </script>
 
+    <!-- E-E-A-T: Author / Creator identity (real, verifiable entity) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Combo_WICK",
+      "alternateName": ["ComboWick", "COMBO_WICK"],
+      "url": "https://combowick.com/about",
+      "image": "https://combowick.com/images/combo-wick-logo.png",
+      "jobTitle": "Roblox Script Developer & Verified Mythic Creator",
+      "knowsAbout": ["Roblox Lua scripting", "Roblox executors", "Roblox anti-cheat", "Game automation"],
+      "worksFor": {"@type": "Organization", "name": "ComboWick", "url": "https://combowick.com"},
+      "sameAs": [
+        "https://www.youtube.com/@COMBO_WICK",
+        "https://discord.com/invite/ufrz9Zaqs8",
+        "https://rscripts.net/u/Combo_WICK"
+      ]
+    }
+    </script>
+
+    <!-- Real, verifiable third-party reputation anchor: Rscripts Verified Mythic Creator -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Review",
+      "itemReviewed": {"@type": "Organization", "name": "ComboWick", "url": "https://combowick.com"},
+      "author": {"@type": "Organization", "name": "Rscripts.net", "url": "https://rscripts.net"},
+      "reviewBody": "ComboWick (Combo_WICK) is listed on Rscripts.net as a Verified Mythic Creator with over 6.7 million script views — a verifiable, independent reputation signal in the Roblox scripting community.",
+      "publisher": {"@type": "Organization", "name": "Rscripts.net"}
+    }
+    </script>
+
     <!-- FAQPage schema lives on the /faq route via SEOHead, not here, so it only appears on the page that displays those questions. -->
+
 
     <!-- Hide Lovable badge (covers <a>, custom elements, iframes, and any bottom-right pinned widget) -->
     <style>
