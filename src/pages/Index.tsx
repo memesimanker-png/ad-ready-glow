@@ -116,6 +116,7 @@ export default function Index() {
       </div>
 
       <BlogPreviewSection />
+      <TrustSection />
       <FAQSection />
 
       {/* CTA */}
