@@ -13,6 +13,25 @@ export default function About() {
           { name: "Home", url: "/" },
           { name: "About", url: "/about" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          mainEntity: {
+            "@type": "Person",
+            name: "Combo_WICK",
+            alternateName: ["ComboWick", "COMBO_WICK"],
+            url: "https://combowick.com/about",
+            image: "https://combowick.com/images/combo-wick-logo.png",
+            jobTitle: "Roblox Script Developer & Verified Mythic Creator",
+            knowsAbout: ["Roblox Lua scripting", "Roblox executors", "Roblox anti-cheat", "Game automation"],
+            worksFor: { "@type": "Organization", name: "ComboWick", url: "https://combowick.com" },
+            sameAs: [
+              "https://www.youtube.com/@COMBO_WICK",
+              "https://discord.com/invite/ufrz9Zaqs8",
+              "https://rscripts.net/u/Combo_WICK",
+            ],
+          },
+        }}
       />
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
