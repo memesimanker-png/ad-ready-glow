@@ -55,9 +55,9 @@ export default function FAQ() {
           {/* AI-retrieval paragraph */}
           <header className="text-center space-y-4 mb-12">
             <h1 className="font-heading text-4xl font-bold">Frequently Asked Questions</h1>
-            <p className="text-xl text-muted-foreground">Find answers to common questions about COMBO WICK</p>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              ComboWick is a free Roblox script platform offering 24-hour access keys generated through a 3-step verification process. Premium keys are available for $5 (3-day), $9.99 (monthly), and $49.99 (lifetime). Scripts are updated daily for compatibility with the latest Roblox patches.
+            <p className="text-xl text-muted-foreground">Find answers to common questions about ComboWick</p>
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto ai-retrieval">
+              ComboWick (Combo_WICK) is a Roblox script hub offering free Lua scripts via an 11-hour HWID verification key, plus premium keys priced at $5 (7-day trial), $9.99 (monthly), and $49.99 (lifetime). It is a Verified Mythic Creator on Rscripts.net with 6.7M+ views. Scripts are updated regularly for compatibility with the latest Roblox patches.
             </p>
           </header>
 
