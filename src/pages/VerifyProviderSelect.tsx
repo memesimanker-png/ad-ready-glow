@@ -231,28 +231,32 @@ export default function VerifyProviderSelect() {
     });
   }
 
-  steps.push({
-    key: "direct-link",
-    title: "Process Free Access",
-    done: directLinkClicks >= requiredClicks,
-    icon: <MousePointerClick className="h-4 w-4" />,
-    render: () => (
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
-        </p>
-        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
-          <MousePointerClick className="h-4 w-4" />
-          {directLinkClicks >= requiredClicks
-            ? "✓ Processing Complete"
-            : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
-        </Button>
-        <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
-      </div>
-    ),
-  });
+  const directLinkAdEnabled = isAdEnabled("verify-provider-select", "direct_link");
 
-  const directLinkDone = directLinkClicks >= requiredClicks;
+  if (directLinkAdEnabled) {
+    steps.push({
+      key: "direct-link",
+      title: "Process Free Access",
+      done: directLinkClicks >= requiredClicks,
+      icon: <MousePointerClick className="h-4 w-4" />,
+      render: () => (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
+          </p>
+          <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
+            <MousePointerClick className="h-4 w-4" />
+            {directLinkClicks >= requiredClicks
+              ? "✓ Processing Complete"
+              : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
+          </Button>
+          <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
+        </div>
+      ),
+    });
+  }
+
+  const directLinkDone = !directLinkAdEnabled || directLinkClicks >= requiredClicks;
 
   steps.push({
     key: "unlock",
