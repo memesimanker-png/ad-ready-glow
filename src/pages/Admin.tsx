@@ -1827,6 +1827,8 @@ function AdToggleControl() {
     </Card>
   );
 }
+
+function Row({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex justify-between gap-4 border-b border-border/40 py-1.5">
       <span className="text-muted-foreground">{label}</span>
