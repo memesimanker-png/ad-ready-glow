@@ -206,6 +206,33 @@ export type Database = {
         }
         Relationships: []
       }
+      key_ad_settings: {
+        Row: {
+          ad_type: string
+          created_at: string
+          enabled: boolean
+          id: string
+          page: string
+          updated_at: string
+        }
+        Insert: {
+          ad_type: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          page: string
+          updated_at?: string
+        }
+        Update: {
+          ad_type?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          page?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       key_discounts: {
         Row: {
           active: boolean

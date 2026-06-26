@@ -6,8 +6,9 @@ import { useEffect } from "react";
  * cadence and frequency cap on their end (typically fires on a real user
  * click). Loading it again on revisit is a no-op if it's already present.
  */
-export function usePopunder() {
+export function usePopunder(enabled: boolean = true) {
   useEffect(() => {
+    if (!enabled) return;
     const POPUNDER_ID = "monetag-popunder-11035708";
     const load = () => {
       if (document.getElementById(POPUNDER_ID)) return;
@@ -21,5 +22,5 @@ export function usePopunder() {
     load();
     document.addEventListener("pointerdown", load, { capture: true, once: true });
     return () => document.removeEventListener("pointerdown", load, { capture: true } as any);
-  }, []);
+  }, [enabled]);
 }

@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
+import { useAdSettings } from "@/hooks/useAdSettings";
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
@@ -25,6 +26,7 @@ function makeNonce(): string {
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAdEnabled } = useAdSettings();
   const [mounted, setMounted] = useState(false);
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
@@ -52,19 +54,7 @@ export default function VerifyProviderSelect() {
       setDirectLinkClicks(DEFAULT_DIRECT_LINK_CLICKS); // monetag step already passed
     }
 
-    // Monetag one-click popunder — ONLY on this page
-    const POPUNDER_ID = "monetag-popunder-11035708";
-    const loadPopunder = () => {
-      if (document.getElementById(POPUNDER_ID)) return;
-      const loader = document.createElement("script");
-      loader.id = POPUNDER_ID;
-      loader.dataset.zone = "11035708";
-      loader.src = "https://al5sm.com/tag.min.js";
-      loader.async = true;
-      document.body.appendChild(loader);
-    };
-    loadPopunder();
-    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
+    // Monetag popunder is handled in a separate effect gated by ad settings.
 
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);
@@ -96,8 +86,25 @@ export default function VerifyProviderSelect() {
         if (data?.lootlabs_clicks) setLootlabsRequired(data.lootlabs_clicks);
       });
 
-    return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
   }, []);
+
+  // Monetag popunder — gated by admin ad settings.
+  useEffect(() => {
+    if (!isAdEnabled("verify-provider-select", "popunder")) return;
+    const POPUNDER_ID = "monetag-popunder-11035708";
+    const loadPopunder = () => {
+      if (document.getElementById(POPUNDER_ID)) return;
+      const loader = document.createElement("script");
+      loader.id = POPUNDER_ID;
+      loader.dataset.zone = "11035708";
+      loader.src = "https://al5sm.com/tag.min.js";
+      loader.async = true;
+      document.body.appendChild(loader);
+    };
+    loadPopunder();
+    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
+    return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
+  }, [isAdEnabled]);
 
   useEffect(() => {
     if (youtubeTimer > 0) {
@@ -224,28 +231,32 @@ export default function VerifyProviderSelect() {
     });
   }
 
-  steps.push({
-    key: "direct-link",
-    title: "Process Free Access",
-    done: directLinkClicks >= requiredClicks,
-    icon: <MousePointerClick className="h-4 w-4" />,
-    render: () => (
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">
-          Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
-        </p>
-        <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
-          <MousePointerClick className="h-4 w-4" />
-          {directLinkClicks >= requiredClicks
-            ? "✓ Processing Complete"
-            : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
-        </Button>
-        <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
-      </div>
-    ),
-  });
+  const directLinkAdEnabled = isAdEnabled("verify-provider-select", "direct_link");
 
-  const directLinkDone = directLinkClicks >= requiredClicks;
+  if (directLinkAdEnabled) {
+    steps.push({
+      key: "direct-link",
+      title: "Process Free Access",
+      done: directLinkClicks >= requiredClicks,
+      icon: <MousePointerClick className="h-4 w-4" />,
+      render: () => (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Click the button {requiredClicks} {requiredClicks === 1 ? "time" : "times"} to process your free access.
+          </p>
+          <Button onClick={handleDirectLinkClick} className="w-full gap-2" disabled={directLinkClicks >= requiredClicks}>
+            <MousePointerClick className="h-4 w-4" />
+            {directLinkClicks >= requiredClicks
+              ? "✓ Processing Complete"
+              : `Click Ad Button (${directLinkClicks}/${requiredClicks})`}
+          </Button>
+          <Progress value={(directLinkClicks / requiredClicks) * 100} className="h-1" />
+        </div>
+      ),
+    });
+  }
+
+  const directLinkDone = !directLinkAdEnabled || directLinkClicks >= requiredClicks;
 
   steps.push({
     key: "unlock",

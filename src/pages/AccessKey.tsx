@@ -11,6 +11,7 @@ import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { usePopunder } from "@/hooks/usePopunder";
+import { useAdSettings } from "@/hooks/useAdSettings";
 
 
 
@@ -33,7 +34,8 @@ export default function AccessKey() {
   const [adClicks, setAdClicks] = useState(0);
   const REQUIRED_AD_CLICKS = 2;
 
-  usePopunder();
+  const { isAdEnabled } = useAdSettings();
+  usePopunder(isAdEnabled("access-key", "popunder"));
 
   const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 
@@ -245,7 +247,7 @@ export default function AccessKey() {
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
-      <SkipAdsBanner />
+      {isAdEnabled("access-key", "skip_ads_banner") && <SkipAdsBanner />}
       <header className="container py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -331,7 +333,7 @@ export default function AccessKey() {
           </Card>
         </div>
       </main>
-      <SkipAdsFloatButton />
+      {isAdEnabled("access-key", "skip_ads_float") && <SkipAdsFloatButton />}
     </div>
   );
 }
