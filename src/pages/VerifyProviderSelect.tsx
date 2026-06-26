@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { NoIndex } from "@/components/NoIndex";
+import { useAdSettings } from "@/hooks/useAdSettings";
 
 const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
@@ -25,6 +26,7 @@ function makeNonce(): string {
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAdEnabled } = useAdSettings();
   const [mounted, setMounted] = useState(false);
 
   const [showTutorialPopup, setShowTutorialPopup] = useState(false);
