@@ -86,8 +86,25 @@ export default function VerifyProviderSelect() {
         if (data?.lootlabs_clicks) setLootlabsRequired(data.lootlabs_clicks);
       });
 
-    return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
   }, []);
+
+  // Monetag popunder — gated by admin ad settings.
+  useEffect(() => {
+    if (!isAdEnabled("verify-provider-select", "popunder")) return;
+    const POPUNDER_ID = "monetag-popunder-11035708";
+    const loadPopunder = () => {
+      if (document.getElementById(POPUNDER_ID)) return;
+      const loader = document.createElement("script");
+      loader.id = POPUNDER_ID;
+      loader.dataset.zone = "11035708";
+      loader.src = "https://al5sm.com/tag.min.js";
+      loader.async = true;
+      document.body.appendChild(loader);
+    };
+    loadPopunder();
+    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
+    return () => document.removeEventListener("pointerdown", loadPopunder, { capture: true } as any);
+  }, [isAdEnabled]);
 
   useEffect(() => {
     if (youtubeTimer > 0) {
