@@ -54,19 +54,7 @@ export default function VerifyProviderSelect() {
       setDirectLinkClicks(DEFAULT_DIRECT_LINK_CLICKS); // monetag step already passed
     }
 
-    // Monetag one-click popunder — ONLY on this page
-    const POPUNDER_ID = "monetag-popunder-11035708";
-    const loadPopunder = () => {
-      if (document.getElementById(POPUNDER_ID)) return;
-      const loader = document.createElement("script");
-      loader.id = POPUNDER_ID;
-      loader.dataset.zone = "11035708";
-      loader.src = "https://al5sm.com/tag.min.js";
-      loader.async = true;
-      document.body.appendChild(loader);
-    };
-    loadPopunder();
-    document.addEventListener("pointerdown", loadPopunder, { capture: true, once: true });
+    // Monetag popunder is handled in a separate effect gated by ad settings.
 
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);
