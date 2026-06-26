@@ -6,12 +6,14 @@ import { Key, Clock, Shield, Zap, Crown, CheckCircle, Play } from "lucide-react"
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { usePopunder } from "@/hooks/usePopunder";
+import { useAdSettings } from "@/hooks/useAdSettings";
 
 
 
 export default function Keys() {
   const { t } = useTranslation();
-  usePopunder();
+  const { isAdEnabled } = useAdSettings();
+  usePopunder(isAdEnabled("keys", "popunder"));
 
 
   return (
