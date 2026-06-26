@@ -1610,6 +1610,9 @@ function KeyToolsTab() {
 
       <VerifyStepsControl />
 
+      <AdToggleControl />
+
+
 
       <Card className="p-6 space-y-4">
         <div>
@@ -1729,8 +1732,101 @@ function VerifyStepsControl() {
 }
 
 
+function AdToggleControl() {
+  const { toast } = useToast();
+  const [rows, setRows] = useState<{ id: string; page: string; ad_type: string; enabled: boolean }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [savingKey, setSavingKey] = useState<string | null>(null);
 
-function Row({ label, value }: { label: string; value: any }) {
+  const PAGES: { id: string; label: string }[] = [
+    { id: "verify-step1", label: "Verify — Step 1" },
+    { id: "verify-step2", label: "Verify — Step 2" },
+    { id: "verify-step3", label: "Verify — Step 3" },
+    { id: "verify-provider-select", label: "Verify — Provider Select" },
+    { id: "access-key", label: "Access Key" },
+    { id: "keys", label: "Keys" },
+  ];
+  const AD_TYPE_LABELS: Record<string, string> = {
+    popunder: "Monetag Popunder",
+    direct_link: "Monetag Direct Link",
+    sliding_ad: "Promo Modal (Sliding Ad)",
+    skip_ads_banner: "Skip-Ads Banner",
+    skip_ads_float: "Skip-Ads Float Button",
+  };
+  const PAGE_AD_TYPES: Record<string, string[]> = {
+    "verify-step1": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
+    "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
+    "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
+    "verify-provider-select": ["popunder", "direct_link"],
+    "access-key": ["popunder", "skip_ads_banner", "skip_ads_float"],
+    keys: ["popunder"],
+  };
+
+  const load = async () => {
+    const { data } = await supabase.from("key_ad_settings" as any).select("*");
+    setRows((data as any) || []);
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const isEnabled = (page: string, adType: string) => {
+    const r = rows.find((x) => x.page === page && x.ad_type === adType);
+    return r ? r.enabled : true;
+  };
+
+  const toggle = async (page: string, adType: string, next: boolean) => {
+    const k = `${page}:${adType}`;
+    setSavingKey(k);
+    const existing = rows.find((x) => x.page === page && x.ad_type === adType);
+    let error;
+    if (existing) {
+      ({ error } = await supabase.from("key_ad_settings" as any)
+        .update({ enabled: next, updated_at: new Date().toISOString() }).eq("id", existing.id));
+    } else {
+      ({ error } = await supabase.from("key_ad_settings" as any)
+        .insert({ page, ad_type: adType, enabled: next }));
+    }
+    setSavingKey(null);
+    if (error) { toast({ variant: "destructive", title: "Failed to save", description: error.message }); return; }
+    await load();
+    toast({ title: next ? "Ad enabled" : "Ad disabled", description: `${AD_TYPE_LABELS[adType]} on ${page}` });
+  };
+
+  return (
+    <Card className="p-6 space-y-4">
+      <div>
+        <h3 className="font-semibold flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /> Ad Placements per Page</h3>
+        <p className="text-sm text-muted-foreground">Turn individual ad types on or off for each key/verification page. Changes apply instantly.</p>
+      </div>
+      {loading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+      ) : (
+        <div className="space-y-5">
+          {PAGES.map((p) => (
+            <div key={p.id} className="rounded-lg border border-border/60 p-4 space-y-3">
+              <div className="font-medium text-sm">{p.label}</div>
+              <div className="space-y-2">
+                {PAGE_AD_TYPES[p.id].map((adType) => {
+                  const k = `${p.id}:${adType}`;
+                  const on = isEnabled(p.id, adType);
+                  return (
+                    <div key={adType} className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-muted-foreground flex items-center gap-2">
+                        {AD_TYPE_LABELS[adType]}
+                        {savingKey === k && <Loader2 className="h-3 w-3 animate-spin" />}
+                      </span>
+                      <Switch checked={on} disabled={savingKey === k} onCheckedChange={(v) => toggle(p.id, adType, v)} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
   return (
     <div className="flex justify-between gap-4 border-b border-border/40 py-1.5">
       <span className="text-muted-foreground">{label}</span>
