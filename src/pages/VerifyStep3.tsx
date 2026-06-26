@@ -13,12 +13,14 @@ import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import SlidingAd from "@/components/SlidingAd";
+import { useAdSettings } from "@/hooks/useAdSettings";
 
 
 export default function VerifyStep3() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isAdEnabled } = useAdSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [buttonEnabled, setButtonEnabled] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export default function VerifyStep3() {
     <>
       <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
-        <SkipAdsBanner />
+        {isAdEnabled("verify-step3", "skip_ads_banner") && <SkipAdsBanner />}
         <header className="container py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -100,8 +102,8 @@ export default function VerifyStep3() {
             </Card>
           </div>
         </main>
-        <SkipAdsFloatButton />
-        <SlidingAd />
+        {isAdEnabled("verify-step3", "skip_ads_float") && <SkipAdsFloatButton />}
+        {isAdEnabled("verify-step3", "sliding_ad") && <SlidingAd />}
       </div>
     </>
   );
