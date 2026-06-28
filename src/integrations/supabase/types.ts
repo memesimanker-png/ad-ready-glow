@@ -601,6 +601,7 @@ export type Database = {
       }
       verify_settings: {
         Row: {
+          access_key_clicks: number
           direct_link_clicks: number
           id: number
           lootlabs_clicks: number
@@ -608,6 +609,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          access_key_clicks?: number
           direct_link_clicks?: number
           id?: number
           lootlabs_clicks?: number
@@ -615,6 +617,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          access_key_clicks?: number
           direct_link_clicks?: number
           id?: number
           lootlabs_clicks?: number

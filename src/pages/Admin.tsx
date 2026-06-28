@@ -1674,55 +1674,57 @@ function KeyToolsTab() {
 function VerifyStepsControl() {
   const { toast } = useToast();
   const [clicks, setClicks] = useState<number>(2);
+  const [accessClicks, setAccessClicks] = useState<number>(2);
   const [lootlabs, setLootlabs] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase.from("verify_settings").select("direct_link_clicks, lootlabs_clicks").eq("id", 1).maybeSingle()
+    supabase.from("verify_settings").select("direct_link_clicks, access_key_clicks, lootlabs_clicks").eq("id", 1).maybeSingle()
       .then(({ data }) => {
-        if (data?.direct_link_clicks) setClicks(data.direct_link_clicks);
-        if (data?.lootlabs_clicks) setLootlabs(data.lootlabs_clicks);
+        if (data?.direct_link_clicks != null) setClicks(data.direct_link_clicks);
+        if ((data as any)?.access_key_clicks != null) setAccessClicks((data as any).access_key_clicks);
+        if (data?.lootlabs_clicks != null) setLootlabs(data.lootlabs_clicks);
         setLoading(false);
       });
   }, []);
 
   const save = async () => {
-    if (clicks < 1 || clicks > 10) { toast({ variant: "destructive", title: "Monetag steps must be 1–10" }); return; }
-    if (lootlabs < 1 || lootlabs > 5) { toast({ variant: "destructive", title: "LootLabs steps must be 1–5" }); return; }
+    if (clicks < 1 || clicks > 10) { toast({ variant: "destructive", title: "Provider-Select clicks must be 1–10" }); return; }
+    if (accessClicks < 0 || accessClicks > 10) { toast({ variant: "destructive", title: "Access Key clicks must be 0–10" }); return; }
+    if (lootlabs < 1 || lootlabs > 5) { toast({ variant: "destructive", title: "LootLabs hops must be 1–5" }); return; }
     setSaving(true);
     const { error } = await supabase.from("verify_settings")
-      .update({ direct_link_clicks: clicks, lootlabs_clicks: lootlabs, updated_at: new Date().toISOString() })
+      .update({ direct_link_clicks: clicks, access_key_clicks: accessClicks, lootlabs_clicks: lootlabs, updated_at: new Date().toISOString() } as any)
       .eq("id", 1);
     setSaving(false);
     if (error) { toast({ variant: "destructive", title: "Failed to save", description: error.message }); return; }
-    toast({ title: "Saved", description: `Free key now requires ${clicks} ad ${clicks === 1 ? "step" : "steps"} + ${lootlabs} LootLabs ${lootlabs === 1 ? "step" : "steps"}.` });
+    toast({ title: "Saved", description: `Provider-Select: ${clicks} • Access Key: ${accessClicks} • LootLabs: ${lootlabs} hops.` });
   };
+
+  const numCls = "w-24 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50";
 
   return (
     <Card className="p-6 space-y-4">
       <div>
-        <h3 className="font-semibold flex items-center gap-2"><MousePointerClick className="h-4 w-4 text-primary" /> Free Key Ad Steps</h3>
-        <p className="text-sm text-muted-foreground">Control how many ad steps users complete before unlocking a free key.</p>
+        <h3 className="font-semibold flex items-center gap-2"><MousePointerClick className="h-4 w-4 text-primary" /> Free Key — Ad Click Steps</h3>
+        <p className="text-sm text-muted-foreground">The "press the ad button X times" gate appears on two pages. Set each independently. Set Access Key to 0 to skip the second gate.</p>
       </div>
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium mb-1 block">Monetag ad-button clicks (1–10)</label>
-          <input
-            type="number" min="1" max="10" disabled={loading}
-            value={clicks}
-            onChange={(e) => setClicks(Number(e.target.value))}
-            className="w-24 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-          />
+          <label className="text-sm font-medium mb-1 block">Provider-Select ad clicks (1–10)</label>
+          <p className="text-xs text-muted-foreground mb-1">Monetag direct-link presses on <code>/verify/provider-select</code>.</p>
+          <input type="number" min="1" max="10" disabled={loading} value={clicks} onChange={(e) => setClicks(Number(e.target.value))} className={numCls} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Access Key ad clicks (0–10)</label>
+          <p className="text-xs text-muted-foreground mb-1">Monetag direct-link presses on <code>/access-key</code> before the key is generated.</p>
+          <input type="number" min="0" max="10" disabled={loading} value={accessClicks} onChange={(e) => setAccessClicks(Number(e.target.value))} className={numCls} />
         </div>
         <div>
           <label className="text-sm font-medium mb-1 block">LootLabs unlock hops (1–5)</label>
-          <input
-            type="number" min="1" max="5" disabled={loading}
-            value={lootlabs}
-            onChange={(e) => setLootlabs(Number(e.target.value))}
-            className="w-24 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-          />
+          <p className="text-xs text-muted-foreground mb-1">Number of LootLabs link completions required.</p>
+          <input type="number" min="1" max="5" disabled={loading} value={lootlabs} onChange={(e) => setLootlabs(Number(e.target.value))} className={numCls} />
         </div>
         <Button onClick={save} disabled={saving || loading} className="gap-2 shrink-0">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Save
@@ -1759,7 +1761,7 @@ function AdToggleControl() {
     "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-provider-select": ["popunder", "direct_link"],
-    "access-key": ["popunder", "skip_ads_banner", "skip_ads_float"],
+    "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float"],
     keys: ["popunder"],
   };
 
