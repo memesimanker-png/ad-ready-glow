@@ -46,7 +46,7 @@ export const PAGE_AD_TYPES: Record<AdPage, AdType[]> = {
   "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
   "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
   "verify-provider-select": ["popunder", "direct_link"],
-  "access-key": ["popunder", "skip_ads_banner", "skip_ads_float"],
+  "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float"],
   keys: ["popunder"],
 };
 
