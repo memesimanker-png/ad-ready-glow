@@ -51,6 +51,15 @@ export default function AccessKey() {
       return;
     }
 
+    supabase
+      .from("verify_settings")
+      .select("access_key_clicks")
+      .eq("id", 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.access_key_clicks != null) setRequiredClicks(data.access_key_clicks);
+      });
+
     loadStoredKeyData();
     checkExistingKey();
   }, [navigate, toast]);
