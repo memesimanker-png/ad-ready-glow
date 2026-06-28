@@ -130,7 +130,7 @@ export default function AccessKey() {
 
   const generateKey = async () => {
     if (!canGenerate || isLoading) return;
-    if (adClicks < REQUIRED_AD_CLICKS) {
+    if (directLinkEnabled && adClicks < REQUIRED_AD_CLICKS) {
       handleAdClick();
       return;
     }
