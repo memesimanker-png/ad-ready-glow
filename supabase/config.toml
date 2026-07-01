@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.inject-today]
 verify_jwt = false
+
+[functions.public-announcements]
+verify_jwt = false
