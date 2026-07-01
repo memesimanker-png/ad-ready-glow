@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          expires_at: string | null
+          id: string
+          message: string
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          message: string
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          expires_at?: string | null
+          id?: string
+          message?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           discord_webhook_url: string | null
@@ -699,6 +726,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
