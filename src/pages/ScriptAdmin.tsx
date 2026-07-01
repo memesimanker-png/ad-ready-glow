@@ -132,7 +132,19 @@ export default function ScriptAdmin() {
         youtube_url: form.youtube_url || null,
       } as any);
       if (error) throw error;
-      toast({ title: "Script saved!" });
+
+      // Auto-publish an announcement so the in-game loader shows the new script.
+      try {
+        await supabase.from("announcements" as any).insert({
+          title: "New Script Released",
+          message: `${form.title} for ${form.game} is now live on ComboWick.`,
+          enabled: true,
+        } as any);
+      } catch (annErr) {
+        console.error("announcement insert failed", annErr);
+      }
+
+      toast({ title: "Script saved!", description: "Announcement pushed to the loader API." });
       setForm({ ...empty });
       refetch();
     } catch (e: any) {
