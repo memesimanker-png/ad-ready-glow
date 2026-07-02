@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Shield, Monitor, Smartphone, Apple, ExternalLink, MessageCircle, ShoppingCart, RefreshCw, AlertCircle, CheckCircle2, Search, X } from "lucide-react";
+import { Shield, Monitor, Smartphone, Apple, ExternalLink, MessageCircle, ShoppingCart, RefreshCw, AlertCircle, CheckCircle2, Search, X, Cpu, Boxes, KeyRound, Code2, Layers, Zap } from "lucide-react";
 import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type Executor = {
   _id: string;
@@ -32,8 +33,35 @@ type Executor = {
   elementCertified?: boolean;
   longestRunning?: boolean;
   hasIssues?: boolean;
+  extype?: string;
+  detectionReason?: string;
+  recommendedReason?: string;
+  possibleBanwave?: boolean;
   slug?: { logo?: string; owner?: string } | string;
 };
+
+// Maps the raw `extype` (w/a/i/m + executor/external) into a proper, separated group.
+type ExecGroup = { key: string; label: string; kind: "internal" | "external"; order: number };
+
+function execGroup(e: Executor): ExecGroup {
+  const t = (e.extype || "").toLowerCase();
+  const external = t.includes("external");
+  const platformRaw = (e.platform || "").toLowerCase();
+  let plat = "Windows";
+  if (t.startsWith("a") || platformRaw.includes("android")) plat = "Android";
+  else if (t.startsWith("i") || platformRaw.includes("ios")) plat = "iOS";
+  else if (t.startsWith("m") || platformRaw.includes("mac")) plat = "Mac";
+  else if (t.startsWith("w") || platformRaw.includes("win")) plat = "Windows";
+  else if (e.platform) plat = e.platform;
+
+  const kind: "internal" | "external" = external ? "external" : "internal";
+  const label = external ? `${plat} External Executors` : `${plat} Executors`;
+  const platOrder: Record<string, number> = { Windows: 0, Android: 2, iOS: 3, Mac: 4 };
+  const base = platOrder[plat] ?? 5;
+  // externals sit right after their platform's internals
+  const order = base * 2 + (external ? 1 : 0);
+  return { key: label, label, kind, order };
+}
 
 type InjectVersions = {
   Windows?: { Version: string; Date: string };
@@ -116,6 +144,7 @@ function ExecutorUpdated({ value }: { value?: string }) {
 
 function PlatformIcon({ p }: { p: string }) {
   const key = p.trim().toLowerCase();
+  if (key.includes("external")) return <Boxes className="h-3.5 w-3.5" aria-label={p} />;
   if (key.includes("ios") || key.includes("mac")) return <Apple className="h-3.5 w-3.5" aria-label={p} />;
   if (key.includes("android")) return <Smartphone className="h-3.5 w-3.5" aria-label={p} />;
   return <Monitor className="h-3.5 w-3.5" aria-label={p} />;
@@ -189,6 +218,7 @@ export default function Executors() {
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "working" | "patched">("all");
+  const [selected, setSelected] = useState<Executor | null>(null);
 
   const [versions, setVersions] = useState<InjectVersions | null>(null);
   const [cheats, setCheats] = useState<Record<string, InjectCheat> | null>(null);
@@ -264,14 +294,15 @@ export default function Executors() {
   }, [executors, showHidden, search, priceFilter, statusFilter]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, Executor[]>();
+    const map = new Map<string, { list: Executor[]; kind: "internal" | "external"; order: number }>();
     for (const e of visible) {
-      const platforms = (e.platform || "Unknown").split(",").map((p) => p.trim()).filter(Boolean);
-      const primary = platforms[0] || "Unknown";
-      if (!map.has(primary)) map.set(primary, []);
-      map.get(primary)!.push(e);
+      const g = execGroup(e);
+      if (!map.has(g.key)) map.set(g.key, { list: [], kind: g.kind, order: g.order });
+      map.get(g.key)!.list.push(e);
     }
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+    return Array.from(map.entries())
+      .sort(([, a], [, b]) => a.order - b.order)
+      .map(([label, v]) => ({ label, ...v }));
   }, [visible]);
 
   // Inject.Today entries not already covered by executors.online (dedupe by lowercased title)
@@ -468,12 +499,19 @@ export default function Executors() {
               </Button>
             </div>
           ) : (
-            groups.map(([platform, list]) => (
-              <div key={platform} className="mb-8">
-                <h2 className="font-heading text-sm uppercase tracking-wider text-primary flex items-center gap-2 mb-3 border-b border-border/40 pb-2">
-                  <PlatformIcon p={platform} /> {platform} {t("Roblox Executors")}
-                  <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
-                </h2>
+            groups.map(({ label, list, kind }) => (
+              <div key={label} className="mb-8">
+                <div className="mb-3 border-b border-border/40 pb-2">
+                  <h2 className="font-heading text-sm uppercase tracking-wider text-primary flex items-center gap-2">
+                    <PlatformIcon p={kind === "external" ? "external" : label} /> {label}
+                    <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
+                  </h2>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    {kind === "external"
+                      ? "External tools that run outside the Roblox process — usually harder to detect, often paid."
+                      : "Internal executors that inject directly into Roblox. Tap any card for full stats."}
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {list.map((exec) => {
                     const working = exec.updateStatus === true;
@@ -483,7 +521,7 @@ export default function Executors() {
                     const purchase = normalizeExternalUrl(exec.purchaselink);
                     const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
                     return (
-                      <article key={exec._id} className="group/card relative min-w-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card to-card/40 p-3 text-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.35)] [transform:translateZ(0)] animate-fade-in">
+                      <article key={exec._id} role="button" tabIndex={0} onClick={() => setSelected(exec)} onKeyDown={(ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); setSelected(exec); } }} className="group/card relative min-w-0 cursor-pointer overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-card to-card/40 p-3 text-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [transform:translateZ(0)] animate-fade-in">
                         <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
                         <div className="mb-2 flex min-w-0 items-start gap-2">
                           {logo ? (
@@ -543,17 +581,17 @@ export default function Executors() {
                           </span>
                           <div className="flex shrink-0 items-center gap-1">
                             {website && (
-                              <a href={website} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex h-6 w-6 items-center justify-center rounded border border-primary/40 text-primary hover:bg-primary/10">
+                              <a href={website} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex h-6 w-6 items-center justify-center rounded border border-primary/40 text-primary hover:bg-primary/10">
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             )}
                             {discord && (
-                              <a href={discord} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
+                              <a href={discord} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <MessageCircle className="h-3 w-3" />
                               </a>
                             )}
                             {purchase && (
-                              <a href={purchase} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
+                              <a href={purchase} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <ShoppingCart className="h-3 w-3" />
                               </a>
                             )}
@@ -688,6 +726,103 @@ export default function Executors() {
           </div>
         </div>
       </section>
+
+      <ExecutorModal exec={selected} onClose={() => setSelected(null)} />
     </Layout>
+  );
+}
+
+function StatChip({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: string; tone?: "good" | "bad" | "warn" }) {
+  const toneCls = tone === "good" ? "text-success" : tone === "bad" ? "text-destructive" : tone === "warn" ? "text-warning" : "text-foreground";
+  return (
+    <div className="rounded-lg border border-border/50 bg-background/40 p-2.5">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">{icon}{label}</div>
+      <div className={`mt-1 text-sm font-semibold ${toneCls}`}>{value}</div>
+    </div>
+  );
+}
+
+function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () => void }) {
+  if (!exec) return null;
+  const working = exec.updateStatus === true;
+  const detected = exec.detected === true;
+  const website = normalizeExternalUrl(exec.websitelink);
+  const discord = normalizeExternalUrl(exec.discordlink);
+  const purchase = normalizeExternalUrl(exec.purchaselink);
+  const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
+  const g = execGroup(exec);
+  const updatedTs = parseExecutorDate(exec.updatedDate);
+
+  return (
+    <Dialog open={!!exec} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-lg max-h-[88vh] overflow-y-auto">
+        <div className="flex items-start gap-3">
+          {logo ? (
+            <img src={cacheLogo(logo)} alt={`${exec.title} logo`} referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-lg object-cover bg-muted" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+          ) : (
+            <div className="h-14 w-14 shrink-0 rounded-lg bg-muted" />
+          )}
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-heading text-2xl font-bold leading-tight">{exec.title}</h2>
+              {exec.version && <span className="text-xs text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>}
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px]">
+              <span className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">{g.label}</span>
+              {exec.elementCertified && <span className="rounded-sm bg-success/15 px-1.5 py-0.5 font-semibold uppercase text-success">Certified</span>}
+              {exec.longestRunning && <span className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-semibold uppercase text-primary">Veteran</span>}
+              {exec.beta && <span className="rounded-sm bg-warning/15 px-1.5 py-0.5 font-semibold uppercase text-warning">Beta</span>}
+              {exec.hasIssues && <span className="rounded-sm bg-destructive/15 px-1.5 py-0.5 font-semibold uppercase text-destructive">Issues</span>}
+              {exec.possibleBanwave && <span className="rounded-sm bg-destructive/15 px-1.5 py-0.5 font-semibold uppercase text-destructive">Banwave Risk</span>}
+            </div>
+          </div>
+        </div>
+
+        {(typeof exec.uncPercentage === "number" || typeof exec.suncPercentage === "number") && (
+          <div className="mt-4 space-y-2 rounded-lg border border-border/50 bg-background/40 p-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Function Support</div>
+            {typeof exec.uncPercentage === "number" && <UncBar value={exec.uncPercentage} label="UNC" />}
+            {typeof exec.suncPercentage === "number" && <UncBar value={exec.suncPercentage} label="SUNC" />}
+          </div>
+        )}
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <StatChip icon={<Zap className="h-3 w-3" />} label="Status" value={working ? "Working" : "Patched"} tone={working ? "good" : "bad"} />
+          <StatChip icon={<Shield className="h-3 w-3" />} label="Detection" value={detected ? "Detected" : "Undetected"} tone={detected ? "bad" : "good"} />
+          <StatChip icon={<ShoppingCart className="h-3 w-3" />} label="Price" value={exec.free ? "Free" : `Paid${exec.cost ? ` · ${String(exec.cost)}` : ""}`} tone={exec.free ? "good" : "warn"} />
+          <StatChip icon={<KeyRound className="h-3 w-3" />} label="Key System" value={exec.keysystem ? "Yes" : "No"} tone={exec.keysystem ? "warn" : "good"} />
+          <StatChip icon={<Code2 className="h-3 w-3" />} label="Decompiler" value={exec.decompiler ? "Yes" : "No"} />
+          <StatChip icon={<Layers className="h-3 w-3" />} label="Multi-Inject" value={exec.multiInject ? "Yes" : "No"} />
+          <StatChip icon={<Cpu className="h-3 w-3" />} label="Type" value={g.kind === "external" ? "External" : "Internal"} />
+          <StatChip icon={<Boxes className="h-3 w-3" />} label="Client Mods" value={exec.clientmods ? "Yes" : "No"} />
+          <StatChip icon={<Monitor className="h-3 w-3" />} label="Platform" value={exec.platform || "Unknown"} />
+        </div>
+
+        <div className="mt-4 space-y-1.5 text-xs text-muted-foreground">
+          <div className="flex justify-between gap-2"><span>Roblox Version</span><span className="truncate text-foreground">{exec.rbxversion ? String(exec.rbxversion) : "Unknown"}</span></div>
+          <div className="flex justify-between gap-2"><span>Last Updated</span><span className="text-foreground">{updatedTs ? `${formatRelative(updatedTs, Date.now())} · ${formatAbsolute(updatedTs)}` : "Unknown"}</span></div>
+          {exec.detectionReason && <div className="flex justify-between gap-2"><span>Detection Note</span><span className="text-right text-foreground">{exec.detectionReason}</span></div>}
+          {exec.recommendedReason && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 text-foreground">{exec.recommendedReason}</div>}
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {website && (
+            <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
+              <ExternalLink className="h-4 w-4" /> Website
+            </a>
+          )}
+          {discord && (
+            <a href={discord} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:border-primary/50 hover:text-primary">
+              <MessageCircle className="h-4 w-4" /> Discord
+            </a>
+          )}
+          {purchase && (
+            <a href={purchase} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:border-primary/50 hover:text-primary">
+              <ShoppingCart className="h-4 w-4" /> Purchase
+            </a>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
