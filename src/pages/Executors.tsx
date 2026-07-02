@@ -726,6 +726,103 @@ export default function Executors() {
           </div>
         </div>
       </section>
+
+      <ExecutorModal exec={selected} onClose={() => setSelected(null)} />
     </Layout>
+  );
+}
+
+function StatChip({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: string; tone?: "good" | "bad" | "warn" }) {
+  const toneCls = tone === "good" ? "text-success" : tone === "bad" ? "text-destructive" : tone === "warn" ? "text-warning" : "text-foreground";
+  return (
+    <div className="rounded-lg border border-border/50 bg-background/40 p-2.5">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">{icon}{label}</div>
+      <div className={`mt-1 text-sm font-semibold ${toneCls}`}>{value}</div>
+    </div>
+  );
+}
+
+function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () => void }) {
+  if (!exec) return null;
+  const working = exec.updateStatus === true;
+  const detected = exec.detected === true;
+  const website = normalizeExternalUrl(exec.websitelink);
+  const discord = normalizeExternalUrl(exec.discordlink);
+  const purchase = normalizeExternalUrl(exec.purchaselink);
+  const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
+  const g = execGroup(exec);
+  const updatedTs = parseExecutorDate(exec.updatedDate);
+
+  return (
+    <Dialog open={!!exec} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-lg max-h-[88vh] overflow-y-auto">
+        <div className="flex items-start gap-3">
+          {logo ? (
+            <img src={cacheLogo(logo)} alt={`${exec.title} logo`} referrerPolicy="no-referrer" className="h-14 w-14 shrink-0 rounded-lg object-cover bg-muted" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+          ) : (
+            <div className="h-14 w-14 shrink-0 rounded-lg bg-muted" />
+          )}
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-heading text-2xl font-bold leading-tight">{exec.title}</h2>
+              {exec.version && <span className="text-xs text-muted-foreground">v{exec.version.replace(/^v/i, "")}</span>}
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px]">
+              <span className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">{g.label}</span>
+              {exec.elementCertified && <span className="rounded-sm bg-success/15 px-1.5 py-0.5 font-semibold uppercase text-success">Certified</span>}
+              {exec.longestRunning && <span className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-semibold uppercase text-primary">Veteran</span>}
+              {exec.beta && <span className="rounded-sm bg-warning/15 px-1.5 py-0.5 font-semibold uppercase text-warning">Beta</span>}
+              {exec.hasIssues && <span className="rounded-sm bg-destructive/15 px-1.5 py-0.5 font-semibold uppercase text-destructive">Issues</span>}
+              {exec.possibleBanwave && <span className="rounded-sm bg-destructive/15 px-1.5 py-0.5 font-semibold uppercase text-destructive">Banwave Risk</span>}
+            </div>
+          </div>
+        </div>
+
+        {(typeof exec.uncPercentage === "number" || typeof exec.suncPercentage === "number") && (
+          <div className="mt-4 space-y-2 rounded-lg border border-border/50 bg-background/40 p-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Function Support</div>
+            {typeof exec.uncPercentage === "number" && <UncBar value={exec.uncPercentage} label="UNC" />}
+            {typeof exec.suncPercentage === "number" && <UncBar value={exec.suncPercentage} label="SUNC" />}
+          </div>
+        )}
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <StatChip icon={<Zap className="h-3 w-3" />} label="Status" value={working ? "Working" : "Patched"} tone={working ? "good" : "bad"} />
+          <StatChip icon={<Shield className="h-3 w-3" />} label="Detection" value={detected ? "Detected" : "Undetected"} tone={detected ? "bad" : "good"} />
+          <StatChip icon={<ShoppingCart className="h-3 w-3" />} label="Price" value={exec.free ? "Free" : `Paid${exec.cost ? ` · ${String(exec.cost)}` : ""}`} tone={exec.free ? "good" : "warn"} />
+          <StatChip icon={<KeyRound className="h-3 w-3" />} label="Key System" value={exec.keysystem ? "Yes" : "No"} tone={exec.keysystem ? "warn" : "good"} />
+          <StatChip icon={<Code2 className="h-3 w-3" />} label="Decompiler" value={exec.decompiler ? "Yes" : "No"} />
+          <StatChip icon={<Layers className="h-3 w-3" />} label="Multi-Inject" value={exec.multiInject ? "Yes" : "No"} />
+          <StatChip icon={<Cpu className="h-3 w-3" />} label="Type" value={g.kind === "external" ? "External" : "Internal"} />
+          <StatChip icon={<Boxes className="h-3 w-3" />} label="Client Mods" value={exec.clientmods ? "Yes" : "No"} />
+          <StatChip icon={<Monitor className="h-3 w-3" />} label="Platform" value={exec.platform || "Unknown"} />
+        </div>
+
+        <div className="mt-4 space-y-1.5 text-xs text-muted-foreground">
+          <div className="flex justify-between gap-2"><span>Roblox Version</span><span className="truncate text-foreground">{exec.rbxversion ? String(exec.rbxversion) : "Unknown"}</span></div>
+          <div className="flex justify-between gap-2"><span>Last Updated</span><span className="text-foreground">{updatedTs ? `${formatRelative(updatedTs, Date.now())} · ${formatAbsolute(updatedTs)}` : "Unknown"}</span></div>
+          {exec.detectionReason && <div className="flex justify-between gap-2"><span>Detection Note</span><span className="text-right text-foreground">{exec.detectionReason}</span></div>}
+          {exec.recommendedReason && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 text-foreground">{exec.recommendedReason}</div>}
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {website && (
+            <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
+              <ExternalLink className="h-4 w-4" /> Website
+            </a>
+          )}
+          {discord && (
+            <a href={discord} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:border-primary/50 hover:text-primary">
+              <MessageCircle className="h-4 w-4" /> Discord
+            </a>
+          )}
+          {purchase && (
+            <a href={purchase} target="_blank" rel="noopener noreferrer" className="inline-flex flex-1 min-w-[8rem] items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:border-primary/50 hover:text-primary">
+              <ShoppingCart className="h-4 w-4" /> Purchase
+            </a>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
