@@ -144,6 +144,7 @@ function ExecutorUpdated({ value }: { value?: string }) {
 
 function PlatformIcon({ p }: { p: string }) {
   const key = p.trim().toLowerCase();
+  if (key.includes("external")) return <Boxes className="h-3.5 w-3.5" aria-label={p} />;
   if (key.includes("ios") || key.includes("mac")) return <Apple className="h-3.5 w-3.5" aria-label={p} />;
   if (key.includes("android")) return <Smartphone className="h-3.5 w-3.5" aria-label={p} />;
   return <Monitor className="h-3.5 w-3.5" aria-label={p} />;
