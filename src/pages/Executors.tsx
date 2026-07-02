@@ -751,6 +751,8 @@ function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () =
   const purchase = normalizeExternalUrl(exec.purchaselink);
   const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
   const g = execGroup(exec);
+  const rawDesc = typeof exec.slug === "object" ? exec.slug?.fullDescription : undefined;
+  const description = rawDesc && !/no description currently available/i.test(rawDesc) ? rawDesc.trim() : undefined;
   const updatedTs = parseExecutorDate(exec.updatedDate);
 
   return (
