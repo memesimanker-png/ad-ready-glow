@@ -35,9 +35,9 @@ type Executor = {
   hasIssues?: boolean;
   extype?: string;
   detectionReason?: string;
-  recommendedReason?: string;
+  recommendedReason?: unknown;
   possibleBanwave?: boolean;
-  slug?: { logo?: string; owner?: string } | string;
+  slug?: { logo?: string; owner?: string; fullDescription?: string } | string;
 };
 
 // Maps the raw `extype` (w/a/i/m + executor/external) into a proper, separated group.
@@ -751,6 +751,8 @@ function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () =
   const purchase = normalizeExternalUrl(exec.purchaselink);
   const logo = typeof exec.slug === "object" ? exec.slug?.logo : undefined;
   const g = execGroup(exec);
+  const rawDesc = typeof exec.slug === "object" ? exec.slug?.fullDescription : undefined;
+  const description = rawDesc && !/no description currently available/i.test(rawDesc) ? rawDesc.trim() : undefined;
   const updatedTs = parseExecutorDate(exec.updatedDate);
 
   return (
@@ -802,7 +804,7 @@ function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () =
           <div className="flex justify-between gap-2"><span>Roblox Version</span><span className="truncate text-foreground">{exec.rbxversion ? String(exec.rbxversion) : "Unknown"}</span></div>
           <div className="flex justify-between gap-2"><span>Last Updated</span><span className="text-foreground">{updatedTs ? `${formatRelative(updatedTs, Date.now())} · ${formatAbsolute(updatedTs)}` : "Unknown"}</span></div>
           {exec.detectionReason && <div className="flex justify-between gap-2"><span>Detection Note</span><span className="text-right text-foreground">{exec.detectionReason}</span></div>}
-          {exec.recommendedReason && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 text-foreground">{exec.recommendedReason}</div>}
+          {description && <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-foreground whitespace-pre-line">{description}</div>}
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
