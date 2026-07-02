@@ -35,9 +35,9 @@ type Executor = {
   hasIssues?: boolean;
   extype?: string;
   detectionReason?: string;
-  recommendedReason?: string;
+  recommendedReason?: unknown;
   possibleBanwave?: boolean;
-  slug?: { logo?: string; owner?: string } | string;
+  slug?: { logo?: string; owner?: string; fullDescription?: string } | string;
 };
 
 // Maps the raw `extype` (w/a/i/m + executor/external) into a proper, separated group.
