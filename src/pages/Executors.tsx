@@ -498,12 +498,19 @@ export default function Executors() {
               </Button>
             </div>
           ) : (
-            groups.map(([platform, list]) => (
-              <div key={platform} className="mb-8">
-                <h2 className="font-heading text-sm uppercase tracking-wider text-primary flex items-center gap-2 mb-3 border-b border-border/40 pb-2">
-                  <PlatformIcon p={platform} /> {platform} {t("Roblox Executors")}
-                  <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
-                </h2>
+            groups.map(({ label, list, kind }) => (
+              <div key={label} className="mb-8">
+                <div className="mb-3 border-b border-border/40 pb-2">
+                  <h2 className="font-heading text-sm uppercase tracking-wider text-primary flex items-center gap-2">
+                    <PlatformIcon p={kind === "external" ? "external" : label} /> {label}
+                    <span className="text-xs font-normal text-muted-foreground">({list.length})</span>
+                  </h2>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    {kind === "external"
+                      ? "External tools that run outside the Roblox process — usually harder to detect, often paid."
+                      : "Internal executors that inject directly into Roblox. Tap any card for full stats."}
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                   {list.map((exec) => {
                     const working = exec.updateStatus === true;
