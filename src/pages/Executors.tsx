@@ -802,7 +802,7 @@ function ExecutorModal({ exec, onClose }: { exec: Executor | null; onClose: () =
           <div className="flex justify-between gap-2"><span>Roblox Version</span><span className="truncate text-foreground">{exec.rbxversion ? String(exec.rbxversion) : "Unknown"}</span></div>
           <div className="flex justify-between gap-2"><span>Last Updated</span><span className="text-foreground">{updatedTs ? `${formatRelative(updatedTs, Date.now())} · ${formatAbsolute(updatedTs)}` : "Unknown"}</span></div>
           {exec.detectionReason && <div className="flex justify-between gap-2"><span>Detection Note</span><span className="text-right text-foreground">{exec.detectionReason}</span></div>}
-          {exec.recommendedReason && <div className="rounded-lg border border-primary/30 bg-primary/5 p-2 text-foreground">{exec.recommendedReason}</div>}
+          {description && <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-foreground whitespace-pre-line">{description}</div>}
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
