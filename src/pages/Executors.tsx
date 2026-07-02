@@ -293,14 +293,15 @@ export default function Executors() {
   }, [executors, showHidden, search, priceFilter, statusFilter]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, Executor[]>();
+    const map = new Map<string, { list: Executor[]; kind: "internal" | "external"; order: number }>();
     for (const e of visible) {
-      const platforms = (e.platform || "Unknown").split(",").map((p) => p.trim()).filter(Boolean);
-      const primary = platforms[0] || "Unknown";
-      if (!map.has(primary)) map.set(primary, []);
-      map.get(primary)!.push(e);
+      const g = execGroup(e);
+      if (!map.has(g.key)) map.set(g.key, { list: [], kind: g.kind, order: g.order });
+      map.get(g.key)!.list.push(e);
     }
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+    return Array.from(map.entries())
+      .sort(([, a], [, b]) => a.order - b.order)
+      .map(([label, v]) => ({ label, ...v }));
   }, [visible]);
 
   // Inject.Today entries not already covered by executors.online (dedupe by lowercased title)
