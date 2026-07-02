@@ -33,8 +33,35 @@ type Executor = {
   elementCertified?: boolean;
   longestRunning?: boolean;
   hasIssues?: boolean;
+  extype?: string;
+  detectionReason?: string;
+  recommendedReason?: string;
+  possibleBanwave?: boolean;
   slug?: { logo?: string; owner?: string } | string;
 };
+
+// Maps the raw `extype` (w/a/i/m + executor/external) into a proper, separated group.
+type ExecGroup = { key: string; label: string; kind: "internal" | "external"; order: number };
+
+function execGroup(e: Executor): ExecGroup {
+  const t = (e.extype || "").toLowerCase();
+  const external = t.includes("external");
+  const platformRaw = (e.platform || "").toLowerCase();
+  let plat = "Windows";
+  if (t.startsWith("a") || platformRaw.includes("android")) plat = "Android";
+  else if (t.startsWith("i") || platformRaw.includes("ios")) plat = "iOS";
+  else if (t.startsWith("m") || platformRaw.includes("mac")) plat = "Mac";
+  else if (t.startsWith("w") || platformRaw.includes("win")) plat = "Windows";
+  else if (e.platform) plat = e.platform;
+
+  const kind: "internal" | "external" = external ? "external" : "internal";
+  const label = external ? `${plat} External Executors` : `${plat} Executors`;
+  const platOrder: Record<string, number> = { Windows: 0, Android: 2, iOS: 3, Mac: 4 };
+  const base = platOrder[plat] ?? 5;
+  // externals sit right after their platform's internals
+  const order = base * 2 + (external ? 1 : 0);
+  return { key: label, label, kind, order };
+}
 
 type InjectVersions = {
   Windows?: { Version: string; Date: string };
