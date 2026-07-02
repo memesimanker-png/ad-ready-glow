@@ -218,6 +218,7 @@ export default function Executors() {
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "working" | "patched">("all");
+  const [selected, setSelected] = useState<Executor | null>(null);
 
   const [versions, setVersions] = useState<InjectVersions | null>(null);
   const [cheats, setCheats] = useState<Record<string, InjectCheat> | null>(null);
