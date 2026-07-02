@@ -581,17 +581,17 @@ export default function Executors() {
                           </span>
                           <div className="flex shrink-0 items-center gap-1">
                             {website && (
-                              <a href={website} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex h-6 w-6 items-center justify-center rounded border border-primary/40 text-primary hover:bg-primary/10">
+                              <a href={website} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Website" className="inline-flex h-6 w-6 items-center justify-center rounded border border-primary/40 text-primary hover:bg-primary/10">
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             )}
                             {discord && (
-                              <a href={discord} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
+                              <a href={discord} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Discord" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <MessageCircle className="h-3 w-3" />
                               </a>
                             )}
                             {purchase && (
-                              <a href={purchase} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
+                              <a href={purchase} onClick={(ev) => ev.stopPropagation()} target="_blank" rel="noopener noreferrer" title="Purchase" className="inline-flex h-6 w-6 items-center justify-center rounded border border-border hover:border-primary/40 hover:text-primary">
                                 <ShoppingCart className="h-3 w-3" />
                               </a>
                             )}
