@@ -76,7 +76,4 @@ export function ScriptUnlockGate({ slug }: Props) {
   );
 }
 
-/** Back-compat alias for the previous LootLabs-named export. */
-export const LootlabsUnlockGate = ScriptUnlockGate;
-
 export { UNLOCK_TTL_MS };

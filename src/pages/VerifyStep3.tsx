@@ -78,7 +78,7 @@ export default function VerifyStep3() {
                 {selectedProvider && (
                   <div className="text-sm text-center">
                     <p>{t("Using provider:")} <span className="font-medium">
-                      {selectedProvider === "linkvertise" ? "Linkvertise" : selectedProvider === "workink" ? "Work.ink" : "LootLabs"}
+                      Linkvertise
                     </span></p>
                   </div>
                 )}
