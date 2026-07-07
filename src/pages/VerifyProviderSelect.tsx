@@ -17,12 +17,6 @@ const WAIT_TIME_SECONDS = 3;
 const DIRECT_LINK_URL = "https://omg10.com/4/11035707";
 const DEFAULT_DIRECT_LINK_CLICKS = 2;
 
-function makeNonce(): string {
-  const arr = new Uint8Array(16);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
 export default function VerifyProviderSelect() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -39,22 +33,10 @@ export default function VerifyProviderSelect() {
 
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
   const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
-  const [unlocking, setUnlocking] = useState(false);
-
-  const [lootlabsRequired, setLootlabsRequired] = useState(1);
-  const [lootlabsDone, setLootlabsDone] = useState(0);
+  const [starting, setStarting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-
-    // Returning from a LootLabs hop (multi-step): keep prior progress.
-    const llReturn = new URLSearchParams(window.location.search).get("ll") === "1";
-    if (llReturn) {
-      setLootlabsDone(Number(localStorage.getItem("lootlabs_done_count") || "0"));
-      setDirectLinkClicks(DEFAULT_DIRECT_LINK_CLICKS); // monetag step already passed
-    }
-
-    // Monetag popunder is handled in a separate effect gated by ad settings.
 
     const hideTutorial = localStorage.getItem("hide_tutorial_popup");
     if (!hideTutorial) setShowTutorialPopup(true);
@@ -67,25 +49,23 @@ export default function VerifyProviderSelect() {
       setShowSubscriptionGate(true);
     }
 
+    // Fresh run of the 3-step Linkvertise flow.
     localStorage.removeItem("step1_completed");
     localStorage.removeItem("step2_completed");
     localStorage.removeItem("step3_completed");
     localStorage.removeItem("verification_step");
     localStorage.removeItem("direct_link_completed");
     localStorage.removeItem("direct_link_clicks");
-    localStorage.setItem("selected_ad_provider", "lootlabs");
-    if (!llReturn) localStorage.removeItem("lootlabs_done_count");
+    localStorage.setItem("selected_ad_provider", "linkvertise");
 
     supabase
       .from("verify_settings")
-      .select("direct_link_clicks, lootlabs_clicks")
+      .select("direct_link_clicks")
       .eq("id", 1)
       .maybeSingle()
       .then(({ data }) => {
-        if (data?.direct_link_clicks) setRequiredClicks(data.direct_link_clicks);
-        if (data?.lootlabs_clicks) setLootlabsRequired(data.lootlabs_clicks);
+        if ((data as any)?.direct_link_clicks) setRequiredClicks((data as any).direct_link_clicks);
       });
-
   }, []);
 
   // Monetag popunder — gated by admin ad settings.
@@ -159,36 +139,11 @@ export default function VerifyProviderSelect() {
     });
   };
 
-  const handleUnlock = async () => {
-    setUnlocking(true);
-    try {
-      const origin = window.location.origin;
-      const nonce = makeNonce();
-      localStorage.setItem("verify_lootlabs_pending", JSON.stringify({ nonce, ts: Date.now() }));
-      const destination = `${origin}/ad-return/verify?hash=${nonce}`;
-
-      let lastErr: unknown = null;
-      for (let i = 0; i < 3; i++) {
-        try {
-          const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
-            body: { title: "ComboWick Key", destination },
-          });
-          if (error) throw error;
-          const url = (data as { loot_url?: string } | null)?.loot_url;
-          if (!url) throw new Error("No link returned");
-          window.location.href = url;
-          return;
-        } catch (e) {
-          lastErr = e;
-          await new Promise((r) => setTimeout(r, 400 * (i + 1)));
-        }
-      }
-      throw lastErr ?? new Error("Unlock failed");
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Try again";
-      toast({ title: "Unlock failed", description: msg, variant: "destructive" });
-      setUnlocking(false);
-    }
+  // Start the 3-step Linkvertise verification.
+  const handleStart = () => {
+    setStarting(true);
+    localStorage.setItem("selected_ad_provider", "linkvertise");
+    navigate("/verify/step1");
   };
 
   const handleCloseTutorial = () => setShowTutorialPopup(false);
@@ -265,24 +220,16 @@ export default function VerifyProviderSelect() {
     icon: <CheckCircle2 className="h-4 w-4" />,
     render: () => (
       <div className="rounded-lg border border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 p-6 text-center">
-        <p className="text-base font-semibold mb-2">
-          {lootlabsRequired > 1 ? `Complete ${lootlabsRequired} quick steps to your key` : "One quick step to your key"}
-        </p>
+        <p className="text-base font-semibold mb-2">Complete 3 quick Linkvertise steps to your key</p>
         <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-          Complete {lootlabsRequired > 1 ? "a short task" : "one short task"} to unlock your HWID key.
+          You'll complete three short Linkvertise checkpoints (Step 1 → 2 → 3), then your HWID key unlocks.
         </p>
-        {lootlabsRequired > 1 && (
-          <div className="mb-4">
-            <Progress value={(lootlabsDone / lootlabsRequired) * 100} className="h-1.5 max-w-xs mx-auto" />
-            <p className="mt-2 text-xs text-muted-foreground">Step {Math.min(lootlabsDone + 1, lootlabsRequired)} of {lootlabsRequired}</p>
-          </div>
-        )}
-        <Button onClick={handleUnlock} disabled={unlocking || !subscriptionGateCompleted || !directLinkDone} size="lg" className="gap-2">
-          {unlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
-          {unlocking ? "Generating link..." : lootlabsRequired > 1 ? `Unlock Step ${lootlabsDone + 1}/${lootlabsRequired}` : "Unlock Free Key"}
+        <Button onClick={handleStart} disabled={starting || !subscriptionGateCompleted || !directLinkDone} size="lg" className="gap-2">
+          {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
+          {starting ? "Starting..." : "Start Verification (Step 1 of 3)"}
         </Button>
         <p className="mt-4 text-[11px] text-muted-foreground">
-          Want to skip the task entirely? <a href="/premium-keys" className="text-primary underline">Premium Keys</a>.
+          Want to skip the tasks entirely? <a href="/premium-keys" className="text-primary underline">Premium Keys</a>.
         </p>
       </div>
     ),
@@ -347,7 +294,7 @@ export default function VerifyProviderSelect() {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-2xl">Verification</CardTitle>
-                  <CardDescription>One quick step to unlock your free key.</CardDescription>
+                  <CardDescription>Complete the steps to unlock your free key.</CardDescription>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">Progress</p>

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
-import { generateLinkvertiseUrl } from "@/lib/linkvertise";
+import { buildLinkvertiseUrl } from "@/lib/linkvertise";
+import { useVerifyLinks } from "@/hooks/useVerifyLinks";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { NoIndex } from "@/components/NoIndex";
@@ -23,31 +24,20 @@ export default function VerifyStep1() {
   const { isAdEnabled } = useAdSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [buttonEnabled, setButtonEnabled] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>("linkvertise");
+  const links = useVerifyLinks();
 
   useEffect(() => {
-    const provider = localStorage.getItem("selected_ad_provider");
-    if (!provider) {
-      localStorage.setItem("selected_ad_provider", "linkvertise");
-      setSelectedProvider("linkvertise");
-    } else {
-      setSelectedProvider(provider);
-    }
+    localStorage.setItem("selected_ad_provider", "linkvertise");
+    setSelectedProvider("linkvertise");
   }, []);
 
   const handleVerification = () => {
     setIsLoading(true);
     localStorage.setItem("verification_step", "step1");
-    localStorage.setItem("selected_ad_provider", selectedProvider || "");
-
-    if (selectedProvider === "linkvertise") {
-      const returnUrl = `${window.location.origin}/ad-return/step1`;
-      window.location.href = generateLinkvertiseUrl(returnUrl);
-    } else if (selectedProvider === "lootlabs") {
-      window.location.href = "https://lootdest.org/s?hovfnQ85";
-    } else {
-      window.location.href = "https://workink.net/1XgX/0yrwn95k";
-    }
+    localStorage.setItem("selected_ad_provider", "linkvertise");
+    const returnUrl = `${window.location.origin}/ad-return/step1`;
+    window.location.href = buildLinkvertiseUrl(links[0], returnUrl);
   };
 
   return (
