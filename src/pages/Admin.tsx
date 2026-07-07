@@ -1670,21 +1670,30 @@ function KeyToolsTab() {
   );
 }
 
-/* ─── Verify Steps Control (free key ad-step count) ─── */
+/* ─── Verify Steps Control (free key ad-step count + Linkvertise config) ─── */
 function VerifyStepsControl() {
   const { toast } = useToast();
   const [clicks, setClicks] = useState<number>(2);
   const [accessClicks, setAccessClicks] = useState<number>(2);
-  const [lootlabs, setLootlabs] = useState<number>(1);
+  const [extHours, setExtHours] = useState<number>(11);
+  const [lv1, setLv1] = useState<string>("");
+  const [lv2, setLv2] = useState<string>("");
+  const [lv3, setLv3] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase.from("verify_settings").select("direct_link_clicks, access_key_clicks, lootlabs_clicks").eq("id", 1).maybeSingle()
+    supabase.from("verify_settings")
+      .select("direct_link_clicks, access_key_clicks, extension_hours, linkvertise_link_1, linkvertise_link_2, linkvertise_link_3")
+      .eq("id", 1).maybeSingle()
       .then(({ data }) => {
-        if (data?.direct_link_clicks != null) setClicks(data.direct_link_clicks);
-        if ((data as any)?.access_key_clicks != null) setAccessClicks((data as any).access_key_clicks);
-        if (data?.lootlabs_clicks != null) setLootlabs(data.lootlabs_clicks);
+        const d = data as any;
+        if (d?.direct_link_clicks != null) setClicks(d.direct_link_clicks);
+        if (d?.access_key_clicks != null) setAccessClicks(d.access_key_clicks);
+        if (d?.extension_hours != null) setExtHours(d.extension_hours);
+        if (d?.linkvertise_link_1) setLv1(d.linkvertise_link_1);
+        if (d?.linkvertise_link_2) setLv2(d.linkvertise_link_2);
+        if (d?.linkvertise_link_3) setLv3(d.linkvertise_link_3);
         setLoading(false);
       });
   }, []);
@@ -1692,17 +1701,27 @@ function VerifyStepsControl() {
   const save = async () => {
     if (clicks < 1 || clicks > 10) { toast({ variant: "destructive", title: "Provider-Select clicks must be 1–10" }); return; }
     if (accessClicks < 0 || accessClicks > 10) { toast({ variant: "destructive", title: "Access Key clicks must be 0–10" }); return; }
-    if (lootlabs < 1 || lootlabs > 5) { toast({ variant: "destructive", title: "LootLabs hops must be 1–5" }); return; }
+    if (extHours < 1 || extHours > 876000) { toast({ variant: "destructive", title: "Extension hours must be 1–876000" }); return; }
+    if (!lv1.trim() || !lv2.trim() || !lv3.trim()) { toast({ variant: "destructive", title: "All 3 Linkvertise links are required" }); return; }
     setSaving(true);
     const { error } = await supabase.from("verify_settings")
-      .update({ direct_link_clicks: clicks, access_key_clicks: accessClicks, lootlabs_clicks: lootlabs, updated_at: new Date().toISOString() } as any)
+      .update({
+        direct_link_clicks: clicks,
+        access_key_clicks: accessClicks,
+        extension_hours: extHours,
+        linkvertise_link_1: lv1.trim(),
+        linkvertise_link_2: lv2.trim(),
+        linkvertise_link_3: lv3.trim(),
+        updated_at: new Date().toISOString(),
+      } as any)
       .eq("id", 1);
     setSaving(false);
     if (error) { toast({ variant: "destructive", title: "Failed to save", description: error.message }); return; }
-    toast({ title: "Saved", description: `Provider-Select: ${clicks} • Access Key: ${accessClicks} • LootLabs: ${lootlabs} hops.` });
+    toast({ title: "Saved", description: `Provider-Select: ${clicks} • Access Key: ${accessClicks} • Extension: +${extHours}h.` });
   };
 
   const numCls = "w-24 rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50";
+  const txtCls = "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/50";
 
   return (
     <Card className="p-6 space-y-4">
@@ -1721,15 +1740,35 @@ function VerifyStepsControl() {
           <p className="text-xs text-muted-foreground mb-1">Monetag direct-link presses on <code>/access-key</code> before the key is generated.</p>
           <input type="number" min="0" max="10" disabled={loading} value={accessClicks} onChange={(e) => setAccessClicks(Number(e.target.value))} className={numCls} />
         </div>
-        <div>
-          <label className="text-sm font-medium mb-1 block">LootLabs unlock hops (1–5)</label>
-          <p className="text-xs text-muted-foreground mb-1">Number of LootLabs link completions required.</p>
-          <input type="number" min="1" max="5" disabled={loading} value={lootlabs} onChange={(e) => setLootlabs(Number(e.target.value))} className={numCls} />
-        </div>
-        <Button onClick={save} disabled={saving || loading} className="gap-2 shrink-0">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Save
-        </Button>
       </div>
+
+      <div className="border-t border-border/50 pt-4 space-y-3">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> Linkvertise 3-Step Flow</h3>
+          <p className="text-sm text-muted-foreground">The 3 Linkvertise links users complete in sequence (Step 1 → 2 → 3). Paste your Linkvertise link for each step. Also used for key extensions.</p>
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Linkvertise Link — Step 1</label>
+          <input type="text" disabled={loading} value={lv1} onChange={(e) => setLv1(e.target.value)} placeholder="https://link-to.net/1234567" className={txtCls} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Linkvertise Link — Step 2</label>
+          <input type="text" disabled={loading} value={lv2} onChange={(e) => setLv2(e.target.value)} placeholder="https://link-to.net/1234567" className={txtCls} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Linkvertise Link — Step 3</label>
+          <input type="text" disabled={loading} value={lv3} onChange={(e) => setLv3(e.target.value)} placeholder="https://link-to.net/1234567" className={txtCls} />
+        </div>
+        <div>
+          <label className="text-sm font-medium mb-1 block">Extension hours per completion (1–876000)</label>
+          <p className="text-xs text-muted-foreground mb-1">Hours added (stacked) each time a user completes the flow to extend an existing key.</p>
+          <input type="number" min="1" max="876000" disabled={loading} value={extHours} onChange={(e) => setExtHours(Number(e.target.value))} className={numCls} />
+        </div>
+      </div>
+
+      <Button onClick={save} disabled={saving || loading} className="gap-2 shrink-0">
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Save
+      </Button>
     </Card>
   );
 }
