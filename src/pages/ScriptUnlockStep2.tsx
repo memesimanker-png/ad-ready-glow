@@ -4,13 +4,14 @@ import { Shield, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { NoIndex } from "@/components/NoIndex";
-import { supabase } from "@/integrations/supabase/client";
+import { buildLinkvertiseUrl } from "@/lib/linkvertise";
+import { useVerifyLinks } from "@/hooks/useVerifyLinks";
 
 const APPROVED_DOMAINS = [
-  "lootlabs.gg","loot-link.com","loot-links.com","links.lootlabs.gg","lootdest.org","lootdest.com",
+  "linkvertise.com", "link-to.net", "link-target.net", "link-center.net", "link-hub.net", "direct-link.net",
 ];
 const BLOCKED_DOMAINS = [
-  "link-bypass.com","thebypasser.com","bypass.city","adbypass.org","freebypass.com","loot-bypass.com",
+  "link-bypass.com", "thebypasser.com", "bypass.city", "adbypass.org", "freebypass.com", "linkvertise.net",
 ];
 const NONCE_TTL_MS = 30 * 60 * 1000;
 
@@ -29,9 +30,14 @@ export default function ScriptUnlockStep2() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const links = useVerifyLinks();
   const [msg, setMsg] = useState("Validating step 1…");
+  const [ran, setRan] = useState(false);
 
   useEffect(() => {
+    if (links.every((l) => l === null) || ran) return;
+    setRan(true);
+
     const slug = params.get("slug");
     const hash = params.get("hash");
 
@@ -40,7 +46,7 @@ export default function ScriptUnlockStep2() {
       return;
     }
 
-    const pendingRaw = localStorage.getItem("lootlabs_pending");
+    const pendingRaw = localStorage.getItem("script_unlock_pending");
     let pending: { slug: string; nonce: string; ts: number } | null = null;
     try { pending = pendingRaw ? JSON.parse(pendingRaw) : null; } catch { /* noop */ }
 
@@ -49,7 +55,7 @@ export default function ScriptUnlockStep2() {
       return;
     }
     if (Date.now() - pending.ts > NONCE_TTL_MS) {
-      localStorage.removeItem("lootlabs_pending");
+      localStorage.removeItem("script_unlock_pending");
       navigate(`/blocked?reason=session_expired&redirect=/scripts/${slug}`, { replace: true });
       return;
     }
@@ -59,41 +65,14 @@ export default function ScriptUnlockStep2() {
       return;
     }
 
-    // Rotate nonce, write step2 pending
+    // Rotate nonce, write step2 pending, then send through the 2nd Linkvertise link.
     const nonce2 = makeNonce();
-    localStorage.setItem("lootlabs_pending", JSON.stringify({ slug, nonce: nonce2, ts: Date.now() }));
-
-    (async () => {
-      try {
-        setMsg("Generating step 2 link…");
-        const origin = window.location.origin;
-        const destination = `${origin}/ad-return/script?slug=${encodeURIComponent(slug)}&hash=${nonce2}`;
-        let lastErr: any = null;
-        for (let i = 0; i < 3; i++) {
-          try {
-            const { data, error } = await supabase.functions.invoke("lootlabs-create-link", {
-              body: { title: `Step 2 ${slug}`.slice(0, 30), destination },
-            });
-
-            if (error) throw error;
-            const url = (data as any)?.loot_url;
-            if (!url) throw new Error("No link returned");
-            toast({ title: "Step 1 complete", description: "Redirecting to step 2…" });
-            window.location.href = url;
-            return;
-          } catch (e) {
-            lastErr = e;
-            await new Promise((r) => setTimeout(r, 400 * (i + 1)));
-          }
-        }
-        throw lastErr ?? new Error("Step 2 generation failed");
-      } catch (e: any) {
-        toast({ title: "Step 2 failed", description: e?.message || "Try again", variant: "destructive" });
-        setMsg("Step 2 failed. Returning to script…");
-        setTimeout(() => navigate(`/scripts/${slug}`, { replace: true }), 1500);
-      }
-    })();
-  }, [params, navigate, toast]);
+    localStorage.setItem("script_unlock_pending", JSON.stringify({ slug, nonce: nonce2, ts: Date.now() }));
+    setMsg("Redirecting to step 2…");
+    toast({ title: "Step 1 complete", description: "Redirecting to step 2…" });
+    const destination = `${window.location.origin}/ad-return/script?slug=${encodeURIComponent(slug)}&hash=${nonce2}`;
+    setTimeout(() => { window.location.href = buildLinkvertiseUrl(links[1], destination); }, 600);
+  }, [links, ran, params, navigate, toast]);
 
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">

@@ -276,6 +276,9 @@ export default function AccessKey() {
             <Key className="h-12 w-12 text-primary mx-auto" />
             <h1 className="text-3xl font-bold">Access Key Generator</h1>
             <p className="text-muted-foreground">Generate your HWID access key below.</p>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/extend-key")}>
+              <Clock className="h-4 w-4" /> Already have a key? Add more hours
+            </Button>
           </div>
 
           <Card className="border-primary/30">

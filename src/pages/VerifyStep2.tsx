@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import { YouTubeVideoPlayer } from "@/components/YouTubeVideoPlayer";
 import { getTodaySchedule } from "@/lib/day-schedule";
-import { generateLinkvertiseUrl } from "@/lib/linkvertise";
+import { buildLinkvertiseUrl } from "@/lib/linkvertise";
+import { useVerifyLinks } from "@/hooks/useVerifyLinks";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +27,8 @@ export default function VerifyStep2() {
   const { isAdEnabled } = useAdSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [buttonEnabled, setButtonEnabled] = useState(true);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>("linkvertise");
+  const links = useVerifyLinks();
   const [skipLoading, setSkipLoading] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const todaySchedule = getTodaySchedule();
@@ -66,17 +68,10 @@ export default function VerifyStep2() {
 
   const handleVerification = () => {
     setIsLoading(true);
-    if (selectedProvider) localStorage.setItem("selected_ad_provider", selectedProvider);
+    localStorage.setItem("selected_ad_provider", "linkvertise");
     localStorage.setItem("verification_step", "step2");
-
-    if (selectedProvider === "linkvertise") {
-      const returnUrl = `${window.location.origin}/ad-return/step2`;
-      window.location.href = generateLinkvertiseUrl(returnUrl);
-    } else if (selectedProvider === "lootlabs") {
-      window.location.href = "https://lootdest.org/s?0Um0OrJz";
-    } else {
-      window.location.href = "https://workink.net/1XgX/1va6w706";
-    }
+    const returnUrl = `${window.location.origin}/ad-return/step2`;
+    window.location.href = buildLinkvertiseUrl(links[1], returnUrl);
   };
 
   return (
@@ -150,7 +145,7 @@ export default function VerifyStep2() {
                 {selectedProvider && (
                   <div className="text-sm text-center">
                     <p>{t("Using provider:")} <span className="font-medium">
-                      {selectedProvider === "linkvertise" ? "Linkvertise" : selectedProvider === "workink" ? "Work.ink" : "LootLabs"}
+                      Linkvertise
                     </span></p>
                   </div>
                 )}

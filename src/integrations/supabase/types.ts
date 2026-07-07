@@ -287,6 +287,51 @@ export type Database = {
         }
         Relationships: []
       }
+      key_extensions: {
+        Row: {
+          after_expires_at: string | null
+          before_expires_at: string | null
+          completed_at: string | null
+          created_at: string
+          expires_at: string
+          hours: number
+          hwid: string
+          id: string
+          ip: string | null
+          key_value: string
+          status: string
+          token_hash: string
+        }
+        Insert: {
+          after_expires_at?: string | null
+          before_expires_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          hours?: number
+          hwid: string
+          id?: string
+          ip?: string | null
+          key_value: string
+          status?: string
+          token_hash: string
+        }
+        Update: {
+          after_expires_at?: string | null
+          before_expires_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          hours?: number
+          hwid?: string
+          id?: string
+          ip?: string | null
+          key_value?: string
+          status?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -630,24 +675,33 @@ export type Database = {
         Row: {
           access_key_clicks: number
           direct_link_clicks: number
+          extension_hours: number
           id: number
-          lootlabs_clicks: number
+          linkvertise_link_1: string | null
+          linkvertise_link_2: string | null
+          linkvertise_link_3: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
           access_key_clicks?: number
           direct_link_clicks?: number
+          extension_hours?: number
           id?: number
-          lootlabs_clicks?: number
+          linkvertise_link_1?: string | null
+          linkvertise_link_2?: string | null
+          linkvertise_link_3?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
           access_key_clicks?: number
           direct_link_clicks?: number
+          extension_hours?: number
           id?: number
-          lootlabs_clicks?: number
+          linkvertise_link_1?: string | null
+          linkvertise_link_2?: string | null
+          linkvertise_link_3?: string | null
           updated_at?: string
           updated_by?: string | null
         }

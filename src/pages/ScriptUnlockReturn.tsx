@@ -5,24 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast";
 import { NoIndex } from "@/components/NoIndex";
 
-// Approved Lootlabs domains — referrer must come from one of these.
+// Approved Linkvertise domains — referrer must come from one of these.
 const APPROVED_DOMAINS = [
-  "lootlabs.gg",
-  "loot-link.com",
-  "loot-links.com",
-  "links.lootlabs.gg",
-  "lootdest.org",
-  "lootdest.com",
+  "linkvertise.com", "link-to.net", "link-target.net", "link-center.net", "link-hub.net", "direct-link.net",
 ];
 
 // Known link-bypass sites — always block.
 const BLOCKED_DOMAINS = [
-  "link-bypass.com",
-  "thebypasser.com",
-  "bypass.city",
-  "adbypass.org",
-  "freebypass.com",
-  "loot-bypass.com",
+  "link-bypass.com", "thebypasser.com", "bypass.city", "adbypass.org", "freebypass.com", "linkvertise.net",
 ];
 
 const UNLOCK_TTL_MS = 24 * 60 * 60 * 1000;
@@ -58,7 +48,7 @@ export default function ScriptUnlockReturn() {
     }
 
     // Pending session set when user clicked Unlock (rotated through step2)
-    const pendingRaw = localStorage.getItem("lootlabs_pending");
+    const pendingRaw = localStorage.getItem("script_unlock_pending");
     let pending: { slug: string; nonce: string; ts: number } | null = null;
     try { pending = pendingRaw ? JSON.parse(pendingRaw) : null; } catch { /* noop */ }
 
@@ -67,9 +57,8 @@ export default function ScriptUnlockReturn() {
       return;
     }
 
-
     if (Date.now() - pending.ts > NONCE_TTL_MS) {
-      localStorage.removeItem("lootlabs_pending");
+      localStorage.removeItem("script_unlock_pending");
       navigate(`/blocked?reason=session_expired&redirect=/scripts/${slug}`, { replace: true });
       return;
     }
@@ -85,8 +74,8 @@ export default function ScriptUnlockReturn() {
     }
 
     // Mark as unlocked
-    localStorage.setItem(`lootlabs_unlock_${slug}`, String(Date.now()));
-    localStorage.removeItem("lootlabs_pending");
+    localStorage.setItem(`script_unlock_${slug}`, String(Date.now()));
+    localStorage.removeItem("script_unlock_pending");
     setStage("ok");
     toast({ title: "Script Unlocked", description: "Redirecting…" });
 

@@ -11,7 +11,7 @@ import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
 import { AdSlot } from "@/components/AdSlot";
-import { LootlabsUnlockGate, useScriptUnlocked } from "@/components/LootlabsUnlock";
+import { ScriptUnlockGate, useScriptUnlocked } from "@/components/ScriptUnlockGate";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -259,7 +259,7 @@ export default function ScriptDetail() {
                     </pre>
                   </div>
                 ) : (
-                  <LootlabsUnlockGate
+                  <ScriptUnlockGate
                     slug={script.slug}
                     title={script.title}
                     thumbnail={(script as any).thumbnail_url}
