@@ -14,6 +14,7 @@ import { Navigate, Link } from "react-router-dom";
 import { DiscordPostDialog } from "@/components/DiscordPostDialog";
 import { compressImage } from "@/lib/image-compress";
 import { PAID_GAMES } from "@/lib/paid-games";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DEFAULT_SCRIPT_CODE = `loadstring(game:HttpGet('https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/IQ'))();`;
 const LOADER_API_BASE = "https://vcuwjyjkbtxccywzeadu.supabase.co/functions/v1/public-api/repos/checkurasshole/Loaders/files";
@@ -274,10 +275,63 @@ function GenerateKeyTab() {
 }
 
 /* ─── Paid Scripts Visibility Tab ─── */
+type PaidScriptSetting = {
+  hidden: boolean;
+  paused: boolean;
+  pause_message: string | null;
+  title: string | null;
+  subtitle: string | null;
+  features: string[] | null;
+  warning: string | null;
+  monthly_price: number | null;
+  lifetime_price: number | null;
+  monthly_note: string | null;
+  lifetime_note: string | null;
+};
+
+type PaidScriptDraft = {
+  title: string;
+  subtitle: string;
+  features: string;
+  warning: string;
+  monthly_price: string;
+  lifetime_price: string;
+  monthly_note: string;
+  lifetime_note: string;
+  pause_message: string;
+};
+
+const emptyPaidSetting: PaidScriptSetting = {
+  hidden: false,
+  paused: false,
+  pause_message: null,
+  title: null,
+  subtitle: null,
+  features: null,
+  warning: null,
+  monthly_price: null,
+  lifetime_price: null,
+  monthly_note: null,
+  lifetime_note: null,
+};
+
+const paidDraftFor = (game: (typeof PAID_GAMES)[number], setting?: PaidScriptSetting): PaidScriptDraft => ({
+  title: setting?.title ?? game.title,
+  subtitle: setting?.subtitle ?? game.subtitle,
+  features: (setting?.features?.length ? setting.features : game.features).join("\n"),
+  warning: setting?.warning ?? game.warning ?? "",
+  monthly_price: String(setting?.monthly_price ?? game.monthlyPrice),
+  lifetime_price: String(setting?.lifetime_price ?? game.lifetimePrice ?? ""),
+  monthly_note: setting?.monthly_note ?? game.monthlyNote ?? "",
+  lifetime_note: setting?.lifetime_note ?? game.lifetimeNote ?? "",
+  pause_message: setting?.pause_message ?? "",
+});
+
 function PaidScriptsTab() {
   const { toast } = useToast();
-  const [settings, setSettings] = useState<Record<string, { hidden: boolean; paused: boolean; pause_message: string | null }>>({});
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const queryClient = useQueryClient();
+  const [settings, setSettings] = useState<Record<string, PaidScriptSetting>>({});
+  const [drafts, setDrafts] = useState<Record<string, PaidScriptDraft>>({});
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
 
@@ -285,13 +339,26 @@ function PaidScriptsTab() {
     (async () => {
       const { data, error } = await supabase
         .from("paid_script_settings")
-        .select("game_key, hidden, paused, pause_message");
+        .select("game_key, hidden, paused, pause_message, title, subtitle, features, warning, monthly_price, lifetime_price, monthly_note, lifetime_note");
       if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
-      const map: Record<string, { hidden: boolean; paused: boolean; pause_message: string | null }> = {};
-      const d: Record<string, string> = {};
+      const map: Record<string, PaidScriptSetting> = {};
+      const d: Record<string, PaidScriptDraft> = {};
       (data || []).forEach((r: any) => {
-        map[r.game_key] = { hidden: !!r.hidden, paused: !!r.paused, pause_message: r.pause_message ?? null };
-        d[r.game_key] = r.pause_message ?? "";
+        const game = PAID_GAMES.find((g) => g.key === r.game_key);
+        map[r.game_key] = {
+          hidden: !!r.hidden,
+          paused: !!r.paused,
+          pause_message: r.pause_message ?? null,
+          title: r.title ?? null,
+          subtitle: r.subtitle ?? null,
+          features: Array.isArray(r.features) ? r.features : null,
+          warning: r.warning ?? null,
+          monthly_price: r.monthly_price == null ? null : Number(r.monthly_price),
+          lifetime_price: r.lifetime_price == null ? null : Number(r.lifetime_price),
+          monthly_note: r.monthly_note ?? null,
+          lifetime_note: r.lifetime_note ?? null,
+        };
+        if (game) d[r.game_key] = paidDraftFor(game, map[r.game_key]);
       });
       setSettings(map);
       setDrafts(d);
@@ -299,35 +366,74 @@ function PaidScriptsTab() {
     })();
   }, []);
 
-  const persist = async (key: string, patch: { hidden?: boolean; paused?: boolean; pause_message?: string | null }) => {
-    const current = settings[key] || { hidden: false, paused: false, pause_message: null };
+  const persist = async (key: string, patch: Partial<PaidScriptSetting>) => {
+    const current = settings[key] || emptyPaidSetting;
     const next = { ...current, ...patch };
     setSavingKey(key);
     const { error } = await supabase
       .from("paid_script_settings")
-      .upsert({ game_key: key, hidden: next.hidden, paused: next.paused, pause_message: next.pause_message, updated_at: new Date().toISOString() }, { onConflict: "game_key" });
+      .upsert({ game_key: key, ...next, updated_at: new Date().toISOString() } as any, { onConflict: "game_key" });
     setSavingKey(null);
     if (error) {
       toast({ title: "Update failed", description: error.message, variant: "destructive" });
       return;
     }
     setSettings(prev => ({ ...prev, [key]: next }));
+    queryClient.invalidateQueries({ queryKey: ["paid-script-settings"] });
     toast({ title: "Saved", description: key });
+  };
+
+  const saveDetails = async (game: (typeof PAID_GAMES)[number]) => {
+    const draft = drafts[game.key] ?? paidDraftFor(game, settings[game.key]);
+    const monthly = Number(draft.monthly_price);
+    const lifetimeRaw = draft.lifetime_price.trim();
+    const lifetime = lifetimeRaw ? Number(lifetimeRaw) : null;
+
+    if (!Number.isFinite(monthly) || monthly < 1) {
+      toast({ title: "Invalid monthly price", description: "Monthly price must be at least $1.", variant: "destructive" });
+      return;
+    }
+    if (lifetimeRaw && (!Number.isFinite(lifetime) || lifetime < 0)) {
+      toast({ title: "Invalid lifetime price", description: "Lifetime price must be blank, 0, or higher.", variant: "destructive" });
+      return;
+    }
+
+    const features = draft.features
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    await persist(game.key, {
+      title: draft.title.trim() || game.title,
+      subtitle: draft.subtitle.trim(),
+      features: features.length ? features : game.features,
+      warning: draft.warning.trim(),
+      monthly_price: Number(monthly.toFixed(2)),
+      lifetime_price: lifetime === null ? null : Number(lifetime.toFixed(2)),
+      monthly_note: draft.monthly_note.trim(),
+      lifetime_note: draft.lifetime_note.trim(),
+      pause_message: draft.pause_message.trim() || null,
+    });
+  };
+
+  const patchDraft = (key: string, game: (typeof PAID_GAMES)[number], patch: Partial<PaidScriptDraft>) => {
+    setDrafts(prev => ({ ...prev, [key]: { ...(prev[key] ?? paidDraftFor(game, settings[key])), ...patch } }));
   };
 
   if (loading) return <Loader2 className="h-6 w-6 animate-spin" />;
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="max-w-5xl space-y-4">
       <div>
         <h2 className="text-lg font-semibold">Paid Game Scripts</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Hide a script entirely, or pause purchases (keeps it visible but disables buying and shows a message).
+          Edit paid-game prices, descriptions, visibility, and purchase status.
         </p>
       </div>
       <div className="space-y-3">
         {PAID_GAMES.map((g) => {
-          const s = settings[g.key] || { hidden: false, paused: false, pause_message: null };
+          const s = settings[g.key] || emptyPaidSetting;
+          const draft = drafts[g.key] ?? paidDraftFor(g, s);
           return (
             <Card key={g.key} className="p-4 space-y-3">
               <div className="flex items-center gap-4">
@@ -360,10 +466,88 @@ function PaidScriptsTab() {
                   <span className="ml-1.5">{s.paused ? "Resume Buying" : "Pause Buying"}</span>
                 </Button>
               </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Card title</label>
+                  <input
+                    value={draft.title}
+                    onChange={(e) => patchDraft(g.key, g, { title: e.target.value })}
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Short description</label>
+                  <input
+                    value={draft.subtitle}
+                    onChange={(e) => patchDraft(g.key, g, { subtitle: e.target.value })}
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Monthly price</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    value={draft.monthly_price}
+                    onChange={(e) => patchDraft(g.key, g, { monthly_price: e.target.value })}
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Lifetime price</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={draft.lifetime_price}
+                    onChange={(e) => patchDraft(g.key, g, { lifetime_price: e.target.value })}
+                    placeholder="Leave blank to hide"
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Monthly note</label>
+                  <input
+                    value={draft.monthly_note}
+                    onChange={(e) => patchDraft(g.key, g, { monthly_note: e.target.value })}
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block text-muted-foreground">Lifetime note</label>
+                  <input
+                    value={draft.lifetime_note}
+                    onChange={(e) => patchDraft(g.key, g, { lifetime_note: e.target.value })}
+                    className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium mb-1 block text-muted-foreground">Feature list</label>
+                <textarea
+                  value={draft.features}
+                  onChange={(e) => patchDraft(g.key, g, { features: e.target.value })}
+                  rows={4}
+                  className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium mb-1 block text-muted-foreground">Warning text</label>
+                <input
+                  value={draft.warning}
+                  onChange={(e) => patchDraft(g.key, g, { warning: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
               <div className="flex gap-2">
                 <input
-                  value={drafts[g.key] ?? ""}
-                  onChange={(e) => setDrafts(prev => ({ ...prev, [g.key]: e.target.value }))}
+                  value={draft.pause_message}
+                  onChange={(e) => patchDraft(g.key, g, { pause_message: e.target.value })}
                   placeholder="Pause message e.g. In progress, come back later"
                   className="flex-1 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
@@ -371,11 +555,20 @@ function PaidScriptsTab() {
                   size="sm"
                   variant="outline"
                   disabled={savingKey === g.key}
-                  onClick={() => persist(g.key, { pause_message: (drafts[g.key] ?? "").trim() || null })}
+                  onClick={() => persist(g.key, { pause_message: draft.pause_message.trim() || null })}
                 >
                   <Save className="h-4 w-4" /><span className="ml-1.5">Save Msg</span>
                 </Button>
               </div>
+
+              <Button
+                disabled={savingKey === g.key}
+                onClick={() => saveDetails(g)}
+                className="w-full"
+              >
+                {savingKey === g.key ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                Save Price + Description
+              </Button>
             </Card>
           );
         })}
