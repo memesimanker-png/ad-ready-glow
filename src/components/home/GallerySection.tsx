@@ -74,7 +74,7 @@ export function GallerySection() {
                 sizes="(min-width: 768px) min(33vw, 380px), 50vw"
                 width={800}
                 height={800}
-                fetchPriority={i < 2 ? "high" : "low"}
+                {...({ fetchpriority: i < 2 ? "high" : "low" } as any)}
                 onLoad={(e) => {
                   const parent = (e.currentTarget as HTMLImageElement).parentElement;
                   if (parent) {
