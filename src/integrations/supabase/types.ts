@@ -368,30 +368,54 @@ export type Database = {
       paid_script_settings: {
         Row: {
           created_at: string
+          features: string[] | null
           game_key: string
           hidden: boolean
           id: string
+          lifetime_note: string | null
+          lifetime_price: number | null
+          monthly_note: string | null
+          monthly_price: number | null
           pause_message: string | null
           paused: boolean
+          subtitle: string | null
+          title: string | null
           updated_at: string
+          warning: string | null
         }
         Insert: {
           created_at?: string
+          features?: string[] | null
           game_key: string
           hidden?: boolean
           id?: string
+          lifetime_note?: string | null
+          lifetime_price?: number | null
+          monthly_note?: string | null
+          monthly_price?: number | null
           pause_message?: string | null
           paused?: boolean
+          subtitle?: string | null
+          title?: string | null
           updated_at?: string
+          warning?: string | null
         }
         Update: {
           created_at?: string
+          features?: string[] | null
           game_key?: string
           hidden?: boolean
           id?: string
+          lifetime_note?: string | null
+          lifetime_price?: number | null
+          monthly_note?: string | null
+          monthly_price?: number | null
           pause_message?: string | null
           paused?: boolean
+          subtitle?: string | null
+          title?: string | null
           updated_at?: string
+          warning?: string | null
         }
         Relationships: []
       }

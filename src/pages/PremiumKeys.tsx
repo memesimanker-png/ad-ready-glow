@@ -99,6 +99,17 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+const overrideText = (value: string | null | undefined, fallback?: string) => {
+  if (value === null || value === undefined) return fallback;
+  return value;
+};
+
+const overridePrice = (value: number | null | undefined, fallback?: number) => {
+  if (value === null || value === undefined) return fallback;
+  const price = Number(value);
+  return Number.isFinite(price) && price > 0 ? price : undefined;
+};
+
 export default function PremiumKeys() {
   const { t } = useTranslation();
   const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
@@ -240,29 +251,37 @@ export default function PremiumKeys() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PAID_GAMES.filter((g) => !gameSettings?.get(g.key)?.hidden).map((g) => {
               const setting = gameSettings?.get(g.key);
+              const title = overrideText(setting?.title, g.title) || g.title;
+              const subtitle = overrideText(setting?.subtitle, g.subtitle) || "";
+              const features = setting?.features?.length ? setting.features : g.features;
+              const warning = overrideText(setting?.warning, g.warning);
+              const monthlyPrice = overridePrice(setting?.monthly_price, g.monthlyPrice) || g.monthlyPrice;
+              const lifetimePrice = overridePrice(setting?.lifetime_price, g.lifetimePrice);
+              const monthlyNote = overrideText(setting?.monthly_note, g.monthlyNote);
+              const lifetimeNote = overrideText(setting?.lifetime_note, g.lifetimeNote);
               const pricing = [
-                { price: g.monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: g.monthlyNote },
-                ...(g.lifetimePrice
-                  ? [{ price: g.lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment"), note: g.lifetimeNote }]
+                { price: monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: monthlyNote },
+                ...(lifetimePrice
+                  ? [{ price: lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment"), note: lifetimeNote }]
                   : []),
               ];
               return (
                 <PaidGameCard
                   key={g.title}
                   game={g.game}
-                  title={g.title}
-                  subtitle={g.subtitle}
+                  title={title}
+                  subtitle={subtitle}
                   thumbnail={g.thumbnail}
                   badge={g.badge}
-                  features={g.features}
-                  warning={g.warning}
+                  features={features}
+                  warning={warning}
                   changelog={g.changelog}
                   pricing={pricing}
                   paused={setting?.paused}
                   pauseMessage={setting?.pause_message}
                   onSelectPlan={(plan) => handlePurchase({
                     id: plan.period === "month" ? "monthly" : "lifetime",
-                    nameKey: `${g.title} — ${plan.label}`,
+                    nameKey: `${title} — ${plan.label}`,
                     price: plan.price,
                     script: g.script,
                     color: "", borderColor: "", featureKeys: [],
