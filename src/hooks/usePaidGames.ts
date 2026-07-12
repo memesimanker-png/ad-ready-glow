@@ -13,6 +13,8 @@ export interface PaidGameSetting {
   lifetime_price: number | null;
   monthly_note: string | null;
   lifetime_note: string | null;
+  hide_monthly: boolean;
+  hide_lifetime: boolean;
 }
 
 // Returns admin overrides for paid-game keys.
@@ -22,7 +24,7 @@ export function usePaidGameSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("paid_script_settings")
-        .select("game_key, hidden, paused, pause_message, title, subtitle, features, warning, monthly_price, lifetime_price, monthly_note, lifetime_note");
+        .select("game_key, hidden, paused, pause_message, title, subtitle, features, warning, monthly_price, lifetime_price, monthly_note, lifetime_note, hide_monthly, hide_lifetime");
       if (error) throw error;
       const map = new Map<string, PaidGameSetting>();
       (data || []).forEach((r: any) => {
@@ -38,6 +40,8 @@ export function usePaidGameSettings() {
           lifetime_price: r.lifetime_price == null ? null : Number(r.lifetime_price),
           monthly_note: r.monthly_note ?? null,
           lifetime_note: r.lifetime_note ?? null,
+          hide_monthly: !!r.hide_monthly,
+          hide_lifetime: !!r.hide_lifetime,
         });
       });
       return map;
