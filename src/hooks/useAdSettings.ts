@@ -14,7 +14,8 @@ export type AdType =
   | "direct_link"
   | "sliding_ad"
   | "skip_ads_banner"
-  | "skip_ads_float";
+  | "skip_ads_float"
+  | "script_promo";
 
 export interface AdSettingRow {
   id: string;
