@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, Shield, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, Shield, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick, Megaphone } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
