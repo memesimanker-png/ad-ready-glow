@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, Shield, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, Shield, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick, Megaphone } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -88,6 +88,7 @@ export default function Admin() {
           <TabsList className="bg-secondary/50 flex-wrap h-auto">
             {can("scripts") && <TabsTrigger value="scripts" className="gap-2" title="Manage all scripts (create, edit, delete, send notifications)"><Code className="h-4 w-4" /> Scripts</TabsTrigger>}
             {can("scripts") && <TabsTrigger value="paid-scripts" className="gap-2" title="Show or hide paid game scripts on the Premium page"><EyeOff className="h-4 w-4" /> Paid Scripts</TabsTrigger>}
+            {can("scripts") && <TabsTrigger value="announcements" className="gap-2" title="Push announcements to the Roblox loader API"><Megaphone className="h-4 w-4" /> Announcements</TabsTrigger>}
             {can("orders") && <TabsTrigger value="orders" className="gap-2" title="View premium key purchase orders and payments"><Key className="h-4 w-4" /> Orders</TabsTrigger>}
             {can("generate") && <TabsTrigger value="generate" className="gap-2" title="Manually generate a premium key for a customer"><Plus className="h-4 w-4" /> Generate Key</TabsTrigger>}
             {can("accounts") && <TabsTrigger value="accounts" className="gap-2" title="Manage legacy private inventory"><UserCheck className="h-4 w-4" /> Inventory</TabsTrigger>}
@@ -100,6 +101,7 @@ export default function Admin() {
 
           {can("scripts") && <TabsContent value="scripts"><ScriptsTab /></TabsContent>}
           {can("scripts") && <TabsContent value="paid-scripts"><PaidScriptsTab /></TabsContent>}
+          {can("scripts") && <TabsContent value="announcements"><AnnouncementsTab /></TabsContent>}
           {can("orders") && <TabsContent value="orders"><OrdersTab /></TabsContent>}
           {can("generate") && <TabsContent value="generate"><GenerateKeyTab /></TabsContent>}
           {can("accounts") && <TabsContent value="accounts"><AccountsTab /></TabsContent>}
@@ -2011,14 +2013,15 @@ function AdToggleControl() {
     sliding_ad: "Promo Modal (Sliding Ad)",
     skip_ads_banner: "Skip-Ads Banner",
     skip_ads_float: "Skip-Ads Float Button",
+    script_promo: "Script Promo Popup",
   };
   const PAGE_AD_TYPES: Record<string, string[]> = {
     "verify-step1": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-provider-select": ["popunder", "direct_link"],
-    "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float"],
-    keys: ["popunder"],
+    "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float", "script_promo"],
+    keys: ["popunder", "script_promo"],
   };
 
   const load = async () => {
@@ -2092,6 +2095,227 @@ function Row({ label, value }: { label: string; value: any }) {
     <div className="flex justify-between gap-4 border-b border-border/40 py-1.5">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium text-right break-all">{String(value ?? "—")}</span>
+    </div>
+  );
+}
+
+/* ─── Announcements Tab ─── */
+type Announcement = {
+  id: string;
+  title: string | null;
+  message: string;
+  enabled: boolean;
+  created_at: string;
+  expires_at: string | null;
+};
+
+function AnnouncementsTab() {
+  const { toast } = useToast();
+  const inputCls =
+    "w-full rounded-lg border border-border bg-secondary/50 px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+  const [rows, setRows] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
+  const { data: scripts = [] } = useAllScripts();
+
+  const API_URL =
+    "https://iphiksvnuzpteoryrdxf.supabase.co/functions/v1/public-announcements";
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("id,title,message,enabled,created_at,expires_at")
+      .order("created_at", { ascending: false });
+    if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
+    setRows((data as Announcement[]) || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const create = async () => {
+    if (!message.trim()) {
+      toast({ title: "Message is required", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("announcements").insert({
+      title: title.trim() || null,
+      message: message.trim(),
+      enabled: true,
+      expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: "Post failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setTitle("");
+    setMessage("");
+    setExpiresAt("");
+    toast({ title: "Announcement posted", description: "Live on the loader API within ~60s." });
+    load();
+  };
+
+  const toggle = async (row: Announcement) => {
+    const { error } = await supabase
+      .from("announcements")
+      .update({ enabled: !row.enabled })
+      .eq("id", row.id);
+    if (error) {
+      toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    load();
+  };
+
+  const remove = async (row: Announcement) => {
+    if (!confirm("Delete this announcement?")) return;
+    const { error } = await supabase.from("announcements").delete().eq("id", row.id);
+    if (error) {
+      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    load();
+  };
+
+  const insertScript = (slug: string, scriptTitle: string) => {
+    const url = `https://combowick.com/scripts/${slug}`;
+    setMessage((m) => (m ? `${m}\n` : "") + `New script: ${scriptTitle} — ${url}`);
+    if (!title) setTitle(`New Script: ${scriptTitle}`);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card className="p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Megaphone className="h-5 w-5 text-primary" />
+          <h2 className="font-heading text-lg font-bold">Post Announcement</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Anything posted here is served as JSON at the loader API and shows up in-game.
+        </p>
+        <div className="space-y-3">
+          <input
+            className={inputCls}
+            placeholder="Title (optional)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <textarea
+            className={inputCls + " min-h-[110px] resize-y"}
+            placeholder="Announcement message…"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <label className="text-xs text-muted-foreground flex items-center gap-2">
+              Expires (optional)
+              <input
+                type="datetime-local"
+                className="rounded-lg border border-border bg-secondary/50 px-3 py-2 text-sm"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+              />
+            </label>
+            <Button onClick={create} disabled={saving} className="gap-2 sm:ml-auto">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Post to API
+            </Button>
+          </div>
+        </div>
+        {scripts.length > 0 && (
+          <div className="border-t border-border/40 pt-3">
+            <p className="text-xs text-muted-foreground mb-2">Quick-insert a script link:</p>
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+              {scripts.slice(0, 30).map((s: any) => (
+                <button
+                  key={s.id}
+                  onClick={() => insertScript(s.slug, s.title)}
+                  className="px-2.5 py-1 text-xs rounded border border-border bg-secondary/50 hover:bg-primary/20 hover:border-primary/50 transition"
+                >
+                  {s.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border/40 pt-3">
+          <Code className="h-3.5 w-3.5" />
+          <span className="break-all">Loader endpoint: {API_URL}</span>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(API_URL);
+              toast({ title: "Copied API URL" });
+            }}
+            className="ml-auto p-1 hover:text-primary"
+            title="Copy"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </Card>
+
+      <Card className="p-5">
+        <h3 className="font-heading font-bold mb-4">All Announcements</h3>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : rows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No announcements yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {rows.map((row) => {
+              const expired = row.expires_at && new Date(row.expires_at) < new Date();
+              return (
+                <div
+                  key={row.id}
+                  className="flex items-start gap-3 rounded-lg border border-border bg-secondary/30 p-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    {row.title && <div className="font-semibold text-sm">{row.title}</div>}
+                    <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words">
+                      {row.message}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                      <span>{new Date(row.created_at).toLocaleString()}</span>
+                      <span
+                        className={
+                          row.enabled && !expired
+                            ? "text-green-500"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        {expired ? "Expired" : row.enabled ? "Live" : "Hidden"}
+                      </span>
+                      {row.expires_at && (
+                        <span>· expires {new Date(row.expires_at).toLocaleString()}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Switch checked={row.enabled} onCheckedChange={() => toggle(row)} />
+                    <button
+                      onClick={() => remove(row)}
+                      className="p-1.5 rounded hover:bg-destructive/20 text-destructive"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

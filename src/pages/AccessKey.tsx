@@ -12,6 +12,7 @@ import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { usePopunder } from "@/hooks/usePopunder";
 import { useAdSettings } from "@/hooks/useAdSettings";
+import ScriptPromoPopup from "@/components/ScriptPromoPopup";
 
 
 
@@ -259,6 +260,7 @@ export default function AccessKey() {
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
+      <ScriptPromoPopup enabled={isAdEnabled("access-key", "script_promo")} />
       {isAdEnabled("access-key", "skip_ads_banner") && <SkipAdsBanner />}
       <header className="container py-6">
         <div className="flex items-center justify-between">

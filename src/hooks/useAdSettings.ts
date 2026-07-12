@@ -14,7 +14,8 @@ export type AdType =
   | "direct_link"
   | "sliding_ad"
   | "skip_ads_banner"
-  | "skip_ads_float";
+  | "skip_ads_float"
+  | "script_promo";
 
 export interface AdSettingRow {
   id: string;
@@ -38,6 +39,7 @@ export const AD_TYPES: { id: AdType; label: string }[] = [
   { id: "sliding_ad", label: "Promo Modal (Sliding Ad)" },
   { id: "skip_ads_banner", label: "Skip-Ads Banner" },
   { id: "skip_ads_float", label: "Skip-Ads Float Button" },
+  { id: "script_promo", label: "Script Promo Popup" },
 ];
 
 // Which ad types each page actually renders (controls Admin matrix).
@@ -46,8 +48,8 @@ export const PAGE_AD_TYPES: Record<AdPage, AdType[]> = {
   "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
   "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
   "verify-provider-select": ["popunder", "direct_link"],
-  "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float"],
-  keys: ["popunder"],
+  "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float", "script_promo"],
+  keys: ["popunder", "script_promo"],
 };
 
 let cache: AdSettingRow[] | null = null;
