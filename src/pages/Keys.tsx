@@ -7,6 +7,7 @@ import { useTranslation } from "@/lib/translation-context";
 import { SEOHead } from "@/components/SEOHead";
 import { usePopunder } from "@/hooks/usePopunder";
 import { useAdSettings } from "@/hooks/useAdSettings";
+import ScriptPromoPopup from "@/components/ScriptPromoPopup";
 
 
 
