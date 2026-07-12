@@ -12,6 +12,7 @@ import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
 import { usePopunder } from "@/hooks/usePopunder";
 import { useAdSettings } from "@/hooks/useAdSettings";
+import ScriptPromoPopup from "@/components/ScriptPromoPopup";
 
 
 
