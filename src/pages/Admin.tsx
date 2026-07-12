@@ -471,6 +471,24 @@ function PaidScriptsTab() {
                   {savingKey === g.key ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
                   <span className="ml-1.5">{s.paused ? "Resume Buying" : "Pause Buying"}</span>
                 </Button>
+                <Button
+                  size="sm"
+                  variant={s.hide_monthly ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { hide_monthly: !s.hide_monthly })}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="ml-1.5">{s.hide_monthly ? "Enable Monthly" : "Disable Monthly"}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant={s.hide_lifetime ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { hide_lifetime: !s.hide_lifetime })}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span className="ml-1.5">{s.hide_lifetime ? "Enable Lifetime" : "Disable Lifetime"}</span>
+                </Button>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
