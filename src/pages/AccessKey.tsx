@@ -259,6 +259,7 @@ export default function AccessKey() {
   return (
     <div className="min-h-screen bg-black/70 flex flex-col">
       <NoIndex />
+      <ScriptPromoPopup enabled={isAdEnabled("access-key", "script_promo")} />
       {isAdEnabled("access-key", "skip_ads_banner") && <SkipAdsBanner />}
       <header className="container py-6">
         <div className="flex items-center justify-between">
