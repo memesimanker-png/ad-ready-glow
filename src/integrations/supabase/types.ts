@@ -371,6 +371,8 @@ export type Database = {
           features: string[] | null
           game_key: string
           hidden: boolean
+          hide_lifetime: boolean
+          hide_monthly: boolean
           id: string
           lifetime_note: string | null
           lifetime_price: number | null
@@ -388,6 +390,8 @@ export type Database = {
           features?: string[] | null
           game_key: string
           hidden?: boolean
+          hide_lifetime?: boolean
+          hide_monthly?: boolean
           id?: string
           lifetime_note?: string | null
           lifetime_price?: number | null
@@ -405,6 +409,8 @@ export type Database = {
           features?: string[] | null
           game_key?: string
           hidden?: boolean
+          hide_lifetime?: boolean
+          hide_monthly?: boolean
           id?: string
           lifetime_note?: string | null
           lifetime_price?: number | null

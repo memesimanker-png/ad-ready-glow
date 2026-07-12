@@ -260,11 +260,14 @@ export default function PremiumKeys() {
               const monthlyNote = overrideText(setting?.monthly_note, g.monthlyNote);
               const lifetimeNote = overrideText(setting?.lifetime_note, g.lifetimeNote);
               const pricing = [
-                { price: monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: monthlyNote },
-                ...(lifetimePrice
+                ...(!setting?.hide_monthly
+                  ? [{ price: monthlyPrice, label: t("Monthly"), period: "month" as const, description: t("Renews monthly"), note: monthlyNote }]
+                  : []),
+                ...(lifetimePrice && !setting?.hide_lifetime
                   ? [{ price: lifetimePrice, label: t("Lifetime"), period: "lifetime" as const, description: t("One-time payment"), note: lifetimeNote }]
                   : []),
               ];
+              if (pricing.length === 0) return null;
               return (
                 <PaidGameCard
                   key={g.title}

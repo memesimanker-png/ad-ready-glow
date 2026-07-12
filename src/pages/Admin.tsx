@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick } from "lucide-react";
+import { Loader2, Sparkles, Plus, Save, Trash2, Edit, Key, Users, Code, Eye, EyeOff, Copy, UserCheck, Mail, MailOpen, MailX, Bell, ShieldCheck, ShieldAlert, Shield, MessageSquare, Upload, ImageIcon, X, Wrench, Search, RefreshCw, Ban, ArrowLeftRight, Clock, MousePointerClick } from "lucide-react";
 import { useAllScripts } from "@/hooks/useScripts";
 import { CATEGORIES } from "@/lib/scripts-data";
 import { Navigate, Link } from "react-router-dom";
@@ -287,6 +287,8 @@ type PaidScriptSetting = {
   lifetime_price: number | null;
   monthly_note: string | null;
   lifetime_note: string | null;
+  hide_monthly: boolean;
+  hide_lifetime: boolean;
 };
 
 type PaidScriptDraft = {
@@ -313,6 +315,8 @@ const emptyPaidSetting: PaidScriptSetting = {
   lifetime_price: null,
   monthly_note: null,
   lifetime_note: null,
+  hide_monthly: false,
+  hide_lifetime: false,
 };
 
 const paidDraftFor = (game: (typeof PAID_GAMES)[number], setting?: PaidScriptSetting): PaidScriptDraft => ({
@@ -339,7 +343,7 @@ function PaidScriptsTab() {
     (async () => {
       const { data, error } = await supabase
         .from("paid_script_settings")
-        .select("game_key, hidden, paused, pause_message, title, subtitle, features, warning, monthly_price, lifetime_price, monthly_note, lifetime_note");
+        .select("game_key, hidden, paused, pause_message, title, subtitle, features, warning, monthly_price, lifetime_price, monthly_note, lifetime_note, hide_monthly, hide_lifetime");
       if (error) toast({ title: "Load failed", description: error.message, variant: "destructive" });
       const map: Record<string, PaidScriptSetting> = {};
       const d: Record<string, PaidScriptDraft> = {};
@@ -357,6 +361,8 @@ function PaidScriptsTab() {
           lifetime_price: r.lifetime_price == null ? null : Number(r.lifetime_price),
           monthly_note: r.monthly_note ?? null,
           lifetime_note: r.lifetime_note ?? null,
+          hide_monthly: !!r.hide_monthly,
+          hide_lifetime: !!r.hide_lifetime,
         };
         if (game) d[r.game_key] = paidDraftFor(game, map[r.game_key]);
       });
@@ -464,6 +470,24 @@ function PaidScriptsTab() {
                 >
                   {savingKey === g.key ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
                   <span className="ml-1.5">{s.paused ? "Resume Buying" : "Pause Buying"}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant={s.hide_monthly ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { hide_monthly: !s.hide_monthly })}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="ml-1.5">{s.hide_monthly ? "Enable Monthly" : "Disable Monthly"}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant={s.hide_lifetime ? "default" : "outline"}
+                  disabled={savingKey === g.key}
+                  onClick={() => persist(g.key, { hide_lifetime: !s.hide_lifetime })}
+                >
+                  <Shield className="h-4 w-4" />
+                  <span className="ml-1.5">{s.hide_lifetime ? "Enable Lifetime" : "Disable Lifetime"}</span>
                 </Button>
               </div>
 
