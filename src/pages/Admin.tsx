@@ -2013,14 +2013,15 @@ function AdToggleControl() {
     sliding_ad: "Promo Modal (Sliding Ad)",
     skip_ads_banner: "Skip-Ads Banner",
     skip_ads_float: "Skip-Ads Float Button",
+    script_promo: "Script Promo Popup",
   };
   const PAGE_AD_TYPES: Record<string, string[]> = {
     "verify-step1": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-step2": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-step3": ["sliding_ad", "skip_ads_banner", "skip_ads_float"],
     "verify-provider-select": ["popunder", "direct_link"],
-    "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float"],
-    keys: ["popunder"],
+    "access-key": ["popunder", "direct_link", "skip_ads_banner", "skip_ads_float", "script_promo"],
+    keys: ["popunder", "script_promo"],
   };
 
   const load = async () => {
