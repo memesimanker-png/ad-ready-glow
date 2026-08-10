@@ -37,6 +37,24 @@ export default function VerifyProviderSelect() {
   const [directLinkClicks, setDirectLinkClicks] = useState(0);
   const [requiredClicks, setRequiredClicks] = useState(DEFAULT_DIRECT_LINK_CLICKS);
   const [starting, setStarting] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const todaySchedule = getTodaySchedule();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setIsGoogleUser(data?.user?.app_metadata?.provider === "google");
+    }).catch(() => setIsGoogleUser(false));
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/verify/provider-select`,
+    });
+    if (result.error) {
+      toast({ variant: "destructive", title: "Error", description: result.error.message ?? "Google sign-in failed" });
+    }
+  };
+
 
   useEffect(() => {
     setMounted(true);
