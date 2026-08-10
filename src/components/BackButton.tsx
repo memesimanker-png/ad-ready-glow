@@ -1,17 +1,28 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-/** Global floating "Back" button. Hidden on the landing page. */
+/** Global floating "Back" button. Hidden on the landing page. Forces a full refresh. */
 export function BackButton() {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
 
   if (pathname === "/") return null;
 
   const goBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/");
+    if (window.history.length > 1) {
+      // Navigate back, then hard-refresh the resulting page.
+      const done = () => {
+        window.removeEventListener("popstate", done);
+        window.location.reload();
+      };
+      window.addEventListener("popstate", done);
+      window.history.back();
+      // Fallback if popstate never fires (e.g. blocked navigation).
+      setTimeout(() => window.location.reload(), 600);
+    } else {
+      window.location.href = "/";
+    }
   };
+
 
   return (
     <button
