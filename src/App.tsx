@@ -9,6 +9,7 @@ import { TranslationProvider } from "@/lib/translation-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { BackToTop } from "@/components/BackToTop";
+import { BackButton } from "@/components/BackButton";
 import { RouteProgress } from "@/components/RouteProgress";
 import { ExternalLinkMonetag } from "@/components/ExternalLinkMonetag";
 import { EngagementTracker } from "@/components/EngagementTracker";
@@ -147,6 +148,7 @@ const App = () => (
               </Suspense>
               <StickyMobileCTA />
               <BackToTop />
+              <BackButton />
             </BrowserRouter>
           </MotionConfig>
         </TooltipProvider>
