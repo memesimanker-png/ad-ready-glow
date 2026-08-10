@@ -12,7 +12,6 @@ import { useVerifyLinks } from "@/hooks/useVerifyLinks";
 import { useTranslation } from "@/lib/translation-context";
 import { LinkvertiseTimerNotice } from "@/components/LinkvertiseTimerNotice";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { NoIndex } from "@/components/NoIndex";
 import { SkipAdsBanner } from "@/components/SkipAdsBanner";
 import { SkipAdsFloatButton } from "@/components/SkipAdsFloatButton";
