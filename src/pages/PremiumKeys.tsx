@@ -36,8 +36,7 @@ const tiers = [
     id: "monthly",
     nameKey: "Monthly Access",
     price: 9.99,
-    originalPrice: "$20",
-    discount: "50% OFF",
+
     color: "text-green-400",
     borderColor: "border-green-500/30",
     featureKeys: ["30 Days Access", "$0.33 per day", "Priority support"],
