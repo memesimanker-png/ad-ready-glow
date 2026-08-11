@@ -189,17 +189,13 @@ export default function PremiumKeys() {
                     </h3>
                     {tier.price > 0 ? (
                       <>
-                        {disc ? (
+                        {disc && (
                           <div className="flex items-center justify-center gap-2 mb-1">
                             <span className="text-lg text-muted-foreground line-through">${tier.price}</span>
                             <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-400">{disc.percent}% OFF</span>
                           </div>
-                        ) : tier.originalPrice && (
-                          <div className="flex items-center justify-center gap-2 mb-1">
-                            <span className="text-lg text-muted-foreground line-through">{tier.originalPrice}</span>
-                            <span className="text-xs font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-400">{tier.discount}</span>
-                          </div>
                         )}
+
                         <div className="text-4xl font-bold mb-1">${disc ? disc.final : tier.price}</div>
                         <p className="text-sm text-muted-foreground">{t("Premium Key")}</p>
                         {tier.subtitleKey && <p className="text-xs text-muted-foreground mt-2">{t(tier.subtitleKey)}</p>}
