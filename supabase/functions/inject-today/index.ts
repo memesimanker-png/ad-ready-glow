@@ -9,7 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, OPTIONS",
 };
 
-const TTL = 600; // 10 minutes
+const TTL = 900; // 15 minutes
 const ENDPOINTS: Record<string, string> = {
   versions: "https://inject.today/api/versions/current",
   cheats: "https://inject.today/api/cheats",
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     const data = await upstream.json();
     const payload = { data, fetchedAt: Date.now() };
     memCacheSet(cacheKey, payload, TTL * 1000);
-    await redisSetJSON(cacheKey, payload, TTL * 5);
+    await redisSetJSON(cacheKey, payload, TTL * 4);
     return new Response(JSON.stringify({ ok: true, source: "upstream", fetchedAt: payload.fetchedAt, data }), { headers });
   } catch (e) {
     if (cached) {

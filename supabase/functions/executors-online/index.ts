@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const CACHE_KEY = "executors-online:list:v1";
-const TTL_SECONDS = 60;
+const TTL_SECONDS = 900; // 15 minutes
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
   const headers = {
     ...corsHeaders,
     "Content-Type": "application/json",
-    "Cache-Control": "public, max-age=30, s-maxage=60",
+    "Cache-Control": "public, max-age=900, s-maxage=900, stale-while-revalidate=3600",
   };
 
   // memory cache (per-isolate)
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     const data = await upstream.json();
     const payload = { data, fetchedAt: Date.now() };
     memCacheSet(CACHE_KEY, payload, TTL_SECONDS * 1000);
-    await redisSetJSON(CACHE_KEY, payload, TTL_SECONDS * 5); // keep stale for 5 minutes
+    await redisSetJSON(CACHE_KEY, payload, TTL_SECONDS * 4); // keep stale for 1h
     return new Response(JSON.stringify({ ok: true, source: "upstream", fetchedAt: payload.fetchedAt, data }), { headers });
   } catch (e) {
     if (cached) {
