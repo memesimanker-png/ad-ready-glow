@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   const headers = {
     ...corsHeaders,
     "Content-Type": "application/json",
-    "Cache-Control": "public, max-age=300, s-maxage=600",
+    "Cache-Control": "public, max-age=900, s-maxage=900, stale-while-revalidate=3600",
   };
   const cacheKey = `inject-today:${part}:v1`;
 
