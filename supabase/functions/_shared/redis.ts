@@ -35,9 +35,18 @@ export async function redisGetJSON<T = unknown>(key: string): Promise<T | null> 
   try { return JSON.parse(s) as T; } catch { return null; }
 }
 
-/** SET with TTL (seconds). Fire-and-forget; errors are swallowed. */
+/** SET with TTL (seconds). Uses POST body so large values don't hit URL limits. */
 export async function redisSet(key: string, value: string, ttlSeconds: number): Promise<void> {
-  await call(`set/${encodeURIComponent(key)}/${encodeURIComponent(value)}?EX=${ttlSeconds}`, WRITE_TOKEN);
+  if (!URL_BASE || !WRITE_TOKEN) return;
+  try {
+    await fetch(`${URL_BASE}/set/${encodeURIComponent(key)}?EX=${ttlSeconds}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${WRITE_TOKEN}` },
+      body: value,
+    });
+  } catch {
+    // swallow
+  }
 }
 
 export async function redisSetJSON(key: string, value: unknown, ttlSeconds: number): Promise<void> {
