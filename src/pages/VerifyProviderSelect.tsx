@@ -235,8 +235,9 @@ export default function VerifyProviderSelect() {
   if (todaySchedule.skipStep2) {
     steps.push({
       key: "google",
-      title: isGoogleUser ? "Google connected — Step 2 will be skipped" : "Sign in with Google (skip a step today)",
+      title: isGoogleUser ? "Google connected — Step 2 will be skipped" : "Sign in with Google (optional — skip a step today)",
       done: isGoogleUser,
+      optional: true,
       icon: <Sparkles className="h-4 w-4" />,
       render: () => (
         <div className="space-y-3">
