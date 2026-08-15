@@ -1,4 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { redisGet, redisSet } from "../_shared/redis.ts";
+
+const SITEMAP_CACHE_KEY = "sitemap:xml:v1";
+const SITEMAP_TTL = 900; // 15 min
+let memCache: { at: number; xml: string } | null = null;
 
 const BASE_URL = "https://combowick.com";
 
