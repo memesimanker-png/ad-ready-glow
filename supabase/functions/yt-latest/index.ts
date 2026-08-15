@@ -58,13 +58,19 @@ async function fetchLatest() {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const headers = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=54000, stale-while-revalidate=86400" };
   try {
     if (!cache || Date.now() - cache.at > CACHE_TTL_MS) {
-      cache = { at: Date.now(), data: await fetchLatest() };
+      const shared = await redisGetJSON<any>(REDIS_KEY);
+      if (shared) {
+        cache = { at: Date.now(), data: shared };
+      } else {
+        const data = await fetchLatest();
+        cache = { at: Date.now(), data };
+        await redisSetJSON(REDIS_KEY, data, REDIS_TTL);
+      }
     }
-    return new Response(JSON.stringify(cache.data), {
-      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=54000" },
-    });
+    return new Response(JSON.stringify(cache.data), { headers });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err), videos: [] }), {
       status: 500,
