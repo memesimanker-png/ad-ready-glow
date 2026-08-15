@@ -2,6 +2,8 @@
 // Uses YouTube's public RSS playlist feed (UULF prefix = uploads, long-form only — filters out Shorts).
 // Zero API key, zero quota. Cached in-memory for 2h, served via CDN cache headers.
 
+import { redisGetJSON, redisSetJSON } from "../_shared/redis.ts";
+
 const CHANNEL_SUFFIX = "Y-K7zQjLXzGSOz-Na7A6nQ"; // @COMBO_WICK
 const PLAYLIST_ID = `UULF${CHANNEL_SUFFIX}`;
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
