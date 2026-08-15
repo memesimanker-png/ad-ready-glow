@@ -181,7 +181,7 @@ export default function VerifyProviderSelect() {
   const youtubeProgress = youtubeTimer > 0 ? ((WAIT_TIME_SECONDS - youtubeTimer) / WAIT_TIME_SECONDS) * 100 : youtubeCompleted ? 100 : 0;
   const discordProgress = discordTimer > 0 ? ((WAIT_TIME_SECONDS - discordTimer) / WAIT_TIME_SECONDS) * 100 : discordCompleted ? 100 : 0;
 
-  type Step = { key: string; title: string; done: boolean; icon: React.ReactNode; render: () => React.ReactNode };
+  type Step = { key: string; title: string; done: boolean; optional?: boolean; icon: React.ReactNode; render: () => React.ReactNode };
   const steps: Step[] = [];
 
   if (showSubscriptionGate) {
