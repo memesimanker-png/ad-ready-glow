@@ -297,9 +297,10 @@ export default function VerifyProviderSelect() {
     ),
   });
 
-  const activeIdx = steps.findIndex((s) => !s.done);
-  const completedCount = steps.slice(0, -1).filter((s) => s.done).length;
-  const totalGates = steps.length - 1;
+  const activeIdx = steps.findIndex((s) => !s.done && !s.optional);
+  const gateSteps = steps.slice(0, -1).filter((s) => !s.optional);
+  const completedCount = gateSteps.filter((s) => s.done).length;
+  const totalGates = gateSteps.length;
   const overallPercent = totalGates === 0 ? 100 : Math.round((completedCount / totalGates) * 100);
 
   return (
