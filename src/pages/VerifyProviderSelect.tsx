@@ -181,7 +181,7 @@ export default function VerifyProviderSelect() {
   const youtubeProgress = youtubeTimer > 0 ? ((WAIT_TIME_SECONDS - youtubeTimer) / WAIT_TIME_SECONDS) * 100 : youtubeCompleted ? 100 : 0;
   const discordProgress = discordTimer > 0 ? ((WAIT_TIME_SECONDS - discordTimer) / WAIT_TIME_SECONDS) * 100 : discordCompleted ? 100 : 0;
 
-  type Step = { key: string; title: string; done: boolean; icon: React.ReactNode; render: () => React.ReactNode };
+  type Step = { key: string; title: string; done: boolean; optional?: boolean; icon: React.ReactNode; render: () => React.ReactNode };
   const steps: Step[] = [];
 
   if (showSubscriptionGate) {
@@ -235,8 +235,9 @@ export default function VerifyProviderSelect() {
   if (todaySchedule.skipStep2) {
     steps.push({
       key: "google",
-      title: isGoogleUser ? "Google connected — Step 2 will be skipped" : "Sign in with Google (skip a step today)",
+      title: isGoogleUser ? "Google connected — Step 2 will be skipped" : "Sign in with Google (optional — skip a step today)",
       done: isGoogleUser,
+      optional: true,
       icon: <Sparkles className="h-4 w-4" />,
       render: () => (
         <div className="space-y-3">
@@ -296,9 +297,10 @@ export default function VerifyProviderSelect() {
     ),
   });
 
-  const activeIdx = steps.findIndex((s) => !s.done);
-  const completedCount = steps.slice(0, -1).filter((s) => s.done).length;
-  const totalGates = steps.length - 1;
+  const activeIdx = steps.findIndex((s) => !s.done && !s.optional);
+  const gateSteps = steps.slice(0, -1).filter((s) => !s.optional);
+  const completedCount = gateSteps.filter((s) => s.done).length;
+  const totalGates = gateSteps.length;
   const overallPercent = totalGates === 0 ? 100 : Math.round((completedCount / totalGates) * 100);
 
   return (
@@ -368,8 +370,8 @@ export default function VerifyProviderSelect() {
             <CardContent className="p-0">
               <ol className="divide-y divide-border/40">
                 {steps.map((step, idx) => {
-                  const isActive = idx === activeIdx;
-                  const isLocked = activeIdx !== -1 && idx > activeIdx;
+                  const isActive = idx === activeIdx || (!!step.optional && !step.done && (activeIdx === -1 || idx < activeIdx));
+                  const isLocked = !step.optional && activeIdx !== -1 && idx > activeIdx;
                   const isDone = step.done;
                   return (
                     <li key={step.key} className={`p-5 transition-colors ${isActive ? "bg-primary/5" : isDone ? "opacity-60" : isLocked ? "opacity-40" : ""}`}>

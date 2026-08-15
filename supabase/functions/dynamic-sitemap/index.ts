@@ -1,4 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { redisGet, redisSet } from "../_shared/redis.ts";
+
+const SITEMAP_CACHE_KEY = "sitemap:xml:v1";
+const SITEMAP_TTL = 900; // 15 min
+let memCache: { at: number; xml: string } | null = null;
 
 const BASE_URL = "https://combowick.com";
 
@@ -94,8 +99,24 @@ ${hreflangTags(loc)}
   </url>`;
 }
 
+const xmlHeaders = {
+  "Content-Type": "application/xml; charset=utf-8",
+  "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  "Access-Control-Allow-Origin": "*",
+};
+
 Deno.serve(async () => {
   const today = new Date().toISOString().split("T")[0];
+
+  if (memCache && Date.now() - memCache.at < SITEMAP_TTL * 1000) {
+    return new Response(memCache.xml, { headers: xmlHeaders });
+  }
+  const cached = await redisGet(SITEMAP_CACHE_KEY);
+  if (cached) {
+    memCache = { at: Date.now(), xml: cached };
+    return new Response(cached, { headers: xmlHeaders });
+  }
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -136,14 +157,8 @@ Deno.serve(async () => {
 ${entries.join("\n")}
 </urlset>`;
 
-  return new Response(xml, {
-    headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-      // Cloudflare-style SWR: serve cached for 1h, allow stale for 24h while refreshing.
-      // Cuts edge function invocations during traffic spikes.
-      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-      "CDN-Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      "Access-Control-Allow-Origin": "*",
-    },
-  });
+  memCache = { at: Date.now(), xml };
+  await redisSet(SITEMAP_CACHE_KEY, xml, SITEMAP_TTL);
+
+  return new Response(xml, { headers: xmlHeaders });
 });

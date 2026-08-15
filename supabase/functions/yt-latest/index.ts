@@ -2,10 +2,14 @@
 // Uses YouTube's public RSS playlist feed (UULF prefix = uploads, long-form only — filters out Shorts).
 // Zero API key, zero quota. Cached in-memory for 2h, served via CDN cache headers.
 
+import { redisGetJSON, redisSetJSON } from "../_shared/redis.ts";
+
 const CHANNEL_SUFFIX = "Y-K7zQjLXzGSOz-Na7A6nQ"; // @COMBO_WICK
 const PLAYLIST_ID = `UULF${CHANNEL_SUFFIX}`;
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
 const CACHE_TTL_MS = 15 * 60 * 60 * 1000; // 15 hours
+const REDIS_KEY = "yt-latest:videos:v1";
+const REDIS_TTL = 15 * 60 * 60; // 15 hours shared
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,13 +62,19 @@ async function fetchLatest() {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const headers = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=54000, stale-while-revalidate=86400" };
   try {
     if (!cache || Date.now() - cache.at > CACHE_TTL_MS) {
-      cache = { at: Date.now(), data: await fetchLatest() };
+      const shared = await redisGetJSON<any>(REDIS_KEY);
+      if (shared) {
+        cache = { at: Date.now(), data: shared };
+      } else {
+        const data = await fetchLatest();
+        cache = { at: Date.now(), data };
+        await redisSetJSON(REDIS_KEY, data, REDIS_TTL);
+      }
     }
-    return new Response(JSON.stringify(cache.data), {
-      headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "public, max-age=54000" },
-    });
+    return new Response(JSON.stringify(cache.data), { headers });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err), videos: [] }), {
       status: 500,
