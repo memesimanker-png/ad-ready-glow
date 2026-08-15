@@ -370,8 +370,8 @@ export default function VerifyProviderSelect() {
             <CardContent className="p-0">
               <ol className="divide-y divide-border/40">
                 {steps.map((step, idx) => {
-                  const isActive = idx === activeIdx;
-                  const isLocked = activeIdx !== -1 && idx > activeIdx;
+                  const isActive = idx === activeIdx || (!!step.optional && !step.done && (activeIdx === -1 || idx < activeIdx));
+                  const isLocked = !step.optional && activeIdx !== -1 && idx > activeIdx;
                   const isDone = step.done;
                   return (
                     <li key={step.key} className={`p-5 transition-colors ${isActive ? "bg-primary/5" : isDone ? "opacity-60" : isLocked ? "opacity-40" : ""}`}>
