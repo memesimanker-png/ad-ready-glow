@@ -99,8 +99,24 @@ ${hreflangTags(loc)}
   </url>`;
 }
 
+const xmlHeaders = {
+  "Content-Type": "application/xml; charset=utf-8",
+  "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  "Access-Control-Allow-Origin": "*",
+};
+
 Deno.serve(async () => {
   const today = new Date().toISOString().split("T")[0];
+
+  if (memCache && Date.now() - memCache.at < SITEMAP_TTL * 1000) {
+    return new Response(memCache.xml, { headers: xmlHeaders });
+  }
+  const cached = await redisGet(SITEMAP_CACHE_KEY);
+  if (cached) {
+    memCache = { at: Date.now(), xml: cached };
+    return new Response(cached, { headers: xmlHeaders });
+  }
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
