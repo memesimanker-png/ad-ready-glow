@@ -6,6 +6,8 @@ const CHANNEL_SUFFIX = "Y-K7zQjLXzGSOz-Na7A6nQ"; // @COMBO_WICK
 const PLAYLIST_ID = `UULF${CHANNEL_SUFFIX}`;
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
 const CACHE_TTL_MS = 15 * 60 * 60 * 1000; // 15 hours
+const REDIS_KEY = "yt-latest:videos:v1";
+const REDIS_TTL = 15 * 60 * 60; // 15 hours shared
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
