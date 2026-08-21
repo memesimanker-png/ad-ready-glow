@@ -11,11 +11,10 @@ import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
 import { AdSlot } from "@/components/AdSlot";
-import { ScriptUnlockGate, useScriptUnlocked } from "@/components/ScriptUnlockGate";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const unlocked = useScriptUnlocked(slug);
+
   const { data: script, isLoading } = useScriptBySlug(slug);
   const { data: related = [] } = useRelatedScripts(
     script?.id || "",
