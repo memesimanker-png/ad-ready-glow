@@ -245,27 +245,18 @@ export default function ScriptDetail() {
               <section className="mb-8">
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h2 className="text-lg font-semibold">Script Code</h2>
-                  {unlocked && (
-                    <div className="flex gap-2">
-                      <EmailScriptButton script={script} />
-                      <CopyButton text={script.code} />
-                    </div>
-                  )}
-                </div>
-                {unlocked ? (
-                  <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
-                    <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
-                      {script.code}
-                    </pre>
+                  <div className="flex gap-2">
+                    <EmailScriptButton script={script} />
+                    <CopyButton text={script.code} />
                   </div>
-                ) : (
-                  <ScriptUnlockGate
-                    slug={script.slug}
-                    title={script.title}
-                    thumbnail={(script as any).thumbnail_url}
-                  />
-                )}
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/50 p-4 overflow-x-auto">
+                  <pre className="text-sm text-muted-foreground whitespace-pre font-mono leading-relaxed">
+                    {script.code}
+                  </pre>
+                </div>
               </section>
+
             )}
 
             {/* In-article AdSense — only on free script pages with code shown above (not paid gates) */}
