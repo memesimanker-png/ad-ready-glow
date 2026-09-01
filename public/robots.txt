@@ -2,12 +2,52 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /keys
+Disallow: /premium-keys
+Disallow: /access-key
+Disallow: /extend-key
+Disallow: /claim-access
+Disallow: /oils
+Disallow: /login
+Disallow: /signup
+Disallow: /register
+Disallow: /dashboard
+Disallow: /wall-of-fame
+Disallow: /blocked
+Disallow: /verify
+Disallow: /ad-return
 Crawl-delay: 1
+
+User-agent: AdsBot-Google
+Disallow: /keys
+Disallow: /premium-keys
+Disallow: /access-key
+Disallow: /extend-key
+Disallow: /claim-access
+Disallow: /oils
+Disallow: /verify
+Disallow: /ad-return
+Disallow: /admin
+
+User-agent: Mediapartners-Google
+Disallow: /keys
+Disallow: /premium-keys
+Disallow: /access-key
+Disallow: /extend-key
+Disallow: /claim-access
+Disallow: /oils
+Disallow: /verify
+Disallow: /ad-return
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /keys
+Disallow: /premium-keys
+Disallow: /verify
+Disallow: /ad-return
 Crawl-delay: 2
 
 User-agent: Twitterbot
@@ -59,8 +99,20 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /keys
+Disallow: /premium-keys
+Disallow: /access-key
+Disallow: /extend-key
+Disallow: /claim-access
+Disallow: /oils
+Disallow: /login
+Disallow: /signup
+Disallow: /register
+Disallow: /dashboard
+Disallow: /wall-of-fame
+Disallow: /blocked
+Disallow: /verify
+Disallow: /ad-return
 
 # Sitemap (project domain)
 Sitemap: https://combowick.com/sitemap.xml
-# Dynamic sitemap (always up-to-date — includes all scripts and blog posts)
-Sitemap: https://iphiksvnuzpteoryrdxf.supabase.co/functions/v1/dynamic-sitemap
