@@ -1186,7 +1186,7 @@ end)`}
 
         <h2 className="font-heading text-2xl font-bold mb-4">Por Que Usar a ComboWick?</h2>
         <p className="text-muted-foreground mb-6 leading-relaxed">
-          Todos os scripts da nossa <Link to="/scripts" className="text-primary hover:underline">biblioteca</Link> são testados, atualizados semanalmente e hospedados no nosso GitHub — o que significa: zero malware, zero scripts quebrados, e funcionamento garantido com os principais executores. Se quiser acesso premium sem precisar passar pelas verificações, confira nossas <Link to="/premium-keys" className="text-primary hover:underline">chaves premium</Link> a partir de $5.
+          Todos os scripts da nossa <Link to="/scripts" className="text-primary hover:underline">biblioteca</Link> são testados, atualizados semanalmente e hospedados no nosso GitHub — o que significa: zero malware, zero scripts quebrados, e funcionamento garantido com os principais executores.
         </p>
 
         <Card className="p-6 bg-primary/5 border-primary/30">
@@ -1263,7 +1263,7 @@ end)`}
 
         <h2 className="font-heading text-2xl font-bold mb-4">Why Get Scripts From ComboWick?</h2>
         <p className="text-muted-foreground mb-6 leading-relaxed">
-          Every script in our <Link to="/scripts" className="text-primary hover:underline">library</Link> is tested, updated weekly, and hosted on our GitHub — meaning zero malware, zero broken scripts, and guaranteed compatibility with the major executors. Want to skip the verification steps? Our <Link to="/premium-keys" className="text-primary hover:underline">premium keys</Link> start at $5 for 7-day instant access.
+          Every script in our <Link to="/scripts" className="text-primary hover:underline">library</Link> is tested, updated weekly, and hosted on our GitHub — meaning zero malware, zero broken scripts, and guaranteed compatibility with the major executors.
         </p>
 
         <Card className="p-6 bg-primary/5 border-primary/30">
