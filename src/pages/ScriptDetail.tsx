@@ -234,10 +234,10 @@ export default function ScriptDetail() {
                 <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-8 text-center">
                   <DollarSign className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
                   <p className="text-lg font-semibold mb-2">This is a Premium Script</p>
-                  <p className="text-sm text-muted-foreground mb-4">Purchase a premium key to access this script.</p>
-                  <Link to="/premium-keys" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
-                    Purchase Access
-                  </Link>
+                  <p className="text-sm text-muted-foreground mb-4">This script isn't available for free copy here — join our Discord for access.</p>
+                  <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90 transition-colors">
+                    Join Discord
+                  </a>
                 </div>
               </section>
             ) : (
@@ -309,9 +309,9 @@ export default function ScriptDetail() {
               </div>
 
               {script.is_paid ? (
-                <Link to="/premium-keys" className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors">
-                  <DollarSign className="h-4 w-4" /> Purchase Access
-                </Link>
+                <a href="https://discord.com/invite/ufrz9Zaqs8" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground font-bold hover:opacity-90 transition-colors">
+                  Join Discord for Access
+                </a>
               ) : (
                 <CopyButton text={script.code} className="w-full justify-center" />
               )}
