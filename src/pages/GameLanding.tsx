@@ -169,25 +169,6 @@ export default function GameLanding() {
         </div>
       </section>
 
-      {/* Premium upsell */}
-      <section className="py-16 sm:py-20 border-t border-border/40">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-          <Crown className="w-8 h-8 text-bronze-light mx-auto mb-4" />
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-3 tracking-tight">
-            Tired of the 11-Hour Key Refresh?
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Premium keys skip the verification entirely. $5 for 7 days, $9.99 monthly, $49.99 lifetime.
-          </p>
-          <Link to="/premium-keys">
-            <Button size="lg" className="text-sm px-8 py-6 uppercase tracking-wider neon-glow">
-              <Zap className="mr-2 h-4 w-4" />
-              Get Premium Key
-            </Button>
-          </Link>
-        </div>
-      </section>
-
       {/* FAQ */}
       <section className="py-16 sm:py-20 border-t border-border/40">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
