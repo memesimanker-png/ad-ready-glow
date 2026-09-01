@@ -82,14 +82,14 @@ export default function Index() {
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link to="/premium-keys">
+            <Link to="/executors">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
-                {t("Premium Keys")}
+                {t("Executors")}
               </Button>
             </Link>
-            <Link to="/keys">
+            <Link to="/guides">
               <Button variant="outline" size="lg" className="text-sm px-10 py-7 uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
-                {t("Get Key")}
+                {t("Guides")}
               </Button>
             </Link>
           </motion.div>
