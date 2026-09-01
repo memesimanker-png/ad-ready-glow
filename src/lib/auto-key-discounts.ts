@@ -22,8 +22,8 @@ const RULES: Rule[] = [
   },
   {
     days: [2, 4], // Tuesday + Thursday
-    label: "Lifetime Flash Deal",
-    tiers: { lifetime: 18 },
+    label: "Flash Deal",
+    tiers: { monthly: 12, lifetime: 18 },
   },
   {
     days: [3], // Wednesday
