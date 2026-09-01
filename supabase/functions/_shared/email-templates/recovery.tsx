@@ -1,7 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
-import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
 
 interface RecoveryEmailProps { siteName: string; confirmationUrl: string }
 
@@ -14,15 +14,9 @@ export const RecoveryEmail = ({ confirmationUrl }: RecoveryEmailProps) => (
         <Section style={header}><Heading style={brand}>COMBO_WICK</Heading></Section>
         <Section style={card}>
           <Heading style={h1}>Reset your password</Heading>
-          <Text style={text}>
-            We got a request to reset your Combo_WICK password. Tap the button below to choose a new one — the link expires shortly for your safety.
-          </Text>
-          <Section style={btnWrap}>
-            <Button style={button} href={confirmationUrl}>Reset Password</Button>
-          </Section>
-          <Text style={fineprint}>
-            Didn't ask for this? Ignore this email and your password stays the same.
-          </Text>
+          <Text style={text}>Tap the button below to choose a new password. This link expires shortly.</Text>
+          <Section style={btnWrap}><Button style={button} href={confirmationUrl}>Reset Password</Button></Section>
+          <Text style={fineprint}>Didn't request this? You can safely ignore this email.</Text>
         </Section>
         <Text style={footer}>© Combo_WICK · combowick.com</Text>
       </Container>
