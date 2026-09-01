@@ -1,6 +1,8 @@
 // Automatic, recurring day-based discounts for PREMIUM KEYS only.
 // The $5 7-day trial is never discounted. Prices restore automatically
 // as soon as the day window ends (everything is computed live from UTC).
+// Strategy: lifetime converts best, so lifetime is discounted every day
+// (biggest cut on weekends), monthly gets lighter cuts.
 
 export type AutoDiscount = { percent: number; label: string };
 
@@ -16,17 +18,22 @@ const RULES: Rule[] = [
   {
     days: [1], // Monday
     label: "Monday Reset Sale",
-    tiers: { monthly: 15, lifetime: 10 },
+    tiers: { monthly: 15, lifetime: 20 },
+  },
+  {
+    days: [2, 4], // Tuesday + Thursday
+    label: "Lifetime Flash Deal",
+    tiers: { lifetime: 18 },
   },
   {
     days: [3], // Wednesday
     label: "Midweek Deal",
-    tiers: { monthly: 10, lifetime: 10 },
+    tiers: { monthly: 10, lifetime: 15 },
   },
   {
     days: [5, 6, 0], // Friday → Sunday
-    label: "Weekend Sale",
-    tiers: { monthly: 20, lifetime: 15 },
+    label: "Weekend Blowout",
+    tiers: { monthly: 20, lifetime: 25 },
   },
 ];
 
