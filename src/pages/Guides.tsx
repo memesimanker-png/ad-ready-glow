@@ -87,7 +87,7 @@ export default function Guides() {
           <Card className="p-6 mb-10 bg-primary/5 border-primary/20">
             <h2 className="font-heading text-lg font-semibold mb-2">New to Roblox scripting?</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Start with <Link to="/keys" className="text-primary hover:underline">Getting Started with Combo_WICK</Link>, then read the <Link to="/executors" className="text-primary hover:underline">Executor Compatibility Guide</Link> to pick the right tool for your device. Once you've run your first script successfully, the <Link to="/tutorials" className="text-primary hover:underline">Lua Scripting Tutorials</Link> are the natural next step if you want to start writing your own.
+              Start with the <Link to="/docs" className="text-primary hover:underline">Getting Started docs</Link>, then read the <Link to="/executors" className="text-primary hover:underline">Executor Compatibility Guide</Link> to pick the right tool for your device. Once you've run your first script successfully, the <Link to="/tutorials" className="text-primary hover:underline">Lua Scripting Tutorials</Link> are the natural next step if you want to start writing your own.
             </p>
           </Card>
 
