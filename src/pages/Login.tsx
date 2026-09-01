@@ -63,9 +63,6 @@ export default function Login() {
                   Sign In
                 </Button>
               </form>
-              <p className="text-sm text-center text-muted-foreground mt-4">
-                Don't have an account? <Link to="/signup" className="text-primary hover:underline">Sign up</Link>
-              </p>
             </CardContent>
           </Card>
         </div>
