@@ -26,7 +26,7 @@ export const EN_TEXTS: Record<string, string> = {
   "Premium Script": "Premium Script",
   "Roblox Tools": "Roblox Tools",
   "Delivered Instantly": "Delivered Instantly",
-  "hero_desc": "Explore free Roblox scripts, premium keys, executor guides, and Lua tutorials with secure PayPal checkout for premium access.",
+  "hero_desc": "Explore free Roblox scripts, executor guides, and Lua tutorials — all in one place.",
   "View Packages": "View Packages",
   "Learn More": "Learn More",
   // Features
@@ -269,11 +269,11 @@ export const EN_TEXTS: Record<string, string> = {
   "Copy": "Copy",
   // Homepage hero & CTA
   "Welcome to": "Welcome to",
-  "hero_main_desc": "Combo_WICK is the trusted source for free Roblox scripts, premium keys, executors, and Lua guides. Instant key delivery, secure payments, and 24/7 Discord support — built for serious gamers and developers.",
+  "hero_main_desc": "Combo_WICK is the trusted source for free Roblox scripts, executor reviews, and Lua guides — tested, updated regularly, and backed by 24/7 Discord support for gamers and developers.",
   "Browse Scripts": "Browse Scripts",
   "Get Key": "Get Key",
   "Ready to Get Started?": "Ready to Get Started?",
-  "cta_main_desc": "Join users using Combo_WICK every day. Free scripts, premium keys, executor guides, and Lua tutorials — all in one place.",
+  "cta_main_desc": "Join users using Combo_WICK every day. Free scripts, executor guides, and Lua tutorials — all in one place.",
   "Explore Scripts": "Explore Scripts",
   "Read Our Guides": "Read Our Guides",
   // Footer
