@@ -138,7 +138,7 @@ export default function Contact() {
                 <div>
                   <p className="font-semibold text-foreground">Message received</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Thanks! Replies will appear in your <Link to="/dashboard" className="text-primary underline">dashboard</Link>. Expect a response within 24h on weekdays.
+                    Thanks! We'll get back to you by email within 24h on weekdays.
                   </p>
                   <Button variant="outline" size="sm" className="mt-3" onClick={() => setSent(false)}>
                     Send another
