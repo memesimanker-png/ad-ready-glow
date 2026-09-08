@@ -4,10 +4,19 @@ import { Gamepad2 } from "lucide-react";
 interface GameThumbnailProps {
   gameName: string;
   universeId?: number | null;
+  /** Roblox game link — used to derive the place ID when no universe ID is set. */
+  gameUrl?: string | null;
   /** Custom thumbnail URL — when provided, overrides the Roblox auto-fetch. */
   customUrl?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg";
+}
+
+/** Extracts the place ID from any roblox.com/games/<id>/... link. */
+export function placeIdFromGameUrl(url?: string | null): number | null {
+  if (!url) return null;
+  const m = String(url).match(/roblox\.com\/(?:[a-z-]+\/)?games\/(\d+)/i) || String(url).match(/(?:placeId|id)=(\d+)/i);
+  return m ? Number(m[1]) : null;
 }
 
 const sizeMap = {
@@ -16,9 +25,11 @@ const sizeMap = {
   lg: "w-20 h-20 rounded-xl",
 };
 
-export function GameThumbnail({ gameName, universeId, customUrl, className = "", size = "sm" }: GameThumbnailProps) {
+export function GameThumbnail({ gameName, universeId, gameUrl, customUrl, className = "", size = "sm" }: GameThumbnailProps) {
+  // Fall back to the place ID in the Roblox game link when no universe ID is stored.
+  const lookupId = universeId || placeIdFromGameUrl(gameUrl);
   // Skip the Roblox fetch entirely when admin uploaded a custom image.
-  const fetched = useGameThumbnail(customUrl ? null : universeId);
+  const fetched = useGameThumbnail(customUrl ? null : lookupId);
   const thumbnail = customUrl || fetched;
 
   return thumbnail ? (

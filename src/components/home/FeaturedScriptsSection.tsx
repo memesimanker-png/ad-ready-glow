@@ -51,7 +51,7 @@ export function FeaturedScriptsSection() {
                   className="flex flex-col h-full p-4"
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <GameThumbnail gameName={s.game} universeId={(s as any).game_universe_id} size="sm" />
+                    <GameThumbnail gameName={s.game} universeId={(s as any).game_universe_id} gameUrl={(s as any).game_url} size="sm" />
                     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                       <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 truncate max-w-[140px]">
                         {s.game}
