@@ -4,10 +4,19 @@ import { Gamepad2 } from "lucide-react";
 interface GameThumbnailProps {
   gameName: string;
   universeId?: number | null;
+  /** Roblox game link — used to derive the place ID when no universe ID is set. */
+  gameUrl?: string | null;
   /** Custom thumbnail URL — when provided, overrides the Roblox auto-fetch. */
   customUrl?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg";
+}
+
+/** Extracts the place ID from any roblox.com/games/<id>/... link. */
+export function placeIdFromGameUrl(url?: string | null): number | null {
+  if (!url) return null;
+  const m = String(url).match(/roblox\.com\/(?:[a-z-]+\/)?games\/(\d+)/i) || String(url).match(/(?:placeId|id)=(\d+)/i);
+  return m ? Number(m[1]) : null;
 }
 
 const sizeMap = {
