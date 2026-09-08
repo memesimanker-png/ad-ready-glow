@@ -25,9 +25,11 @@ const sizeMap = {
   lg: "w-20 h-20 rounded-xl",
 };
 
-export function GameThumbnail({ gameName, universeId, customUrl, className = "", size = "sm" }: GameThumbnailProps) {
+export function GameThumbnail({ gameName, universeId, gameUrl, customUrl, className = "", size = "sm" }: GameThumbnailProps) {
+  // Fall back to the place ID in the Roblox game link when no universe ID is stored.
+  const lookupId = universeId || placeIdFromGameUrl(gameUrl);
   // Skip the Roblox fetch entirely when admin uploaded a custom image.
-  const fetched = useGameThumbnail(customUrl ? null : universeId);
+  const fetched = useGameThumbnail(customUrl ? null : lookupId);
   const thumbnail = customUrl || fetched;
 
   return thumbnail ? (
