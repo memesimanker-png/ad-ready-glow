@@ -81,6 +81,7 @@ export default function ScriptPromoPopup({ enabled = true, delayMs = 2500 }: Scr
               <GameThumbnail
                 gameName={promo.game}
                 universeId={promo.game_universe_id}
+                gameUrl={(promo as any).game_url}
                 className="h-full w-full object-cover"
               />
             </div>
