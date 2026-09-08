@@ -11,6 +11,7 @@ import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { SEOHead } from "@/components/SEOHead";
 import { EmailScriptButton } from "@/components/EmailScriptButton";
 import { AdSlot } from "@/components/AdSlot";
+import { maybeFireDirectLink } from "@/lib/monetag";
 
 export default function ScriptDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -203,7 +204,11 @@ export default function ScriptDetail() {
                       </span>
                     )}
                   </div>
-                  <h1 className="text-2xl md:text-3xl font-bold font-heading" style={{ textWrap: "balance" as any }}>
+                  <h1
+                    onClick={() => maybeFireDirectLink()}
+                    className="text-2xl md:text-3xl font-bold font-heading cursor-pointer"
+                    style={{ textWrap: "balance" as any }}
+                  >
                     {script.title}
                   </h1>
                 </div>
