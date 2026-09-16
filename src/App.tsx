@@ -27,7 +27,6 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const Scripts = lazy(() => import("./pages/Scripts"));
 const ScriptDetail = lazy(() => import("./pages/ScriptDetail"));
 const GameLanding = lazy(() => import("./pages/GameLanding"));
-const Executors = lazy(() => import("./pages/Executors"));
 const Tutorials = lazy(() => import("./pages/Tutorials"));
 const Docs = lazy(() => import("./pages/Docs"));
 const Guides = lazy(() => import("./pages/Guides"));
@@ -87,7 +86,6 @@ const App = () => (
                   <Route path="/scripts" element={<Scripts />} />
                   <Route path="/scripts/:slug" element={<ScriptDetail />} />
                   <Route path="/games/:game" element={<GameLanding />} />
-                  <Route path="/executors" element={<Executors />} />
                   <Route path="/tutorials" element={<Tutorials />} />
                   <Route path="/docs" element={<Docs />} />
                   <Route path="/guides" element={<Guides />} />
