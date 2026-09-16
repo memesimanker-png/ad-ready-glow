@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/scripts", label: "Scripts" },
-  { to: "/executors", label: "Executors" },
   { to: "/guides", label: "Guides" },
   { to: "/docs", label: "Docs" },
   { to: "/blog", label: "Blog" },
