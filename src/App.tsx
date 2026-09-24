@@ -28,7 +28,6 @@ const Scripts = lazy(() => import("./pages/Scripts"));
 const ScriptDetail = lazy(() => import("./pages/ScriptDetail"));
 const GameLanding = lazy(() => import("./pages/GameLanding"));
 const Tutorials = lazy(() => import("./pages/Tutorials"));
-const Docs = lazy(() => import("./pages/Docs"));
 const Guides = lazy(() => import("./pages/Guides"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const AntiCheatGuide = lazy(() => import("./pages/AntiCheatGuide"));
@@ -87,7 +86,6 @@ const App = () => (
                   <Route path="/scripts/:slug" element={<ScriptDetail />} />
                   <Route path="/games/:game" element={<GameLanding />} />
                   <Route path="/tutorials" element={<Tutorials />} />
-                  <Route path="/docs" element={<Docs />} />
                   <Route path="/guides" element={<Guides />} />
                   <Route path="/changelog" element={<Changelog />} />
                   <Route path="/anti-cheat-guide" element={<AntiCheatGuide />} />

@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { redisGet, redisSet } from "../_shared/redis.ts";
 
-const SITEMAP_CACHE_KEY = "sitemap:xml:v2";
+const SITEMAP_CACHE_KEY = "sitemap:xml:v3";
 const SITEMAP_TTL = 900; // 15 min
 let memCache: { at: number; xml: string } | null = null;
 
@@ -12,7 +12,6 @@ const STATIC_PAGES = [
   { loc: "/about", changefreq: "monthly", priority: "0.8" },
   { loc: "/scripts", changefreq: "daily", priority: "0.9" },
   { loc: "/tutorials", changefreq: "monthly", priority: "0.7" },
-  { loc: "/docs", changefreq: "monthly", priority: "0.7" },
   { loc: "/guides", changefreq: "monthly", priority: "0.7" },
   { loc: "/changelog", changefreq: "monthly", priority: "0.5" },
   { loc: "/anti-cheat-guide", changefreq: "monthly", priority: "0.6" },
