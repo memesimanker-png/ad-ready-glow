@@ -35,13 +35,6 @@ const guides = [
     readTime: "10 min read",
   },
   {
-    title: "Premium Key System Documentation",
-    description: "Technical deep-dive on how Combo_WICK's HWID-locked key system works under the hood — key generation, hardware fingerprinting, expiry handling, the dashboard activation flow, and the API endpoints used by partner script authors.",
-    icon: BookOpen,
-    link: "/docs",
-    readTime: "12 min read",
-  },
-  {
     title: "Account Safety Best Practices",
     description: "Why you should always use an alt account for testing scripts, how to set up 2-factor authentication on Roblox, recognizing phishing attempts that target script users, and what to do if your main account gets compromised.",
     icon: Shield,
@@ -87,7 +80,7 @@ export default function Guides() {
           <Card className="p-6 mb-10 bg-primary/5 border-primary/20">
             <h2 className="font-heading text-lg font-semibold mb-2">New to Roblox scripting?</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Start with the <Link to="/docs" className="text-primary hover:underline">Getting Started docs</Link>, then read the <Link to="/executors" className="text-primary hover:underline">Executor Compatibility Guide</Link> to pick the right tool for your device. Once you've run your first script successfully, the <Link to="/tutorials" className="text-primary hover:underline">Lua Scripting Tutorials</Link> are the natural next step if you want to start writing your own.
+              Start with the <Link to="/executors" className="text-primary hover:underline">Executor Compatibility Guide</Link> to pick the right tool for your device. Once you've run your first script successfully, the <Link to="/tutorials" className="text-primary hover:underline">Lua Scripting Tutorials</Link> are the natural next step if you want to start writing your own.
             </p>
           </Card>
 
