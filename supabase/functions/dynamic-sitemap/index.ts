@@ -12,7 +12,6 @@ const STATIC_PAGES = [
   { loc: "/about", changefreq: "monthly", priority: "0.8" },
   { loc: "/scripts", changefreq: "daily", priority: "0.9" },
   { loc: "/tutorials", changefreq: "monthly", priority: "0.7" },
-  { loc: "/docs", changefreq: "monthly", priority: "0.7" },
   { loc: "/guides", changefreq: "monthly", priority: "0.7" },
   { loc: "/changelog", changefreq: "monthly", priority: "0.5" },
   { loc: "/anti-cheat-guide", changefreq: "monthly", priority: "0.6" },
