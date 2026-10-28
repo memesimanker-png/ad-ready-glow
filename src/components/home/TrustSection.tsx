@@ -10,7 +10,7 @@ const stats = [
   { icon: BadgeCheck, label: "Rscripts Status", value: "Verified Mythic Creator" },
   { icon: Eye, label: "Script Views", value: "6.7M+" },
   { icon: MessageCircle, label: "Discord Members", value: "50k+" },
-  { icon: Youtube, label: "Channel", value: "@COMBO_WICK" },
+  { icon: Youtube, label: "Channel", value: "@Triple_WICK" },
 ];
 
 export function TrustSection() {
@@ -59,7 +59,7 @@ export function TrustSection() {
               <BadgeCheck className="mr-2 h-4 w-4" /> Verify on Rscripts
             </Button>
           </a>
-          <a href="https://www.youtube.com/@COMBO_WICK" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.youtube.com/@Triple_WICK" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" className="uppercase tracking-wider border-bronze/30 hover:bg-bronze/10 hover:text-bronze-light">
               <Youtube className="mr-2 h-4 w-4" /> Watch on YouTube
             </Button>

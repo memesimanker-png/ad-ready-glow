@@ -68,7 +68,7 @@ export default function Contact() {
     <Layout>
       <SEOHead
         title="Contact ComboWick — Discord, YouTube & Message Form"
-        description="Reach the ComboWick team via Discord support, YouTube @COMBO_WICK, or a tracked message about premium keys, scripts, and Lua tutorials."
+        description="Reach the ComboWick team via Discord support, YouTube @Triple_WICK, or a tracked message about premium keys, scripts, and Lua tutorials."
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: "Contact", url: "/contact" },
@@ -88,7 +88,7 @@ export default function Contact() {
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
               { icon: MessageSquare, title: "Discord (Fastest)", desc: "Our 50k+ Discord server replies within minutes during peak hours.", contact: "Join the Discord", href: "https://discord.com/invite/ufrz9Zaqs8" },
-              { icon: Youtube, title: "YouTube — @COMBO_WICK", desc: "Script reviews, tutorials, executor showcases, and weekly updates.", contact: "youtube.com/@COMBO_WICK", href: "https://www.youtube.com/@COMBO_WICK" },
+              { icon: Youtube, title: "YouTube — @Triple_WICK", desc: "Script reviews, tutorials, executor showcases, and weekly updates.", contact: "youtube.com/@Triple_WICK", href: "https://www.youtube.com/@Triple_WICK" },
               { icon: Clock, title: "Response Times", desc: "Discord under 30 min during peak hours. Tracked messages within 24h on weekdays. Premium key activation is always prioritized.", contact: null, href: null },
             ].map(({ icon: Icon, title, desc, contact, href }) => (
               <Card key={title} className="p-6 bg-glass">

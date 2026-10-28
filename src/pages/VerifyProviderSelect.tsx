@@ -13,7 +13,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { getTodaySchedule } from "@/lib/day-schedule";
 
 
-const YOUTUBE_URL = "https://www.youtube.com/@COMBO_WICK";
+const YOUTUBE_URL = "https://www.youtube.com/@Triple_WICK";
 const DISCORD_URL = "https://discord.com/invite/9FWBQnVXCy";
 const SUBSCRIPTION_GATE_DURATION_DAYS = 7;
 const WAIT_TIME_SECONDS = 3;
