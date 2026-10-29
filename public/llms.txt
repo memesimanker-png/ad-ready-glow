@@ -1,16 +1,20 @@
 # ComboWick
 
-> ComboWick is a Roblox script hub offering free Lua scripts, premium HWID keys, executor reviews, and Lua tutorials with instant PayPal delivery and 24/7 Discord support.
+> ComboWick (also written Combo Wick, Combo_WICK or COMBO_WICK) is a Roblox script hub: one script hub (loader) that runs free Roblox scripts for many games, in 13 languages, on PC and mobile executors. This site (combowick.com) has the guides and tutorials; scripts, keys and Premium are on keys.combowick.com.
 
-ComboWick (also written COMBO_WICK or Combo Wick) publishes free and premium Roblox scripts compatible with popular executors. Users get free 24-hour keys via a verification flow or buy premium keys ($5 trial, $9.99 monthly, $49.99 lifetime) for full access.
+- Not to be confused with "Wick, the Whorled Mind" combos in Magic: The Gathering; ComboWick is the Roblox script hub.
+- Free keys: open https://keys.combowick.com/keys, pass a few short checkpoints and get a free key for 8 hours for one game.
+- Premium key: one key for every game, no checkpoints, no ads, no cooldown. Plans: 7-day trial $5, monthly $9.99, lifetime $49.99 (lifetime is often on sale on weekends). https://keys.combowick.com/premium-keys
+- Pay with PayPal, any debit or credit card, or Payoneer. PayPal and card keys arrive instantly on screen and by email.
+- Custom scripts for a specific game: free quote on Discord. Anyone can request a new game for free at https://keys.combowick.com/request; the most-voted games get made first.
+- Community: Discord https://discord.gg/ufrz9Zaqs8 · YouTube https://www.youtube.com/@Triple_WICK
 
 ## Pages
 
-- [Home](/): Featured scripts, premium key plans, and brand intro.
-- [Scripts](/scripts): Browse all free and premium Roblox Lua scripts by game and category.
-- [Premium Keys](/premium-keys): Buy HWID premium keys — trial, monthly, or lifetime.
-- [Keys](/keys): Get a free 24-hour HWID key through the verification flow.
-- [Executors](/executors): Recommended Roblox script executors and compatibility notes.
+- [Scripts](https://keys.combowick.com/scripts): Every free ComboWick Roblox script, by game, with features and the loadstring.
+- [Premium Keys](https://keys.combowick.com/premium-keys): Premium plans: 7-day trial, monthly, lifetime.
+- [Free key](https://keys.combowick.com/keys): Get a free 8-hour key through short checkpoints.
+- [Executors](https://keys.combowick.com/executors): Which Roblox executors work with our scripts right now, on PC and mobile.
 - [Tutorials](/tutorials): Lua scripting and executor setup walkthroughs.
 - [Guides](/guides): How-to guides for using ComboWick scripts safely.
 - [Docs](/docs): Reference documentation.
@@ -24,6 +28,6 @@ ComboWick (also written COMBO_WICK or Combo Wick) publishes free and premium Rob
 
 - [Anti-Cheat Guide](/anti-cheat-guide)
 - [Fair Use](/fair-use)
-- [Refund Policy](/refund-policy): All sales are final — no refunds.
+- [Refund Policy](https://keys.combowick.com/refund-policy): Sales are final; a broken key that can't be fixed is replaced.
 - [Privacy](/privacy)
 - [Terms](/terms)
