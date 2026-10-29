@@ -96,6 +96,14 @@
       "destination": "/ko/roblox/:page.html"
     },
     {
+      "source": "/ar/roblox",
+      "destination": "/ar/roblox/index.html"
+    },
+    {
+      "source": "/ar/roblox/:page",
+      "destination": "/ar/roblox/:page.html"
+    },
+    {
       "source": "/((?!api/|assets/|images/|videos/|.*\\.(?:xml|txt|json|js|css|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|otf|mp4|webmanifest|html)).*)",
       "destination": "/index.html"
     }
